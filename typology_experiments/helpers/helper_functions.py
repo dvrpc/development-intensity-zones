@@ -47,6 +47,8 @@ def duplicate_state_key(new_geo_key_values):
 
     df = state_key.copy()  # Makes a copy of _resources.state_key
 
+    df = df.astype(str)  # Makes all columns in the _resources.state_key copy string
+
     df[
         "geo_key"
     ] = new_geo_key_values  # Overwrites the geo_key column of the _resources.state_key copy with the user's input
