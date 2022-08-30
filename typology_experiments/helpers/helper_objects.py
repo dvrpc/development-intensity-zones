@@ -16,7 +16,9 @@ county_id_3dig_values = [
     [
         item
         for sublist in db.query(
-            "SELECT DISTINCT county_id_3dig FROM _resources.county_key WHERE state_id = '" + i + "'"
+            "SELECT DISTINCT county_id_3dig FROM _resources.county_key WHERE state_id = '"
+            + str(i)
+            + "'"
         )
         for item in sublist
     ]
