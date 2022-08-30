@@ -9,11 +9,11 @@ import requests
 
 from io import BytesIO
 
-import pdfplumber
+import pdfplumber  # FIRST HAD TO RUN "conda activate typology-experiments" AND THEN 'python -m pip install "pdfplumber"' BEFORE RUNNING THIS COMMAND
 
 import re
 
-import gspread
+import gspread  # FIRST HAD TO RUN "conda activate typology-experiments" AND THEN 'python -m pip install "gspread"' BEFORE RUNNING THIS COMMAND
 
 import os
 
