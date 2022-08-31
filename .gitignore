@@ -1,7 +1,7 @@
 *.egg-info
 __pycache__
 .env
-script_comments\
+script_comments/
 
 *.ipynb
 
