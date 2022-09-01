@@ -12,6 +12,8 @@ import requests
 
 import io
 
+import fiona
+
 
 from typology_experiments import Database, DATABASE_URL
 
@@ -43,27 +45,36 @@ lodes7_urls = [
     "https://lehd.ces.census.gov/data/lodes/LODES7/pa/wac/pa_wac_S000_JT00_2018.csv.gz",
 ]  # Creates a list of the URLs to use to get the LODES7 "wac_S000_JT00_2018" CSV GZ files for each state (DE, MD, NJ and PA)
 
-lodes7_data_list = [
+lodes7_tables_list = [
     pd.read_csv(gzip.open(io.BytesIO(requests.get(i).content))) for i in lodes7_urls
 ]  # Streams in those LODES7 tables from their CSV GZ files
 
 
-dvrpc_land_use_2015 = gpd.read_file(
+dvrpc_land_use_2015_filtered = gpd.read_file(
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*"
 ).to_crs(
     crs="EPSG:32618"
-)  # Reads in as a geo data frame/shapefile in the standard DVRPC EPSG a FILTERED GIS server link containing just the records I want from the 2015 DVRPC land use inventory
+)  # Streams in as a geo data frame/shapefile in the standard DVRPC EPSG a FILTERED GIS server link containing just the records I want from the 2015 DVRPC land use inventory
 
 
 dvrpc_pos_2020 = gpd.read_file(
     "P:/15-44-070 Environmental Planning/GIS Data/Open Space Inventory/Final Layers POS 2020/2020_CompleteRegion_POS.shp"
-)  # Brings in the entire 2020 DVRPC protected open space inventory
+)  # Reads in the entire 2020 DVRPC protected open space inventory
 
 
-b  # Bring in the features from  G:\Shared drives\Long Range Plan\2050B Plan\Centers Update\typology_experiments\Shapes\POS.gdb
+pos_gdb_feature_classes_list = [
+    gpd.read_file(
+        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb",
+        layer=feature_class,
+    )
+    for feature_class in fiona.listlayers(
+        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb"
+    )
+]  # Reads in all of the feature classes in the POS geodatabase as a list of geo data frame/shapefiles
 
 
-b  # Bring in DVRPC block group polygons?
+b  # Stream in just the DVRPC block group polygons, or all of Delaware, Maryland, New Jersey and Pennsylvania's block group polygons? - I ASKED BEN THIS
 
 
-b  # Load all the data I gathered above into the typology_experiments Postgres database
+b  # Load all the data I gathered above into the typology_experiments Postgres database (FIRST MAKE A DICTIONARY OF THE NON-SPATIAL TABLES, THEN MAKE A DICTIONARY OF THE GEO DATA
+# FRAMES/SHAPEFILES, THEN LOAD IN THE VALUES OF EACH DICTIONARY INTO _raw SEPARATELY)
