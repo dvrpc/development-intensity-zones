@@ -73,7 +73,10 @@ pos_gdb_feature_classes_list = [
 ]  # Reads in all of the feature classes in the POS geodatabase as a list of geo data frame/shapefiles
 
 
-b  # Stream in just the DVRPC block group polygons, or all of Delaware, Maryland, New Jersey and Pennsylvania's block group polygons? - I ASKED BEN THIS
+b  # Stream in all of Delaware, Maryland, New Jersey and Pennsylvania's BLOCK polygons
+
+
+b  # Stream in all of Delaware, Maryland, New Jersey and Pennsylvania's BLOCK GROUP polygons
 
 
 b  # Load all the data I gathered above into the typology_experiments Postgres database (FIRST MAKE A DICTIONARY OF THE NON-SPATIAL TABLES, THEN MAKE A DICTIONARY OF THE GEO DATA
