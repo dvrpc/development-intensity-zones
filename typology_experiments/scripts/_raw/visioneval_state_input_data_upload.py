@@ -6,15 +6,11 @@ import pandas as pd
 
 import geopandas as gpd
 
-import esri2gpd  # FIRST HAD TO RUN "conda activate typology-experiments" AND THEN 'python -m pip install "esri2gpd"' BEFORE RUNNING THIS COMMAND
-
 import gzip
 
 import requests
 
 import io
-
-import pyproj  # This and the pyproj.datadir.set_data_dir() command solve an error that came up later when the nbi_tables_creation_year shapefile was first made
 
 
 from typology_experiments import Database, DATABASE_URL
@@ -25,11 +21,6 @@ db = Database(DATABASE_URL)
 from typology_experiments.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE
 
 # "from typology_experiments import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
-
-
-pyproj.datadir.set_data_dir(
-    "C:/Users/ISchwarzenberg/Miniconda3/envs/tracking-progress/Library/share/proj"
-)
 
 
 api_urls = [
@@ -57,22 +48,16 @@ lodes7_data_list = [
 ]  # Streams in those LODES7 tables from their CSV GZ files
 
 
-b  # Bring in the records from the 2015 DVRPC land use inventory where lu15sub = '13000'
-
-"""
-dvrpc_land_use_2015 = gpd.read_file("https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*")
-
-dvrpc_land_use_2015 = esri2gpd.get(
+dvrpc_land_use_2015 = gpd.read_file(
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*"
 ).to_crs(
     crs="EPSG:32618"
-)  # FIX THE ERROR THAT'S HERE WHEN I COME BACK HERE: Reads in as a geo data frame/shapefile in the standard DVRPC EPSG a GIS server link containing just the records I want from the 2015 DVRPC land use inventory
-"""
+)  # Reads in as a geo data frame/shapefile in the standard DVRPC EPSG a FILTERED GIS server link containing just the records I want from the 2015 DVRPC land use inventory
 
 
 dvrpc_pos_2020 = gpd.read_file(
     "P:/15-44-070 Environmental Planning/GIS Data/Open Space Inventory/Final Layers POS 2020/2020_CompleteRegion_POS.shp"
-)  # FIX THE ERROR THAT'S HERE WHEN I COME BACK HERE: Brings in the entire 2020 DVRPC protected open space inventory
+)  # Brings in the entire 2020 DVRPC protected open space inventory
 
 
 b  # Bring in the features from  G:\Shared drives\Long Range Plan\2050B Plan\Centers Update\typology_experiments\Shapes\POS.gdb
