@@ -64,7 +64,9 @@ tables_to_upload_dictionary = {
 }  # Creates a dictionary of just the tables to upload
 
 
-for tablename, df in tables_to_upload_dictionary.items():
+[
     db.import_dataframe(
         df, f"_resources.{tablename}", df_import_kwargs={"if_exists": "replace", "index": False}
-    )  # Loads all the tables into the _resources schema of the database
+    )
+    for tablename, df in tables_to_upload_dictionary.items()
+]  # Loads all the tables into the _resources schema of the database
