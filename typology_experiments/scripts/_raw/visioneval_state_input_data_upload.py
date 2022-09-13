@@ -243,7 +243,7 @@ shps_to_upload_dictionary = dict(
 db.import_geodataframe(
     values_for_shps_to_upload_dictionary[2], keys_for_shps_to_upload_dictionary[2], schema="_raw"
 )  # COME BACK HERE WHEN I COME BACK TO THIS TO CONTINUE EXPLORING THE CAUSES OF ERRORS HERE
-test_shp = gpd.read_file("P:/ISchwarzenberg/LRP/Miscellaneous_Testing/NJ_POS_Shapefile.shp")
+
 """
 [
     db.import_geodataframe(
