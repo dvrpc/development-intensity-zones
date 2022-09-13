@@ -18,8 +18,6 @@ import zipfile
 
 import tempfile
 
-from collections import Counter
-
 
 from typology_experiments import Database, DATABASE_URL
 
@@ -90,6 +88,7 @@ dvrpc_shplist = [
 ]  # Streams in as geo data frames/shapefiles: A FILTERED GIS server link containing just the records I want from the 2015 DVRPC land use inventory, and the entire 2020 DVRPC
 # protected open space inventory, and puts both of them into a list
 
+
 dvrpc_shplist = [
     i.explode(ignore_index=True) for i in dvrpc_shplist
 ]  # Turns multipolygon geometries into regular polygon geometries in both geo data frames/shapefiles. This solves errors when importing the geo data frames/shapefiles into the
@@ -107,7 +106,10 @@ dvrpc_shpkeylist = [
 
 pos_gdb_shpkeylist = fiona.listlayers(
     "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb"
-)  # Gets just the names of each feature class/the keys for the dictionary by simply getting the name of each feature class in the POS geodatabase
+)[
+    1:
+]  # Gets just the names of each feature class/the keys for the dictionary by simply getting the name of each feature class in the POS geodatabase, EXCEPT FOR NJ_POS WHICH
+# HAS 3-DIMENSIONAL POLYGONS WHICH I DON'T WANT
 
 pos_gdb_shplist = [
     gpd.read_file(
@@ -115,7 +117,9 @@ pos_gdb_shplist = [
         layer=feature_class,
     )
     for feature_class in pos_gdb_shpkeylist
-]  # Reads in all of the feature classes in the POS geodatabase as a list of geo data frame/shapefiles
+]  # Reads in all of the feature classes in the POS geodatabase EXCEPT FOR NJ_POS as a list of geo data frame/shapefiles
+
+nj_pos = b
 
 pos_gdb_shplist = [
     i.to_crs(crs="EPSG:32618") for i in pos_gdb_shplist
@@ -239,6 +243,17 @@ shps_to_upload_dictionary = dict(
 db.import_geodataframe(
     values_for_shps_to_upload_dictionary[2], keys_for_shps_to_upload_dictionary[2], schema="_raw"
 )  # COME BACK HERE WHEN I COME BACK TO THIS TO CONTINUE EXPLORING THE CAUSES OF ERRORS HERE
+test_shp = gpd.read_file("P:/ISchwarzenberg/LRP/Miscellaneous_Testing/NJ_POS_Shapefile.shp")
+"""
+[
+    db.import_geodataframe(
+        values_for_shps_to_upload_dictionary[i],
+        keys_for_shps_to_upload_dictionary[i],
+        schema="_raw",
+    )
+    for i in list(range(len(values_for_shps_to_upload_dictionary)))
+]
+"""
 
 """
 for tablename, df in shps_to_upload_dictionary.items():
