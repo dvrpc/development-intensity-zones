@@ -142,12 +142,12 @@ blocks_and_bgs_shplist = [
 ]
 
 blocks_and_bgs_shplist = [
-    i.to_crs(crs="EPSG:32618") for i in blocks_and_bgs_shplist
-]  # Puts all of those shapefiles in the standard DVRPC EPSG
-
-blocks_and_bgs_shplist = [
     i.explode(ignore_index=True) for i in blocks_and_bgs_shplist
 ]  # Turns multipolygon geometries into regular polygon geometries in all of the geo data frames/shapefiles
+
+blocks_and_bgs_shplist = [
+    i.to_crs(crs="EPSG:32618") for i in blocks_and_bgs_shplist
+]  # Puts all of those shapefiles in the standard DVRPC EPSG
 
 blocks_and_bgs_shpkeylist = [
     re.sub(".*\/|\..*", "", i) for i in blocks_and_bgs_shps_urls
