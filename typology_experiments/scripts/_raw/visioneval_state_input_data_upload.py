@@ -149,12 +149,12 @@ blocks_and_bgs_shplist = [
     i.explode(ignore_index=True) for i in blocks_and_bgs_shplist
 ]  # Turns multipolygon geometries into regular polygon geometries in all of the geo data frames/shapefiles
 
-blocks_and_bgs_shps_shpkeylist = [
+blocks_and_bgs_shpkeylist = [
     re.sub(".*\/|\..*", "", i) for i in blocks_and_bgs_shps_urls
 ]  # Gets the keys for the dictionary by extracting just the shapefile names from blocks_and_bgs_shps_urls
 
 """
-blocks_and_bgs_shps_shpkeylist = [
+blocks_and_bgs_shpkeylist = [
     re.sub(".*\\\|\.shp", "", i)
     for i in [
         tempfile.gettempdir() + "\\" + i
@@ -166,29 +166,10 @@ blocks_and_bgs_shps_shpkeylist = [
 """
 
 
-keys_for_nonspatial_tables_to_upload_dictionary = {
-    k: v for (k, v) in locals().items() if "_tablekeylist" in k
-}  # First puts the lists that contain the keys for the eventual dictionary of non-spatial tables to upload to the database/the eventual non-spatial table names into their own
-# dictionary
-
-keys_for_nonspatial_tables_to_upload_dictionary = [
-    s for l in list(keys_for_nonspatial_tables_to_upload_dictionary.values()) for s in l
-]  # Then makes that dictionary's values into a big list of all the keys, thereby getting the final list of keys for the eventual dictionary of non-spatial tables to upload to
-# the database/ the eventual non-spatial table names
-
-values_for_nonspatial_tables_to_upload_dictionary = {
-    k: v for (k, v) in locals().items() if "_tablelist" in k
-}  # This and the next command then repeat the process, but for the values for the eventual dictionary of non-spatial tables to upload to the database/the eventual non-spatial
-# table names
-
-values_for_nonspatial_tables_to_upload_dictionary = [
-    s for l in list(values_for_nonspatial_tables_to_upload_dictionary.values()) for s in l
-]
-
 nonspatial_tables_to_upload_dictionary = dict(
     zip(
-        keys_for_nonspatial_tables_to_upload_dictionary,
-        values_for_nonspatial_tables_to_upload_dictionary,
+        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist,
+        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist,
     )
 )  # Creates the dictionary of tables to upload to the database/the eventual table names
 
@@ -197,30 +178,19 @@ for tablename, df in nonspatial_tables_to_upload_dictionary.items():
         df, f"_raw.{tablename}", df_import_kwargs={"if_exists": "replace", "index": False}
     )  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
 
-keys_for_shps_to_upload_dictionary = {
-    k: v for (k, v) in locals().items() if "_shpkeylist" in k
-}  # This and the next 5 commands essentially repeat the process, but for spatial tables/geo data frames/shapefiles
-
-keys_for_shps_to_upload_dictionary = [
-    s for l in list(keys_for_shps_to_upload_dictionary.values()) for s in l
-]
-
-values_for_shps_to_upload_dictionary = {k: v for (k, v) in locals().items() if "_shplist" in k}
-
-values_for_shps_to_upload_dictionary = [
-    s for l in list(values_for_shps_to_upload_dictionary.values()) for s in l
-]
 
 shps_to_upload_dictionary = dict(
     zip(
-        keys_for_shps_to_upload_dictionary,
-        values_for_shps_to_upload_dictionary,
+        pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
+        pos_and_land_use_shplist + blocks_and_bgs_shplist,
     )
-)
+)  # This and the next command repeat the process, but for spatial tables/geo data frames/shapefiles
 
+"""
 db.import_geodataframe(
     values_for_shps_to_upload_dictionary[2], keys_for_shps_to_upload_dictionary[2], schema="_raw"
 )  # COME BACK HERE WHEN I COME BACK TO THIS TO CONTINUE EXPLORING THE CAUSES OF ERRORS HERE
+"""
 
 """
 [
@@ -233,7 +203,5 @@ db.import_geodataframe(
 ]
 """
 
-"""
 for tablename, df in shps_to_upload_dictionary.items():
     db.import_geodataframe(df, f"{tablename}", schema="_raw")
-"""
