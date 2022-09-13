@@ -78,6 +78,21 @@ lodes7_tablekeylist = [
 ]  # Creates the keys for the dictionary by extracting just the CSV names from lodes7_tables_urls
 
 
+nonspatial_tables_to_upload_dictionary = dict(
+    zip(
+        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist,
+        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist,
+    )
+)  # Creates the dictionary of tables to upload to the database/the eventual table names
+
+[
+    db.import_dataframe(
+        df, f"_raw.{tablename}", df_import_kwargs={"if_exists": "replace", "index": False}
+    )
+    for tablename, df in nonspatial_tables_to_upload_dictionary.items()
+]  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
+
+
 pos_and_land_use_shpkeylist = ["dvrpc_land_use_2015_lu15sub_13000", "dvrpc_pos_2020",] + [
     i.lower()
     for i in fiona.listlayers(
@@ -90,7 +105,7 @@ pos_and_land_use_shp_links = [
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_ProtectedOpenSpace/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
     "https://mapsdep.nj.gov/arcgis/rest/services/Features/Land/MapServer/65/query?outFields=*&where=1%3D1&f=geojson",
     "https://cecilmaps.org/arcgis/rest/services/ConsolidatedWebService/MapServer/24/query?outFields=*&where=1%3D1&f=geojson",
-    "del_river_basin_pos",
+    "https://mapservices.pasda.psu.edu/server/rest/services/pasda/WeConservePA/MapServer/17/query?outFields=*&where=1%3D1&f=geojson",
     "https://gis.chesapeakebay.net/server/rest/services/ChesapeakeProgress/cpProtectedLands_2018/MapServer/0/query?outFields=*&where=1%3D1&f=geojson",
 ]  # Creates a list that contains the links to the POS and land use shapefiles
 
@@ -150,33 +165,14 @@ blocks_and_bgs_shplist = [
 ]  # Puts all of those shapefiles in the standard DVRPC EPSG
 
 blocks_and_bgs_shpkeylist = [
-    re.sub(".*\/|\..*", "", i) for i in blocks_and_bgs_shps_urls
-]  # Gets the keys for the dictionary by extracting just the shapefile names from blocks_and_bgs_shps_urls
-
-"""
-blocks_and_bgs_shpkeylist = [
     re.sub(".*\\\|\.shp", "", i)
     for i in [
         tempfile.gettempdir() + "\\" + i
         for i in [x for x in os.listdir(tempfile.gettempdir()) if x.endswith(".shp")]
     ]
-]  # Gets just the name of each shapefile/the keys for the dictionary by extracting the name of each shapefile from the file name by getting rid 
-# of the ".shp"'s from each file name (NOTE THAT THE KEYS CREATION HAS TO BE DONE THIS WAY AS OPPOSED TO BASED OFF THE URLS IN THIS CASE, SINCE THE ORDER THE SHAPEFILES DOWNLOAD 
-# IN VARY FROM THE WAY THEY'RE ORDERED IN THE blocks_and_bgs_shps_urls LIST)
-"""
-
-
-nonspatial_tables_to_upload_dictionary = dict(
-    zip(
-        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist,
-        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist,
-    )
-)  # Creates the dictionary of tables to upload to the database/the eventual table names
-
-for tablename, df in nonspatial_tables_to_upload_dictionary.items():
-    db.import_dataframe(
-        df, f"_raw.{tablename}", df_import_kwargs={"if_exists": "replace", "index": False}
-    )  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
+]  # Gets just the name of each shapefile/the keys for the dictionary by extracting the name of each shapefile from the file name by getting rid of the ".shp"'s from each file
+# name (NOTE THAT THE KEYS CREATION HAS TO BE DONE THIS WAY AS OPPOSED TO BASED OFF THE URLS IN THIS CASE, SINCE THE ORDER THE SHAPEFILES DOWNLOAD IN VARY FROM THE WAY THEY'RE
+# ORDERED IN THE blocks_and_bgs_shps_urls LIST)
 
 
 shps_to_upload_dictionary = dict(
@@ -184,24 +180,9 @@ shps_to_upload_dictionary = dict(
         pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
         pos_and_land_use_shplist + blocks_and_bgs_shplist,
     )
-)  # This and the next command repeat the process, but for spatial tables/geo data frames/shapefiles
+)  # This and the next command repeat the process that was used for the non-spatial tables, but for the spatial tables/geo data frames/shapefiles
 
-"""
-db.import_geodataframe(
-    values_for_shps_to_upload_dictionary[2], keys_for_shps_to_upload_dictionary[2], schema="_raw"
-)  # COME BACK HERE WHEN I COME BACK TO THIS TO CONTINUE EXPLORING THE CAUSES OF ERRORS HERE
-"""
-
-"""
 [
-    db.import_geodataframe(
-        values_for_shps_to_upload_dictionary[i],
-        keys_for_shps_to_upload_dictionary[i],
-        schema="_raw",
-    )
-    for i in list(range(len(values_for_shps_to_upload_dictionary)))
-]
-"""
-
-for tablename, df in shps_to_upload_dictionary.items():
     db.import_geodataframe(df, f"{tablename}", schema="_raw")
+    for tablename, df in shps_to_upload_dictionary.items()
+]
