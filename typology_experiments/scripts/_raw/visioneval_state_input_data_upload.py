@@ -6,13 +6,13 @@ import pandas as pd
 
 import geopandas as gpd
 
+import fiona
+
 import gzip
 
 import requests
 
 import io
-
-import fiona
 
 import zipfile
 
@@ -78,56 +78,34 @@ lodes7_tablekeylist = [
 ]  # Creates the keys for the dictionary by extracting just the CSV names from lodes7_tables_urls
 
 
-dvrpc_shplist = [
-    gpd.read_file(
-        "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*"
-    ),
-    gpd.read_file(
-        "P:/15-44-070 Environmental Planning/GIS Data/Open Space Inventory/Final Layers POS 2020/2020_CompleteRegion_POS.shp"
-    ),
-]  # Streams in as geo data frames/shapefiles: A FILTERED GIS server link containing just the records I want from the 2015 DVRPC land use inventory, and the entire 2020 DVRPC
-# protected open space inventory, and puts both of them into a list
+pos_and_land_use_shpkeylist = ["dvrpc_land_use_2015_lu15sub_13000", "dvrpc_pos_2020",] + [
+    i.lower()
+    for i in fiona.listlayers(
+        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb"
+    )
+]  # Creates the keys for the dictionary
 
+pos_and_land_use_shp_links = [
+    "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*",
+    "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_ProtectedOpenSpace/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
+    "https://mapsdep.nj.gov/arcgis/rest/services/Features/Land/MapServer/65/query?outFields=*&where=1%3D1&f=geojson",
+    "https://cecilmaps.org/arcgis/rest/services/ConsolidatedWebService/MapServer/24/query?outFields=*&where=1%3D1&f=geojson",
+    "del_river_basin_pos",
+    "https://gis.chesapeakebay.net/server/rest/services/ChesapeakeProgress/cpProtectedLands_2018/MapServer/0/query?outFields=*&where=1%3D1&f=geojson",
+]  # Creates a list that contains the links to the POS and land use shapefiles
 
-dvrpc_shplist = [
-    i.explode(ignore_index=True) for i in dvrpc_shplist
+pos_and_land_use_shplist = [
+    gpd.read_file(i) for i in pos_and_land_use_shp_links
+]  # Streams in as geo data frames/shapefiles those links and puts them into a list
+
+pos_and_land_use_shplist = [
+    i.explode(ignore_index=True) for i in pos_and_land_use_shplist
 ]  # Turns multipolygon geometries into regular polygon geometries in both geo data frames/shapefiles. This solves errors when importing the geo data frames/shapefiles into the
 # database later
 
-dvrpc_shplist = [
-    i.to_crs(crs="EPSG:32618") for i in dvrpc_shplist
+pos_and_land_use_shplist = [
+    i.to_crs(crs="EPSG:32618") for i in pos_and_land_use_shplist
 ]  # Puts both of those shapefiles in the standard DVRPC EPSG if they aren't in it already
-
-dvrpc_shpkeylist = [
-    "dvrpc_land_use_2015_lu15sub_13000",
-    "dvrpc_pos_2020",
-]  # Creates the keys for the dictionary
-
-
-pos_gdb_shpkeylist = fiona.listlayers(
-    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb"
-)[
-    1:
-]  # Gets just the names of each feature class/the keys for the dictionary by simply getting the name of each feature class in the POS geodatabase, EXCEPT FOR NJ_POS WHICH
-# HAS 3-DIMENSIONAL POLYGONS WHICH I DON'T WANT
-
-pos_gdb_shplist = [
-    gpd.read_file(
-        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb",
-        layer=feature_class,
-    )
-    for feature_class in pos_gdb_shpkeylist
-]  # Reads in all of the feature classes in the POS geodatabase EXCEPT FOR NJ_POS as a list of geo data frame/shapefiles
-
-nj_pos = b
-
-pos_gdb_shplist = [
-    i.to_crs(crs="EPSG:32618") for i in pos_gdb_shplist
-]  # Puts all of those feature classes in the standard DVRPC EPSG if they aren't already
-
-pos_gdb_shplist = [
-    i.explode(ignore_index=True) for i in pos_gdb_shplist
-]  # Turns multipolygon geometries into regular polygon geometries in all of the geo data frames/shapefiles
 
 
 blocks_and_bgs_shps_urls = [
