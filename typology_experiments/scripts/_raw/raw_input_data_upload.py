@@ -103,10 +103,6 @@ pos_and_land_use_shpkeylist = ["dvrpc_land_use_2015_lu15sub_13000", "dvrpc_pos_2
 pos_and_land_use_shp_links = [
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*",
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_ProtectedOpenSpace/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
-    "https://mapsdep.nj.gov/arcgis/rest/services/Features/Land/MapServer/65/query?outFields=*&where=1%3D1&f=geojson",
-    "https://cecilmaps.org/arcgis/rest/services/ConsolidatedWebService/MapServer/24/query?outFields=*&where=1%3D1&f=geojson",
-    "https://mapservices.pasda.psu.edu/server/rest/services/pasda/WeConservePA/MapServer/17/query?outFields=*&where=1%3D1&f=geojson",
-    "https://gis.chesapeakebay.net/server/rest/services/ChesapeakeProgress/cpProtectedLands_2018/MapServer/0/query?outFields=*&where=1%3D1&f=geojson",
 ]  # Creates a list that contains the links to the POS and land use shapefiles
 
 pos_and_land_use_shplist = [
