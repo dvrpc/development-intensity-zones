@@ -1,3 +1,5 @@
+drop table if exists density.block_groups_dvrpc_2020;
+
 create table density.block_groups_dvrpc_2020 as
 with
 	block_groups_state_34_2020 as (
@@ -47,4 +49,6 @@ with
         	left join dvrpc_county_id_5dig_values d
             on b.county_id_5dig = d.county_id_5dig
     )
-select "STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE", "GEOID", "NAMELSAD", "ALAND", "AWATER", geom from block_groups_nj_pa_2020_with_in_dvrpc_flag where in_dvrpc='Yes'
+    
+    
+    select "STATEFP", "COUNTYFP", "TRACTCE", "BLKGRPCE", "GEOID", "NAMELSAD", "ALAND", "AWATER", geom from block_groups_nj_pa_2020_with_in_dvrpc_flag where in_dvrpc='Yes'
