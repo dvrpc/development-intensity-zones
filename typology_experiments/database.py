@@ -234,6 +234,19 @@ class Database:
 
         return df
 
+    def get_geodataframe_from_query(self, query: str) -> gpd.GeoDataFrame:
+        """
+        - Return a `geopandas.GeoDataFrame` from a SQL query
+        """
+
+        engine = sqlalchemy.create_engine(self.uri)
+
+        gdf = gpd.GeoDataFrame.from_postgis(query, engine)
+
+        engine.dispose()
+
+        return gdf
+
 
 if __name__ == "__main__":
 
