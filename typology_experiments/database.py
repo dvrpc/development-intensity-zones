@@ -201,6 +201,7 @@ class Database:
             new_tablename,
             engine,
             schema=schema,
+            index=False,
             dtype={"geom": Geometry(geom_type_to_use, srid=epsg_code)},
             if_exists="replace",
         )
