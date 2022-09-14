@@ -93,11 +93,9 @@ nonspatial_tables_to_upload_dictionary = dict(
 ]  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
 
 
-pos_and_land_use_shpkeylist = ["dvrpc_2015_water", "dvrpc_2020_pos",] + [
-    i.lower()
-    for i in fiona.listlayers(
-        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/Shapes/POS.gdb"
-    )
+pos_and_land_use_shpkeylist = [
+    "dvrpc_2015_water",
+    "dvrpc_2020_pos",
 ]  # Creates the keys for the dictionary
 
 pos_and_land_use_shp_links = [
