@@ -27,7 +27,7 @@ block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
 
 dvrpc_2015_water_dissolved = dvrpc_2015_water.dissolve(
     by="lu15catn"
-)  # Dissolves all the individual water body polygons in dvrpc_2015_water so that it's just 1 big polygon of water bodies
+)  # Dissolves all the individual water body polygons in dvrpc_2015_water so that it"s just 1 big polygon of water bodies
 
 dvrpc_2020_pos.insert(
     4, "land_type", "POS"
@@ -35,50 +35,96 @@ dvrpc_2020_pos.insert(
 
 dvrpc_2020_pos_dissolved = dvrpc_2020_pos.dissolve(
     by="land_type"
-)  # Dissolves all the individual POS parcel polygons in dvrpc_2020_pos so that it's just 1 big polygon of POS parcel polygons
+)  # Dissolves all the individual POS parcel polygons in dvrpc_2020_pos so that it"s just 1 big polygon of POS parcel polygons
 
 
 dvrpc_2015_water_dissolved_clipped_to_block_groups = block_groups_dvrpc_2020.clip(
     dvrpc_2015_water_dissolved
-)  # Clips the block groups to the dissolved water so that it's now just a series of block groups that overlap with the water and have their shapes clipped to the parts of the water they overlap with
+)  # Clips the block groups to the dissolved water so that it"s now just a series of block groups that overlap with the water and have their shapes clipped to the parts of the water they overlap with
 
 dvrpc_2020_pos_dissolved_clipped_to_block_groups = block_groups_dvrpc_2020.clip(
     dvrpc_2020_pos_dissolved
-)  # Clips the block groups to the dissolved POS so that it's now just a series of block groups that overlap with the POS and have their shapes clipped to the parts of the water they overlap with
-
+)  # Clips the block groups to the dissolved POS so that it"s now just a series of block groups that overlap with the POS and have their shapes clipped to the parts of the water they overlap with
 
 dvrpc_2015_water_dissolved_clipped_to_block_groups[
-    "w_sqmtafcl"
+    "water_sqmt"
 ] = (
     dvrpc_2015_water_dissolved_clipped_to_block_groups.area
-)  # Calculates the area of each polygon in dvrpc_2015_water_dissolved_clipped_to_block_groups IN SQUARE METERS. Also, "w_sqmtafcl" stands for "water square meters after clip"
+)  # Calculates the area of each polygon in dvrpc_2015_water_dissolved_clipped_to_block_groups IN SQUARE METERS. Also, "water_sqmt" stands for "water square meters after clip"
 
 dvrpc_2020_pos_dissolved_clipped_to_block_groups[
-    "p_sqmtafcl"
+    "pos_sqmt"
 ] = (
     dvrpc_2020_pos_dissolved_clipped_to_block_groups.area
-)  # Does the same but for dvrpc_2020_pos_dissolved_clipped_to_block_groups. Also, "p_sqmtafcl" stands for "POS square meters after clip"
+)  # Does the same but for dvrpc_2020_pos_dissolved_clipped_to_block_groups. Also, "pos_sqmt" stands for "POS square meters after clip"
+
 
 dvrpc_2015_water_dissolved_clipped_to_block_groups = pd.DataFrame(
-    dvrpc_2015_water_dissolved_clipped_to_block_groups[["GEOID", "w_sqmtafcl"]]
+    dvrpc_2015_water_dissolved_clipped_to_block_groups[["GEOID", "water_sqmt"]]
 )  # Makes dvrpc_2015_water_dissolved_clipped_to_block_groups non-spatial and only keeps the columns I want from it
 
 dvrpc_2020_pos_dissolved_clipped_to_block_groups = pd.DataFrame(
-    dvrpc_2020_pos_dissolved_clipped_to_block_groups[["GEOID", "p_sqmtafcl"]]
+    dvrpc_2020_pos_dissolved_clipped_to_block_groups[["GEOID", "pos_sqmt"]]
 )  # Repeats the process but for dvrpc_2020_pos_dissolved_clipped_to_block_groups
 
 block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
     dvrpc_2015_water_dissolved_clipped_to_block_groups, on=["GEOID"], how="left"
-)  # Left joins dvrpc_2015_water_dissolved_clipped_to_block_groups to block_groups_dvrpc_2020, so that way each block group that overlapped with dvrpc_2015_water_dissolved gets their area in square meters that overlapped with that, and the block groups that didn't overlap with that at all get no figures for w_sqmtafcl
+)  # Left joins dvrpc_2015_water_dissolved_clipped_to_block_groups to block_groups_dvrpc_2020, so that way each block group that overlapped with dvrpc_2015_water_dissolved gets their area in square meters that overlapped with that, and the block groups that didn"t overlap with that at all get no figures for water_sqmt
 
-block_groups_dvrpc_2020["w_sqmtafcl"] = block_groups_dvrpc_2020["w_sqmtafcl"].fillna(
+block_groups_dvrpc_2020["water_sqmt"] = block_groups_dvrpc_2020["water_sqmt"].fillna(
     0
-)  # Replaces any NaN in w_sqmtafcl with 0
+)  # Replaces any NaN in water_sqmt with 0
 
 block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
     dvrpc_2020_pos_dissolved_clipped_to_block_groups, on=["GEOID"], how="left"
 )  # This and the next command repeat the process, but for dvrpc_2020_pos_dissolved_clipped_to_block_groups
 
-block_groups_dvrpc_2020["p_sqmtafcl"] = block_groups_dvrpc_2020["p_sqmtafcl"].fillna(0)
+block_groups_dvrpc_2020["pos_sqmt"] = block_groups_dvrpc_2020["pos_sqmt"].fillna(0)
 
-# Note that ALAND and AWATER are each in square meters
+block_groups_dvrpc_2020["undev_sqmt"] = (
+    block_groups_dvrpc_2020["water_sqmt"] + block_groups_dvrpc_2020["pos_sqmt"]
+)  # Calculates the total POS and water area of each block group in square meters (which is the total undevelopable area in square meters for each block group)
+
+block_groups_dvrpc_2020[
+    "ttl_sqmt"
+] = (
+    block_groups_dvrpc_2020.area
+)  # Calculates the total area of each block group in square meters (IGNORES ALAND AND AWATER)
+
+block_groups_dvrpc_2020["dev_sqmt"] = (
+    block_groups_dvrpc_2020["ttl_sqmt"] - block_groups_dvrpc_2020["undev_sqmt"]
+)  # Calculates the total non-POS and water area of each block group in square meters (which is the total developable area in square meters for each block group)
+
+block_groups_dvrpc_2020["non_POS_water_acres"] = round(
+    block_groups_dvrpc_2020["dev_sqmt"] / 4046.856, 0
+)  # Converts the total non-POS and water area of each block group into acres, rounded to the nearest whole number
+
+block_groups_dvrpc_2020["total_acres"] = round(
+    block_groups_dvrpc_2020["ttl_sqmt"] / 4046.856, 0
+)  # Converts the total area of each block group into acres, rounded to the nearest whole number
+
+
+block_groups_dvrpc_2020 = block_groups_dvrpc_2020[
+    [
+        "STATEFP",
+        "COUNTYFP",
+        "TRACTCE",
+        "BLKGRPCE",
+        "GEOID",
+        "NAMELSAD",
+        "ALAND",
+        "AWATER",
+        "water_sqmt",
+        "pos_sqmt",
+        "undev_sqmt",
+        "ttl_sqmt",
+        "dev_sqmt",
+        "non_POS_water_acres",
+        "total_acres",
+        "geom",
+    ]
+]  # Reorders the columns to be in the order I want them to be in
+
+db.import_geodataframe(
+    block_groups_dvrpc_2020, "unprotected_land_area", schema="density"
+)  # Uploads the completed shapefile to density
