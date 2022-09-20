@@ -35,9 +35,9 @@ unprotected_land_area = pd.merge(
     block_groups_dvrpc_2020, data_for_non_pos_water_acres_column, on=["GEOID"], how="left"
 )  # Left joins data_for_non_pos_water_acres_column to block_groups_dvrpc_2020
 
-unprotected_land_area["total_acres"] = round(
-    unprotected_land_area.area / 4046.856, 0
-)  # Calculates the total area of each block group IN ACRES and rounds those figures to the nearest whole number (IGNORES THE EXISTING ALAND AND AWATER COLUMNS AND JUST CALCULATES THE GEOMETRIES)
+unprotected_land_area["aland_acres"] = round(
+    unprotected_land_area["ALAND"] / 4046.856, 0
+)  # Converts ALAND to acres and rounds those figures to the nearest whole number
 
 unprotected_land_area = unprotected_land_area[
     [
@@ -50,7 +50,7 @@ unprotected_land_area = unprotected_land_area[
         "ALAND",
         "AWATER",
         "non_pos_water_acres",
-        "total_acres",
+        "aland_acres",
         "geom",
     ]
 ]  # Reorders the columns to be in the order I want them to be in
