@@ -1,6 +1,6 @@
-drop table if exists density.dvrpc_protected_land_and_water;
+drop table if exists analysis.dvrpc_protected_land_and_water;
 
-create table density.dvrpc_protected_land_and_water as
+create table analysis.dvrpc_protected_land_and_water as
 with
 	dvrpc_protected_land_and_water as (
     	select state, county, os_type as land_use, acres, geom from _raw.dvrpc_2020_pos union
