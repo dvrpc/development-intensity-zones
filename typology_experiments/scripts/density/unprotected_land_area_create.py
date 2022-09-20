@@ -37,6 +37,18 @@ dvrpc_2020_pos_dissolved = dvrpc_2020_pos.dissolve(
     by="land_type"
 )  # Dissolves all the individual POS parcel polygons in dvrpc_2020_pos so that it"s just 1 big polygon of POS parcel polygons
 
+dvrpc_2015_water_dissolved = dvrpc_2015_water_dissolved.to_crs(
+    3857
+)  # Reprojects dvrpc_2015_water_dissolved to EPSG 3857, which is necessary for calculating the areas after the clipping later
+
+dvrpc_2020_pos_dissolved = dvrpc_2020_pos_dissolved.to_crs(
+    3857
+)  # Repeats the process, but for dvrpc_2020_pos_dissolved
+
+block_groups_dvrpc_2020 = block_groups_dvrpc_2020.to_crs(
+    3857
+)  # Repeats the process, but for block_groups_dvrpc_2020
+
 
 dvrpc_2015_water_dissolved_clipped_to_block_groups = block_groups_dvrpc_2020.clip(
     dvrpc_2015_water_dissolved
