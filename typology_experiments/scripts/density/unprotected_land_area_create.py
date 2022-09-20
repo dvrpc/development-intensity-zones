@@ -127,4 +127,4 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020[
 
 db.import_geodataframe(
     block_groups_dvrpc_2020, "unprotected_land_area", schema="density"
-)  # Uploads the completed shapefile to density
+)  # Uploads the completed shapefile to density. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
