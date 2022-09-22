@@ -46,18 +46,15 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 )  # Left joins tot_pops_and_hhs_2020_bg to block_groups_dvrpc_2020
 
 
-block_groups_dvrpc_2020 = gpd.sjoin(
-    block_groups_dvrpc_2020,
-    block_centroids_2010_with_2018_total_jobs,
-    how="left",
-    predicate="within",
-)  # Left one-to-one spatial joins the block_centroids_2010_with_2018_total_jobs points to the block_groups_dvrpc_2020 polygons
+block_centroids_2010_with_2018_total_jobs_bgsdvrpc20_overlay = gpd.overlay(
+    block_centroids_2010_with_2018_total_jobs, block_groups_dvrpc_2020, how="intersection"
+)  # Gives each 2010 block centroid in block_centroids_2010_with_2018_total_jobs its 2020 block group GEOID
 
 numerators_for_density_calculations = (
-    block_groups_dvrpc_2020.groupby(["GEOID"], as_index=False)
+    block_centroids_2010_with_2018_total_jobs_bgsdvrpc20_overlay.groupby(["GEOID"], as_index=False)
     .agg({"ttl_jbs_18": "sum", "t_hhs_d20": "sum"})
     .rename(columns={"ttl_jbs_18": "total_employment", "t_hhs_d20": "total_households"})
-)  # For each GEOID (block group ID/block group), gets the total number of jobs/employment and total number of households
+)  # For each (2020) GEOID (block group ID/block group), gets the total number of jobs/employment and total number of households
 
 numerators_for_density_calculations["density_numerator"] = (
     numerators_for_density_calculations["total_employment"]
@@ -99,42 +96,36 @@ block_groups_dvrpc_2020["alt_density"] = (
 )  # Divides the numerator for density calculations column by total_non_pos_water_acres to get the eventual analysis.density_and_accessibility's alt_density column
 
 
-block_group_centroid_buffers_dvrpc_2020_2_mile = gpd.sjoin(
-    block_group_centroid_buffers_dvrpc_2020_2_mile,
+block_centroids_2010_with_2018_total_jobs_2mibuffers_overlay = gpd.overlay(
     block_centroids_2010_with_2018_total_jobs,
-    how="left",
-    predicate="intersects",
-)  # Left one-to-many spatial joins the block_centroids_2010_with_2018_total_jobs points to the block_group_centroid_buffers_dvrpc_2020_2_mile polygons
-
-block_group_centroid_buffers_dvrpc_2020_2_mile = block_group_centroid_buffers_dvrpc_2020_2_mile.sort_values(
-    "GEOID10"
-)  # Sorts/orders block_group_centroid_buffers_dvrpc_2020_2_mile by GEOID10, essentially just to make sure the left one-to-many spatial join worked properly
+    block_group_centroid_buffers_dvrpc_2020_2_mile,
+    how="intersection",
+)  # Gives each 2010 block centroid in block_centroids_2010_with_2018_total_jobs the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 2-mile buffers)
 
 data_for_tot_emp_2mi_column = (
-    block_group_centroid_buffers_dvrpc_2020_2_mile.groupby(["GEOID"], as_index=False)
+    block_centroids_2010_with_2018_total_jobs_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"ttl_jbs_18": "sum"})
     .rename(columns={"ttl_jbs_18": "tot_emp_2mi"})
-)  # For each GEOID (block group ID/block group), gets the total number of jobs/employment, thereby creating the eventual tot_emp_2mi column
+)  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total number of jobs/employment, thereby creating the eventual tot_emp_2mi column
 
-block_group_centroid_buffers_dvrpc_2020_5_mile = gpd.sjoin(
-    block_group_centroid_buffers_dvrpc_2020_5_mile,
+
+block_centroids_2020_with_2020_total_pop_5mibuffers_overlay = gpd.overlay(
     block_centroids_2020_with_2020_total_pop,
-    how="left",
-    predicate="intersects",
-)  # Left one-to-many spatial joins the block_centroids_2020_with_2020_total_pop points to the block_group_centroid_buffers_dvrpc_2020_5_mile polygons
-
-block_group_centroid_buffers_dvrpc_2020_5_mile = block_group_centroid_buffers_dvrpc_2020_5_mile.sort_values(
-    "GEOID20"
-)  # Sorts/orders block_group_centroid_buffers_dvrpc_2020_5_mile by GEOID20, essentially just to make sure the left one-to-many spatial join worked properly
+    block_group_centroid_buffers_dvrpc_2020_5_mile,
+    how="intersection",
+)  # Gives each 2020 block centroid in block_centroids_2020_with_2020_total_pop the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
 data_for_tot_pop_5mi_column = (
-    block_group_centroid_buffers_dvrpc_2020_5_mile.groupby(["GEOID"], as_index=False)
+    block_centroids_2020_with_2020_total_pop_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"ttl_pop_20": "sum"})
     .rename(columns={"ttl_pop_20": "tot_pop_5mi"})
-)  # For each GEOID (block group ID/block group), gets the total population, thereby creating the eventual tot_pop_5mi column
+)  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total population, thereby creating the eventual tot_pop_5mi column
 
 data_for_accessibility_column = pd.merge(
-    data_for_tot_emp_2mi_column, data_for_tot_pop_5mi_column, on=["GEOID"], how="left"
+    data_for_tot_emp_2mi_column,
+    data_for_tot_pop_5mi_column,
+    on=["GEOID"],
+    how="left",
 )  # Left joins data_for_tot_pop_5mi_column to data_for_tot_emp_2mi_column to get the data for the eventual accessibility column
 
 data_for_accessibility_column["accessibility"] = (
