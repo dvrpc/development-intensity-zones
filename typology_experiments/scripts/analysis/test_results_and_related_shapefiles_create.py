@@ -208,9 +208,3 @@ db.import_geodataframe(
     "block_groups_dvrpc_2020_with_test_results",
     schema="analysis",
 )  # Uploads the completed analysis.block_groups_dvrpc_2020_with_test_results object/shapefile as analysis.block_groups_dvrpc_2020_with_test_results. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
-
-db.import_geodataframe(
-    block_group_land_by_developability_with_test_results,
-    "block_group_land_by_developability_with_test_results",
-    schema="analysis",
-)  # Uploads the completed analysis.block_group_land_by_developability_with_test_results object/shapefile as analysis.block_group_land_by_developability_with_test_results. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
