@@ -1,5 +1,5 @@
 """
-This script creates analysis.density_and_accessibility
+This script creates analysis.forecast_density_and_accessibility
 """
 
 import pandas as pd
@@ -83,7 +83,7 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 
 block_groups_dvrpc_2020["density"] = (
     block_groups_dvrpc_2020["density_numerator"] / block_groups_dvrpc_2020["total_aland_acres"]
-)  # Divides the numerator for density calculations column by total_aland_acres to get the eventual analysis.density_and_accessibility's density column
+)  # Divides the numerator for density calculations column by total_aland_acres to get the eventual analysis.forecast_density_and_accessibility's density column
 
 
 block_centroids_2010_with_emp_2mibuffers_overlay = gpd.overlay(
@@ -134,20 +134,20 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 )  # Left joins data_for_accessibility_column to block_groups_dvrpc_2020
 
 
-density_and_accessibility = pd.DataFrame(
+forecast_density_and_accessibility = pd.DataFrame(
     block_groups_dvrpc_2020[["GEOID", "density", "accessibility"]]
 ).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating analysis.density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
+)  # Starts creating analysis.forecast_density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
 
-density_and_accessibility[["density", "accessibility"]] = density_and_accessibility[
+forecast_density_and_accessibility[
     ["density", "accessibility"]
-].round(
+] = forecast_density_and_accessibility[["density", "accessibility"]].round(
     2
 )  # Rounds density and accessibility to the nearest 2 decimal places
 
 db.import_dataframe(
-    density_and_accessibility,
-    "analysis.density_and_accessibility",
+    forecast_density_and_accessibility,
+    "analysis.forecast_density_and_accessibility",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed table as analysis.density_and_accessibility
+)  # Exports the completed table as analysis.forecast_density_and_accessibility
