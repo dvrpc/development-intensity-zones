@@ -3,11 +3,11 @@ This script creates a density and accessibility table to put into analysis based
 """
 
 employment_column_name = (
-    "combo_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp)
+    "lodes_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp)
 )
 
 first_part_of_table_name = (
-    "forecast"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes)
+    "lodes"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes)
 )
 
 
