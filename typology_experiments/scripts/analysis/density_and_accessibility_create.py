@@ -28,9 +28,9 @@ block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
     'SELECT "GEOID20", "POP20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
 )  # Uses my function to bring in the shapefile containing the total number of jobs for each 2010 block centroid
 
-data_for_aland_acres_and_non_pos_water_acres_columns = db.get_geodataframe_from_query(
-    'SELECT "GEOID", aland_acres, non_pos_water_acres, geom FROM analysis.unprotected_land_area'
-)  # Uses my function to bring in the shapefile containing the data for the eventual aland_acres and non_pos_water_acres columns
+data_for_aland_acres_column = db.get_geodataframe_from_query(
+    'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
+)  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
 
 block_group_centroid_buffers_dvrpc_2020_2_mile = db.get_geodataframe_from_query(
     'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_dvrpc_2020 WHERE buff_mi = 2'
@@ -70,30 +70,20 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 )  # Left joins numerators_for_density_calculations to block_groups_dvrpc_2020
 
 
-data_for_aland_acres_and_non_pos_water_acres_columns = (
-    data_for_aland_acres_and_non_pos_water_acres_columns.groupby(["GEOID"], as_index=False)
-    .agg({"aland_acres": "sum", "non_pos_water_acres": "sum"})
-    .rename(
-        columns={
-            "aland_acres": "total_aland_acres",
-            "non_pos_water_acres": "total_non_pos_water_acres",
-        }
-    )
-)  # For each GEOID (block group ID/block group), gets the total aland_acres and total non_pos_water_acres values (also makes data_for_aland_acres_and_non_pos_water_acres_columns non-spatial in the process)
+data_for_aland_acres_column = (
+    data_for_aland_acres_column.groupby(["GEOID"], as_index=False)
+    .agg({"aland_acres": "sum"})
+    .rename(columns={"aland_acres": "total_aland_acres"})
+)  # For each GEOID (block group ID/block group), gets the total aland_acres value (also makes data_for_aland_acres_column non-spatial in the process)
 
 block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
-    data_for_aland_acres_and_non_pos_water_acres_columns, on=["GEOID"], how="left"
-)  # Left joins data_for_aland_acres_and_non_pos_water_acres_columns to block_groups_dvrpc_2020
+    data_for_aland_acres_column, on=["GEOID"], how="left"
+)  # Left joins data_for_aland_acres_column to block_groups_dvrpc_2020
 
 
 block_groups_dvrpc_2020["density"] = (
     block_groups_dvrpc_2020["density_numerator"] / block_groups_dvrpc_2020["total_aland_acres"]
 )  # Divides the numerator for density calculations column by total_aland_acres to get the eventual analysis.density_and_accessibility's density column
-
-block_groups_dvrpc_2020["alt_density"] = (
-    block_groups_dvrpc_2020["density_numerator"]
-    / block_groups_dvrpc_2020["total_non_pos_water_acres"]
-)  # Divides the numerator for density calculations column by total_non_pos_water_acres to get the eventual analysis.density_and_accessibility's alt_density column
 
 
 block_centroids_2010_with_emp_2mibuffers_overlay = gpd.overlay(
@@ -145,16 +135,16 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 
 
 density_and_accessibility = pd.DataFrame(
-    block_groups_dvrpc_2020[["GEOID", "density", "alt_density", "accessibility"]]
+    block_groups_dvrpc_2020[["GEOID", "density", "accessibility"]]
 ).rename(
     columns={"GEOID": "block_group20"}
 )  # Starts creating analysis.density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
 
-density_and_accessibility[["density", "alt_density", "accessibility"]] = density_and_accessibility[
-    ["density", "alt_density", "accessibility"]
+density_and_accessibility[["density", "accessibility"]] = density_and_accessibility[
+    ["density", "accessibility"]
 ].round(
     2
-)  # Rounds density, alt_density, and accessibility to the nearest 2 decimal places
+)  # Rounds density and accessibility to the nearest 2 decimal places
 
 db.import_dataframe(
     density_and_accessibility,
