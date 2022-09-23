@@ -78,10 +78,23 @@ lodes7_tablekeylist = [
 ]  # Creates the keys for the dictionary by extracting just the CSV names from lodes7_tables_urls
 
 
+dvrpc_forecast_2020_emp_block10_tablelist = [
+    pd.read_csv("C:/Users/ISchwarzenberg/Downloads/dvrpc_forecast_2020_emp_block10.csv")
+]  # Reads in the DVRPC 2020 employment forecast by 2010 block data and puts it into a list (COME BACK AND CHANGE THIS FILE PATH ONCE BEN GIVES ME IT)
+
+dvrpc_forecast_2020_emp_block10_tablekeylist = [
+    "dvrpc_forecast_2020_emp_block10"
+]  # Creates the key for that eventual dictionary
+
+
 nonspatial_tables_to_upload_dictionary = dict(
     zip(
-        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist,
-        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist,
+        tot_pops_and_hhs_2020_tablekeylist
+        + lodes7_tablekeylist
+        + dvrpc_forecast_2020_emp_block10_tablekeylist,
+        tot_pops_and_hhs_2020_tablelist
+        + lodes7_tablelist
+        + dvrpc_forecast_2020_emp_block10_tablelist,
     )
 )  # Creates the dictionary of tables to upload to the database/the eventual table names
 
