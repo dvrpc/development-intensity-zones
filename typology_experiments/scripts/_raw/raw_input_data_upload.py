@@ -79,8 +79,10 @@ lodes7_tablekeylist = [
 
 
 dvrpc_forecast_2020_emp_block10_tablelist = [
-    pd.read_csv("C:/Users/ISchwarzenberg/Downloads/dvrpc_forecast_2020_emp_block10.csv")
-]  # Reads in the DVRPC 2020 employment forecast by 2010 block data and puts it into a list (COME BACK AND CHANGE THIS FILE PATH ONCE BEN GIVES ME IT)
+    pd.read_csv(
+        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/dvrpc_forecast_2020_emp_block10.csv"
+    )
+]  # Reads in the DVRPC 2020 employment forecast by 2010 block data and puts it into a list
 
 dvrpc_forecast_2020_emp_block10_tablekeylist = [
     "dvrpc_forecast_2020_emp_block10"
