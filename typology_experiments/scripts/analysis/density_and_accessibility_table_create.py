@@ -1,6 +1,15 @@
 """
-This script creates analysis.forecast_density_and_accessibility
+This script creates a density and accessibility table to put into analysis based on user input
 """
+
+employment_column_name = (
+    "combo_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp)
+)
+
+first_part_of_table_name = (
+    "forecast"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes)
+)
+
 
 import pandas as pd
 
@@ -21,7 +30,9 @@ tot_pops_and_hhs_2020_bg = db.get_dataframe_from_query(
 )  # Uses my function to bring in the 2020 Decennial households by block group data
 
 block_centroids_2010_with_emp = db.get_geodataframe_from_query(
-    'SELECT "GEOID10", combo_emp, geom FROM analysis.block_centroids_2010_with_emp'
+    'SELECT "GEOID10", '
+    + employment_column_name
+    + ", geom FROM analysis.block_centroids_2010_with_emp"
 )  # Uses my function to bring in the shapefile containing the total number of jobs for each 2010 block centroid
 
 block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
@@ -52,8 +63,8 @@ block_centroids_2010_with_emp_bgsdvrpc20_overlay = gpd.overlay(
 
 numerators_for_density_calculations = (
     block_centroids_2010_with_emp_bgsdvrpc20_overlay.groupby(["GEOID"], as_index=False)
-    .agg({"combo_emp": "sum", "t_hhs_d20": "sum"})
-    .rename(columns={"combo_emp": "total_employment", "t_hhs_d20": "total_households"})
+    .agg({employment_column_name: "sum", "t_hhs_d20": "sum"})
+    .rename(columns={employment_column_name: "total_employment", "t_hhs_d20": "total_households"})
 )  # For each (2020) GEOID (block group ID/block group), gets the total number of jobs/employment and total number of households
 
 numerators_for_density_calculations["density_numerator"] = (
@@ -83,7 +94,7 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 
 block_groups_dvrpc_2020["density"] = (
     block_groups_dvrpc_2020["density_numerator"] / block_groups_dvrpc_2020["total_aland_acres"]
-)  # Divides the numerator for density calculations column by total_aland_acres to get the eventual analysis.forecast_density_and_accessibility's density column
+)  # Divides the numerator for density calculations column by total_aland_acres to get the eventual density and accessibility table's density column
 
 
 block_centroids_2010_with_emp_2mibuffers_overlay = gpd.overlay(
@@ -94,8 +105,8 @@ block_centroids_2010_with_emp_2mibuffers_overlay = gpd.overlay(
 
 data_for_tot_emp_2mi_column = (
     block_centroids_2010_with_emp_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
-    .agg({"combo_emp": "sum"})
-    .rename(columns={"combo_emp": "tot_emp_2mi"})
+    .agg({employment_column_name: "sum"})
+    .rename(columns={employment_column_name: "tot_emp_2mi"})
 )  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total number of jobs/employment, thereby creating the eventual tot_emp_2mi column
 
 
@@ -134,20 +145,20 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 )  # Left joins data_for_accessibility_column to block_groups_dvrpc_2020
 
 
-forecast_density_and_accessibility = pd.DataFrame(
+density_and_accessibility = pd.DataFrame(
     block_groups_dvrpc_2020[["GEOID", "density", "accessibility"]]
 ).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating analysis.forecast_density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
+)  # Starts creating the density and accessibility table's by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
 
-forecast_density_and_accessibility[
+density_and_accessibility[["density", "accessibility"]] = density_and_accessibility[
     ["density", "accessibility"]
-] = forecast_density_and_accessibility[["density", "accessibility"]].round(
+].round(
     2
 )  # Rounds density and accessibility to the nearest 2 decimal places
 
 db.import_dataframe(
-    forecast_density_and_accessibility,
-    "analysis.forecast_density_and_accessibility",
+    density_and_accessibility,
+    "analysis." + first_part_of_table_name + "_density_and_accessibility",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed table as analysis.forecast_density_and_accessibility
+)  # Exports the completed density and accessibility table
