@@ -34,9 +34,13 @@ block_groups_dvrpc_2020 = pd.concat(
     [block_groups_dvrpc_nj_2020, block_groups_dvrpc_pa_2020]
 )  # Merges/row binds/etc block_groups_dvrpc_nj_2020 and block_groups_dvrpc_pa_2020 to get block_groups_dvrpc_2020
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.dissolve(
-    by="GEOID"
-)  # Makes it so it's 1 record per GEOID in block_groups_dvrpc_2020
+
+block_groups_dvrpc_2020["dissolve_field"] = block_groups_dvrpc_2020[
+    "GEOID"
+]  # This and the next command make it so it's 1 record per GEOID in block_groups_dvrpc_2020
+
+block_groups_dvrpc_2020 = block_groups_dvrpc_2020.dissolve(by="dissolve_field")
+
 
 block_groups_dvrpc_2020 = block_groups_dvrpc_2020.explode(
     ignore_index=True
