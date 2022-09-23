@@ -1,5 +1,5 @@
 """
-This script creates analysis.block_centroids_2010_with_2018_lodes_emp_create
+This script creates analysis.block_centroids_2010_with_emp
 """
 
 import pandas as pd
@@ -34,11 +34,11 @@ lodes_all4states_2018.insert(
 )  # Makes a string column of w_geocode to get each block's GEOID10 value, and puts it to the right of w_geocode
 
 
-block_centroids_2010_with_2018_lodes_emp = blocks_all4states_2010_centroids.merge(
+block_centroids_2010_with_emp = blocks_all4states_2010_centroids.merge(
     lodes_all4states_2018, on=["GEOID10"], how="left"
-)  # Left joins lodes_all4states_2018 to blocks_all4states_2010_centroids to create block_centroids_2010_with_2018_lodes_emp
+)  # Left joins lodes_all4states_2018 to blocks_all4states_2010_centroids to create block_centroids_2010_with_emp
 
-block_centroids_2010_with_2018_lodes_emp = block_centroids_2010_with_2018_lodes_emp[
+block_centroids_2010_with_emp = block_centroids_2010_with_emp[
     [
         "STATEFP10",
         "COUNTYFP10",
@@ -114,7 +114,7 @@ block_centroids_2010_with_2018_lodes_emp = block_centroids_2010_with_2018_lodes_
 ]  # Reorders the columns
 
 db.import_geodataframe(
-    block_centroids_2010_with_2018_lodes_emp,
-    "block_centroids_2010_with_2018_lodes_emp",
+    block_centroids_2010_with_emp,
+    "block_centroids_2010_with_emp",
     schema="analysis",
 )  # Uploads the completed shapefile to analysis. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
