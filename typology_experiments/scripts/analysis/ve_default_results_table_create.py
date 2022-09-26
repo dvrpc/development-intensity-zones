@@ -31,18 +31,6 @@ data_for_area_type_column = db.get_dataframe_from_query(
     "SELECT accessibility_levels as accessibility_level, density_levels as density_level, area_type FROM _resources.ve_classifications"
 )  # Uses my function to bring in _resources.ve_classifications, but to use to create the eventual area_type column
 
-data_for_alt_area_type_column = db.get_dataframe_from_query(
-    "SELECT accessibility_levels as accessibility_level, density_levels as alt_density_level, area_type as alt_area_type FROM _resources.ve_classifications"
-)  # Uses my function to bring in _resources.ve_classifications, but to use to create the eventual alt_area_type column
-
-block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
-    "SELECT * FROM analysis.block_groups_dvrpc_2020"
-)  # Uses my function to bring in the analysis.block_groups_dvrpc_2020 shapefile
-
-block_group_land_by_developability = db.get_geodataframe_from_query(
-    "SELECT * FROM analysis.block_group_land_by_developability"
-)  # Uses my function to bring in the analysis.block_group_land_by_developability shapefile
-
 
 density_and_accessibility_table["density_level"] = np.where(
     density_and_accessibility_table["density"]
