@@ -1,5 +1,5 @@
 """
-This script creates _resources.test_thresholds and _resources.test_classifications
+This script uploads _resources.test_thresholds and _resources.test_classifications
 """
 
 import pandas as pd
