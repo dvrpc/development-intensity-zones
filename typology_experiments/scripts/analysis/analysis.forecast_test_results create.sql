@@ -49,7 +49,7 @@ with
         	left join forecast_test_results_accessibility_level_column d
             on b.block_group20 = d.block_group20
     	),
-    forecast_test_results_final as (
+    forecast_test_results_before_unique_id as (
         select
             b.block_group20,
             b.density,
@@ -65,4 +65,4 @@ with
     	)
     
     
-    select * from forecast_test_results_final
+    select row_number() over() as row_number, block_group20, density, accessibility, density_level, accessibility_level, area_type, geom from forecast_test_results_before_unique_id
