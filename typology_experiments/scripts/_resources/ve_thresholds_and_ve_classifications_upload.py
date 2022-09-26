@@ -1,5 +1,5 @@
 """
-This script creates _resources.ve_thresholds and _resources.ve_classifications
+This script uploads _resources.ve_thresholds and _resources.ve_classifications
 """
 
 import pandas as pd
