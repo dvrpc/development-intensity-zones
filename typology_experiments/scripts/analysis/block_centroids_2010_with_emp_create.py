@@ -70,6 +70,27 @@ block_centroids_2010_with_emp["combo_emp"] = np.where(
 )  # Creates combo_emp by saying if the block centroid is in a DVRPC county, use the forecast_2020_emp value, otherwise use the lodes_emp value
 
 
+dvrpc_2050_emp_forecast_by_2010_block = db.get_dataframe_from_query(
+    'SELECT block_id AS "GEOID10", total_jobs AS forecast_2050_emp FROM _raw.urbansim_2050_by_block_2010'
+)  # Uses my function to bring in the DVRPC 2050 employment forecast by 2010 block data
+
+dvrpc_2050_emp_forecast_by_2010_block["GEOID10"] = dvrpc_2050_emp_forecast_by_2010_block[
+    "GEOID10"
+].astype(
+    str
+)  # Makes GEOID10 string so it can be left joined with block_centroids_2010_with_emp
+
+block_centroids_2010_with_emp = block_centroids_2010_with_emp.merge(
+    dvrpc_2050_emp_forecast_by_2010_block, on=["GEOID10"], how="left"
+)  # Left joins dvrpc_2050_emp_forecast_by_2010_block to block_centroids_2010_with_emp
+
+block_centroids_2010_with_emp["combo_2050_emp"] = np.where(
+    block_centroids_2010_with_emp["county_id_5dig"].isin(dvrpc_county_id_5dig_values),
+    block_centroids_2010_with_emp["forecast_2050_emp"],
+    block_centroids_2010_with_emp["lodes_emp"],
+)  # Creates combo_2050_emp by saying if the block centroid is in a DVRPC county, use the forecast_2050_emp value, otherwise use the lodes_emp value
+
+
 block_centroids_2010_with_emp = block_centroids_2010_with_emp[
     [
         "STATEFP10",
@@ -90,10 +111,12 @@ block_centroids_2010_with_emp = block_centroids_2010_with_emp[
         "INTPTLON10",
         "lodes_emp",
         "forecast_2020_emp",
+        "forecast_2050_emp",
         "combo_emp",
+        "combo_2050_emp",
         "geom",
     ]
-]  # Simultaneously keeps only the columns I want and reorders them
+]  # Simultaneously keeps only the columns I want and reorders them. AND LEAVE combo_emp NAMED AS THAT (INSTEAD OF CHANGING ITS NAME TO "combo_2020_emp"), AT LEAST FOR NOW
 
 db.import_geodataframe(
     block_centroids_2010_with_emp,
