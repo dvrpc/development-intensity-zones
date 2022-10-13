@@ -164,8 +164,15 @@ data_for_accessibility_columns = pd.merge(
     how="left",
 )  # Left joins data_for_tot_pop_5mi_column to data_for_tot_emp_2mi_column to essentially start getting the data for the eventual accessibility columns
 
+
+block_centroids_2010_with_emp_5mibuffers_overlay = gpd.overlay(
+    block_centroids_2010_with_emp,
+    block_group_centroid_buffers_dvrpc_2020_5_mile,
+    how="intersection",
+)  # Gives each 2010 block centroid in block_centroids_2010_with_emp the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
+
 data_for_pop_change_5mi_column = (
-    block_centroids_2020_with_2020_total_pop_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
+    block_centroids_2010_with_emp_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"population_change": "sum"})
     .rename(columns={"population_change": "pop_change_5mi"})
 )  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total population change between 2050 and 2020, thereby creating the eventual pop_change_5mi column
@@ -176,6 +183,7 @@ data_for_accessibility_columns = pd.merge(
     on=["GEOID"],
     how="left",
 )  # Left joins data_for_pop_change_5mi_column to data_for_accessibility_columns to finish getting the data for the eventual accessibility columns
+
 
 data_for_accessibility_columns["accessibility"] = (
     (data_for_accessibility_columns["tot_emp_2mi"] * data_for_accessibility_columns["tot_pop_5mi"])
