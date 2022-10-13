@@ -224,7 +224,7 @@ density_and_accessibility[
     ["density", "accessibility", "density_2050", "accessibility_2050"]
 ].round(
     2
-)  # Rounds density and accessibility to the nearest 2 decimal places
+)  # Rounds density, accessibility, density_2050, and accessibility_2050 to the nearest 2 decimal places
 
 db.import_dataframe(
     density_and_accessibility,
