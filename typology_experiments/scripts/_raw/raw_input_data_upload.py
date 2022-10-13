@@ -78,25 +78,27 @@ lodes7_tablekeylist = [
 ]  # Creates the keys for the dictionary by extracting just the CSV names from lodes7_tables_urls
 
 
-dvrpc_forecast_2020_emp_block10_tablelist = [
-    pd.read_csv(
-        "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/dvrpc_forecast_2020_emp_block10.csv"
-    )
-]  # Reads in the DVRPC 2020 employment forecast by 2010 block data and puts it into a list
+forecast_csv_file_paths = [
+    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/dvrpc_forecast_2020_emp_block10.csv",
+    "G:/Shared drives/Socioeconomic and Land Use Analytics/Forecasts/Final Forecast/Block Forecast/results_dvrpc_run_545_block_indicators_2020.csv",
+    "G:/Shared drives/Socioeconomic and Land Use Analytics/Forecasts/Final Forecast/Block Forecast/results_dvrpc_run_545_block_indicators_2050.csv",
+]  # Creates a list of the file paths to the forecast/UrbanSim CSVs
 
-dvrpc_forecast_2020_emp_block10_tablekeylist = [
-    "dvrpc_forecast_2020_emp_block10"
+forecast_tablelist = [
+    pd.read_csv(i) for i in forecast_csv_file_paths
+]  # Reads in those forecast/UrbanSim CSVs and puts them into a list
+
+forecast_tablekeylist = [
+    "dvrpc_forecast_2020_emp_block10",
+    "urbansim_2020_by_block_2010",
+    "urbansim_2050_by_block_2010",
 ]  # Creates the key for that eventual dictionary
 
 
 nonspatial_tables_to_upload_dictionary = dict(
     zip(
-        tot_pops_and_hhs_2020_tablekeylist
-        + lodes7_tablekeylist
-        + dvrpc_forecast_2020_emp_block10_tablekeylist,
-        tot_pops_and_hhs_2020_tablelist
-        + lodes7_tablelist
-        + dvrpc_forecast_2020_emp_block10_tablelist,
+        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist + forecast_tablekeylist,
+        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist + forecast_tablelist,
     )
 )  # Creates the dictionary of tables to upload to the database/the eventual table names
 
