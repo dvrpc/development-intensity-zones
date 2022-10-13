@@ -1,14 +1,10 @@
 """
-This script creates a density and accessibility table to put into analysis based on user input
+This script creates a density and accessibility table to put into analysis based on user input. ALSO, EVEN THOUGH WE'RE NOT MAKING ANY lodes TABLES ETC ANYMORE, STILL KEEP THE SCRIPT WRITTEN IN THIS WAY, AT THE VERY LEAST FOR NOW
 """
 
-employment_column_name = (
-    "lodes_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp)
-)
+employment_column_name = "combo_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp). KEEP THIS SET AS combo_emp FROM NOW ON, AT LEAST FOR NOW
 
-first_part_of_table_name = (
-    "lodes"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes)
-)
+first_part_of_table_name = "forecast"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes). KEEP THIS SET AS forecast FROM NOW ON, AT LEAST FOR NOW
 
 
 import pandas as pd
