@@ -2,9 +2,7 @@
 This script creates a VisionEval default results table to put into analysis based on user input
 """
 
-first_part_of_table_name = (
-    "lodes"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes)
-)
+first_part_of_table_name = "forecast"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes). KEEP THIS SET AS forecast FROM NOW ON, AT LEAST FOR NOW
 
 
 import pandas as pd
