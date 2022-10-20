@@ -61,9 +61,9 @@ with
     forecast_test_results_density_level_2050_column as (
 	
 		select block_group20, 'very low' as density_level_2050 from density_and_accessibility_table where density_2050 < (select density_thresholds from thresholds where levels = 'low') union
-		select block_group20, 'low' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'low') and density < (select density_thresholds from thresholds where levels = 'moderate') union
-		select block_group20, 'moderate' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'moderate') and density < (select density_thresholds from thresholds where levels = 'high') union
-		select block_group20, 'high' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'high') and density < (select density_thresholds from thresholds where levels = 'very high') union
+		select block_group20, 'low' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'low') and density_2050 < (select density_thresholds from thresholds where levels = 'moderate') union
+		select block_group20, 'moderate' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'moderate') and density_2050 < (select density_thresholds from thresholds where levels = 'high') union
+		select block_group20, 'high' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'high') and density_2050 < (select density_thresholds from thresholds where levels = 'very high') union
 		select block_group20, 'very high' as density_level_2050 from density_and_accessibility_table where density_2050 >= (select density_thresholds from thresholds where levels = 'very high') union
 		select block_group20, 'N/A' as density_level_2050 from density_and_accessibility_table where density_2050 is null
 		
@@ -86,9 +86,9 @@ with
     forecast_test_results_accessibility_level_2050_column as (
 	
 		select block_group20, 'very low' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 < (select accessibility_thresholds from thresholds where levels = 'low') union
-		select block_group20, 'low' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'low') and accessibility < (select accessibility_thresholds from thresholds where levels = 'moderate') union
-		select block_group20, 'moderate' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'moderate') and accessibility < (select accessibility_thresholds from thresholds where levels = 'high') union
-		select block_group20, 'high' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'high') and accessibility < (select accessibility_thresholds from thresholds where levels = 'very high') union
+		select block_group20, 'low' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'low') and accessibility_2050 < (select accessibility_thresholds from thresholds where levels = 'moderate') union
+		select block_group20, 'moderate' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'moderate') and accessibility_2050 < (select accessibility_thresholds from thresholds where levels = 'high') union
+		select block_group20, 'high' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'high') and accessibility_2050 < (select accessibility_thresholds from thresholds where levels = 'very high') union
 		select block_group20, 'very high' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 >= (select accessibility_thresholds from thresholds where levels = 'very high') union
 		select block_group20, 'N/A' as accessibility_level_2050 from density_and_accessibility_table where accessibility_2050 is null
 		
