@@ -38,9 +38,12 @@ dvrpc_key = duplicate_state_key(
 )  # Uses my function to create dvrpc_key by first making a copy of state_key and then making its geo_key column just equal 1
 
 
+"""
+NOTE THIS HAS SINCE BEEN MANUALLY REPLACED BY G:\Shared drives\Socioeconomic and Land Use Analytics\Tracking Progress\Data Preparation\postgres_db\county_key_replacement.gsheet
 county_key = duplicate_state_key(
     list(range(9, 18))
 )  # Uses my function to create county_key by first making a copy of state_key and then making its geo_key column equal 9-18
+"""
 
 
 pa_suburban_key = state_key[
