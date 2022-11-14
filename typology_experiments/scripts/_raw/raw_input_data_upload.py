@@ -30,25 +30,25 @@ from typology_experiments.helpers.helper_functions import *  # Imports all funct
 
 
 tot_pops_and_hhs_2020_block = stream_in_census_data(
-    "https://api.census.gov/data/2020/dec/pl?get=P1_001N,P5_001N,H1_002N&for=block:*&in=state:10,24,34,42&in=county:*&in=tract:*&key="
+    "https://api.census.gov/data/2020/dec/pl?get=P1_001N,P5_001N,H1_001N,H1_002N&for=block:*&in=state:10,24,34,42&in=county:*&in=tract:*&key="
     + os.environ["CENSUS_KEY"],
     ["state", "county", "tract", "block"],
-)  # Uses my function to stream in the 2020 total populaion, group quarters population, and total households by BLOCK for all of DE, MD, NJ and PA census table I want using the
+)  # Uses my function to stream in the 2020 total populaion, group quarters population, total households, and total housing units by BLOCK for all of DE, MD, NJ and PA census table I want using the
 # census API
 
 tot_pops_and_hhs_2020_block = tot_pops_and_hhs_2020_block[
-    ["state", "county", "tract", "block", "P1_001N", "P5_001N", "H1_002N"]
+    ["state", "county", "tract", "block", "P1_001N", "P5_001N", "H1_001N", "H1_002N"]
 ]  # Reorders the columns
 
 tot_pops_and_hhs_2020_bg = stream_in_census_data(
-    "https://api.census.gov/data/2020/dec/pl?get=P1_001N,P5_001N,H1_002N&for=block%20group:*&in=state:10,24,34,42&in=county:*&in=tract:*&key="
+    "https://api.census.gov/data/2020/dec/pl?get=P1_001N,P5_001N,H1_001N,H1_002N&for=block%20group:*&in=state:10,24,34,42&in=county:*&in=tract:*&key="
     + os.environ["CENSUS_KEY"],
     ["state", "county", "tract", "block group"],
-)  # Uses my function to stream in the 2020 total populaion, group quarters population, and total households by BLOCK GROUP for all of DE, MD, NJ and PA census table I want using
+)  # Uses my function to stream in the 2020 total populaion, group quarters population, total households, and total housing units by BLOCK GROUP for all of DE, MD, NJ and PA census table I want using
 # the census API
 
 tot_pops_and_hhs_2020_bg = tot_pops_and_hhs_2020_bg[
-    ["state", "county", "tract", "block group", "P1_001N", "P5_001N", "H1_002N"]
+    ["state", "county", "tract", "block group", "P1_001N", "P5_001N", "H1_001N", "H1_002N"]
 ]  # Reorders the columns
 
 tot_pops_and_hhs_2020_tablelist = [
