@@ -1,10 +1,6 @@
 """
-This script edits the existing density and accessibility table. ALSO, EVEN THOUGH WE'RE NOT MAKING ANY lodes TABLES ETC ANYMORE, STILL KEEP THE SCRIPT WRITTEN IN THIS WAY, AT THE VERY LEAST FOR NOW
+This script edits the existing density and accessibility table
 """
-
-employment_column_name = "combo_emp"  # USER DECLARES COLUMN NAME HERE (WOULD BE EITHER combo_emp OR lodes_emp). KEEP THIS SET AS combo_emp FROM NOW ON, AT LEAST FOR NOW
-
-first_part_of_table_name = "forecast"  # USER DECLARES FIRST PART OF TABLE NAME HERE (WOULD BE EITHER forecast OR lodes). KEEP THIS SET AS forecast FROM NOW ON, AT LEAST FOR NOW
 
 
 import pandas as pd
@@ -18,7 +14,7 @@ db = Database(DATABASE_URL)
 
 
 existing_density_and_accessibility_table = db.get_dataframe_from_query(
-    "SELECT * FROM analysis." + first_part_of_table_name + "_density_and_accessibility"
+    "SELECT * FROM analysis.forecast_density_and_accessibility"
 )  # Uses my function to bring in the existing density ad accessibility table
 
 block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
@@ -29,15 +25,13 @@ tot_hus_2020_bg = db.get_dataframe_from_query(
     'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", h1_001n AS housing_units_d20, FROM _raw.tot_pops_and_hhs_2020_bg'
 )  # Uses my function to bring in the 2020 Decennial housing units by block group data
 
-block_centroids_2010_with_emp = db.get_geodataframe_from_query(
-    'SELECT "GEOID10", '
-    + employment_column_name
-    + ", geom FROM analysis.block_centroids_2010_with_emp"
-)  # Uses my function to bring in the shapefile containing the total number of jobs, but forecast and not, for each 2010 block centroid. Also, note that "combo" and "lodes" are both 5 letters each
+properties_with_comm_sqft_thou = db.get_geodataframe_from_query(
+    'SELECT "GEOID10", comm_sqft_thou, geom FROM analysis.costar'
+)  # Uses my function to bring in the shapefile containing the total commercial square feet (in thousands) for each property location
 
 block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
     'SELECT "GEOID20", "POP20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
-)  # Uses my function to bring in the shapefile containing the total number of jobs for each 2010 block centroid
+)  # Uses my function to bring in the shapefile containing the total population for each 2010 block centroid
 
 data_for_aland_acres_column = db.get_geodataframe_from_query(
     'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
@@ -57,25 +51,25 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
 )  # Left joins tot_hus_2020_bg to block_groups_dvrpc_2020
 
 
-block_centroids_2010_with_emp_bgsdvrpc20_overlay = gpd.overlay(
-    block_centroids_2010_with_emp, block_groups_dvrpc_2020, how="intersection"
-)  # Gives each 2010 block centroid in block_centroids_2010_with_emp its 2020 block group GEOID
+properties_with_comm_sqft_thou_bgsdvrpc20_overlay = gpd.overlay(
+    properties_with_comm_sqft_thou, block_groups_dvrpc_2020, how="intersection"
+)  # Gives each property location in properties_with_comm_sqft_thou its 2020 block group GEOID
 
 numerators_for_density_bones_calculations = (
-    block_centroids_2010_with_emp_bgsdvrpc20_overlay.groupby(["GEOID"], as_index=False)
+    properties_with_comm_sqft_thou_bgsdvrpc20_overlay.groupby(["GEOID"], as_index=False)
     .agg(
         {
-            employment_column_name: "sum",
+            "comm_sqft_thou": "sum",
             "housing_units_d20": "sum",
         }
     )
     .rename(
         columns={
-            employment_column_name: "total_employment",
+            "comm_sqft_thou": "total_employment",
             "housing_units_d20": "total_housing_units",
         }
     )
-)  # For each (2020) GEOID (block group ID/block group), gets the total number of jobs/employment and total number of housing units
+)  # For each (2020) GEOID (block group ID/block group), gets the total commercial square feet (in thousands) and total number of housing units
 
 numerators_for_density_bones_calculations["density_bones_numerator"] = (
     numerators_for_density_bones_calculations["total_employment"]
@@ -108,17 +102,17 @@ block_groups_dvrpc_2020["density_bones"] = (
 )  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual density_bones and accessibility_bones table's density_bones column
 
 
-block_centroids_2010_with_emp_2mibuffers_overlay = gpd.overlay(
-    block_centroids_2010_with_emp,
+properties_with_comm_sqft_thou_2mibuffers_overlay = gpd.overlay(
+    properties_with_comm_sqft_thou,
     block_group_centroid_buffers_dvrpc_2020_2_mile,
     how="intersection",
-)  # Gives each 2010 block centroid in block_centroids_2010_with_emp the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 2-mile buffers)
+)  # Gives each property location in properties_with_comm_sqft_thou the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
 
-data_for_tot_emp_2mi_column = (
-    block_centroids_2010_with_emp_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
-    .agg({employment_column_name: "sum"})
-    .rename(columns={employment_column_name: "tot_emp_2mi"})
-)  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total number of jobs/employment, thereby creating the eventual tot_emp_2mi column
+data_for_tot_comm_sqft_thou_2mi_column = (
+    properties_with_comm_sqft_thou_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
+    .agg({"comm_sqft_thou": "sum"})
+    .rename(columns={"comm_sqft_thou": "tot_comm_sqft_thou_2mi"})
+)  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total commercial square feet (in thousands), thereby creating the eventual tot_comm_sqft_thou_2mi column
 
 
 block_centroids_2020_with_2020_total_pop_5mibuffers_overlay = gpd.overlay(
@@ -134,28 +128,28 @@ data_for_tot_pop_5mi_column = (
 )  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total population, thereby creating the eventual tot_pop_5mi column
 
 data_for_accessibility_bones_columns = pd.merge(
-    data_for_tot_emp_2mi_column,
+    data_for_tot_comm_sqft_thou_2mi_column,
     data_for_tot_pop_5mi_column,
     on=["GEOID"],
     how="left",
-)  # Left joins data_for_tot_pop_5mi_column to data_for_tot_emp_2mi_column to essentially start getting the data for the eventual accessibility_bones columns
+)  # Left joins data_for_tot_pop_5mi_column to data_for_tot_comm_sqft_thou_2mi_column to essentially start getting the data for the eventual accessibility_bones columns
 
 
-block_centroids_2010_with_emp_5mibuffers_overlay = gpd.overlay(
-    block_centroids_2010_with_emp,
+properties_with_comm_sqft_thou_5mibuffers_overlay = gpd.overlay(
+    properties_with_comm_sqft_thou,
     block_group_centroid_buffers_dvrpc_2020_5_mile,
     how="intersection",
-)  # Gives each 2010 block centroid in block_centroids_2010_with_emp the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
+)  # Gives each property location in properties_with_comm_sqft_thou the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 5-mile buffers)
 
 
 data_for_accessibility_bones_columns["accessibility_bones"] = (
     (
-        data_for_accessibility_bones_columns["tot_emp_2mi"]
+        data_for_accessibility_bones_columns["tot_comm_sqft_thou_2mi"]
         * data_for_accessibility_bones_columns["tot_pop_5mi"]
     )
     * 2
 ) / (
-    data_for_accessibility_bones_columns["tot_emp_2mi"]
+    data_for_accessibility_bones_columns["tot_comm_sqft_thou_2mi"]
     + data_for_accessibility_bones_columns["tot_pop_5mi"]
 )  # Creates the actual eventual accessibility_bones column
 
