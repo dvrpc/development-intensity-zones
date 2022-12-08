@@ -22,12 +22,12 @@ block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
 )  # Uses my function to bring in the analysis.block_groups_dvrpc_2020 shapefile
 
 tot_hus_2020_bg = db.get_dataframe_from_query(
-    'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", h1_001n AS housing_units_d20, FROM _raw.tot_pops_and_hhs_2020_bg'
+    'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", h1_001n AS housing_units_d20 FROM _raw.tot_pops_and_hhs_2020_bg'
 )  # Uses my function to bring in the 2020 Decennial housing units by block group data
 
-properties_with_comm_sqft_thou = db.get_geodataframe_from_query(
-    'SELECT "GEOID10", comm_sqft_thou, geom FROM analysis.costar'
-)  # Uses my function to bring in the shapefile containing the total commercial square feet (in thousands) for each property location
+costarproperties_rentable_area_bg = db.get_dataframe_from_query(
+    'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_bg'
+)  # Uses my function to bring in the shapefile containing the total commercial square feet (IN THOUSANDS) for each property location
 
 block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
     'SELECT "GEOID20", "POP20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
@@ -36,6 +36,10 @@ block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
 data_for_aland_acres_column = db.get_geodataframe_from_query(
     'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
 )  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
+
+costar_property_locations = db.get_geodataframe_from_query(
+    "SELECT rentable_building_area, shape AS geom FROM _raw.costarproperties"
+)  # Uses my function to bring in the shapefile containing the costar property locations
 
 block_group_centroid_buffers_dvrpc_2020_2_mile = db.get_geodataframe_from_query(
     'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_dvrpc_2020 WHERE buff_mi = 2'
@@ -50,13 +54,13 @@ block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
     tot_hus_2020_bg, on=["GEOID"], how="left"
 )  # Left joins tot_hus_2020_bg to block_groups_dvrpc_2020
 
+block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+    costarproperties_rentable_area_bg, on=["GEOID"], how="left"
+)  # Left joins costarproperties_rentable_area_bg to block_groups_dvrpc_2020 as well
 
-properties_with_comm_sqft_thou_bgsdvrpc20_overlay = gpd.overlay(
-    properties_with_comm_sqft_thou, block_groups_dvrpc_2020, how="intersection"
-)  # Gives each property location in properties_with_comm_sqft_thou its 2020 block group GEOID
 
 numerators_for_density_bones_calculations = (
-    properties_with_comm_sqft_thou_bgsdvrpc20_overlay.groupby(["GEOID"], as_index=False)
+    block_groups_dvrpc_2020.groupby(["GEOID"], as_index=False)
     .agg(
         {
             "comm_sqft_thou": "sum",
@@ -102,14 +106,22 @@ block_groups_dvrpc_2020["density_bones"] = (
 )  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual density_bones and accessibility_bones table's density_bones column
 
 
-properties_with_comm_sqft_thou_2mibuffers_overlay = gpd.overlay(
-    properties_with_comm_sqft_thou,
+costar_property_locations = costar_property_locations.to_crs(
+    "EPSG:32618"
+)  # Reprojects costar_property_locations to the EPSG 32618 CRS to match the CRS of the other shapefiles used in this analysis
+
+costar_property_locations.insert(
+    1, "comm_sqft_thou", costar_property_locations["rentable_building_area"] / 1000
+)  # Adds the comm_sqft_thou column to costar_property_locations, and makes it the 2nd column
+
+costar_property_locations_2mibuffers_overlay = gpd.overlay(
+    costar_property_locations,
     block_group_centroid_buffers_dvrpc_2020_2_mile,
     how="intersection",
-)  # Gives each property location in properties_with_comm_sqft_thou the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
+)  # Gives each property location in costar_property_locations the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
 
 data_for_tot_comm_sqft_thou_2mi_column = (
-    properties_with_comm_sqft_thou_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
+    costar_property_locations_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"comm_sqft_thou": "sum"})
     .rename(columns={"comm_sqft_thou": "tot_comm_sqft_thou_2mi"})
 )  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total commercial square feet (in thousands), thereby creating the eventual tot_comm_sqft_thou_2mi column
@@ -133,13 +145,6 @@ data_for_accessibility_bones_columns = pd.merge(
     on=["GEOID"],
     how="left",
 )  # Left joins data_for_tot_pop_5mi_column to data_for_tot_comm_sqft_thou_2mi_column to essentially start getting the data for the eventual accessibility_bones columns
-
-
-properties_with_comm_sqft_thou_5mibuffers_overlay = gpd.overlay(
-    properties_with_comm_sqft_thou,
-    block_group_centroid_buffers_dvrpc_2020_5_mile,
-    how="intersection",
-)  # Gives each property location in properties_with_comm_sqft_thou the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 5-mile buffers)
 
 
 data_for_accessibility_bones_columns["accessibility_bones"] = (
