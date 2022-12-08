@@ -1,5 +1,5 @@
 """
-This script creates analysis.density_and_accessibility_bones
+This script creates analysis.bones_density_and_accessibility
 """
 
 
@@ -180,7 +180,7 @@ density_bones_and_accessibility_bones[
 )  # Rounds density_bones and accessibility_bones to the nearest 2 decimal places
 
 
-density_and_accessibility_bones = pd.merge(
+bones_density_and_accessibility = pd.merge(
     existing_density_and_accessibility_table,
     density_bones_and_accessibility_bones,
     on=["block_group20"],
@@ -188,7 +188,7 @@ density_and_accessibility_bones = pd.merge(
 )  # Left joins density_bones_and_accessibility_bones back to the the existing density ad accessibility table to create the final results
 
 db.import_dataframe(
-    density_and_accessibility_bones,
-    "analysis.density_and_accessibility_bones",
+    bones_density_and_accessibility,
+    "analysis.bones_density_and_accessibility",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed density_and_accessibility_bones
+)  # Exports the completed bones_density_and_accessibility
