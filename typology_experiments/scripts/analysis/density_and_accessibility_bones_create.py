@@ -1,5 +1,5 @@
 """
-This script edits the existing density and accessibility table
+This script creates analysis.density_and_accessibility_bones
 """
 
 
