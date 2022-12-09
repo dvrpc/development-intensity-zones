@@ -3,7 +3,7 @@ drop view if exists analysis.bones_test_results;
 create view analysis.bones_test_results as 
 with 
 	density_and_accessibility_table as (select * from analysis.bones_density_and_accessibility),
-	thresholds as (select * from _resources.test_thresholds),
+	thresholds as (select * from _resources.bones_thresholds),
 	data_for_area_type_column as (select accessibility_levels as accessibility_level, density_levels as density_level, area_type from _resources.test_classifications),
 	data_for_area_type_2050_column as (
 		
