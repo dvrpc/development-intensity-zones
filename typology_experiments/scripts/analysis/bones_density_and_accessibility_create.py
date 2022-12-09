@@ -22,16 +22,12 @@ block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
 )  # Uses my function to bring in the analysis.block_groups_dvrpc_2020 shapefile
 
 tot_hus_2020_bg = db.get_dataframe_from_query(
-    'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", h1_001n AS housing_units_d20 FROM _raw.tot_pops_and_hhs_2020_bg'
-)  # Uses my function to bring in the 2020 Decennial housing units by block group data
+    'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", p5_001n+h1_001n AS housing_units_d20 FROM _raw.tot_pops_and_hhs_2020_bg'
+)  # Uses my function to bring in the 2020 Decennial housing units by block group data (also, note how we're adding the total group quarters population to the total housing units here)
 
 costarproperties_rentable_area_bg = db.get_dataframe_from_query(
     'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_bg'
 )  # Uses my function to bring in the shapefile containing the total commercial square feet (IN THOUSANDS) for each property location
-
-block_centroids_2020_with_2020_total_pop = db.get_geodataframe_from_query(
-    'SELECT "GEOID20", "POP20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
-)  # Uses my function to bring in the shapefile containing the total population for each 2010 block centroid
 
 data_for_aland_acres_column = db.get_geodataframe_from_query(
     'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
@@ -48,6 +44,19 @@ block_group_centroid_buffers_dvrpc_2020_2_mile = db.get_geodataframe_from_query(
 block_group_centroid_buffers_dvrpc_2020_5_mile = db.get_geodataframe_from_query(
     'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_dvrpc_2020 WHERE buff_mi = 5'
 )  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers
+
+
+block_centroids_2020_geometries = db.get_geodataframe_from_query(
+    'SELECT "GEOID20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
+)  # Uses my function to bring in just the centroids of the 2020 blocks
+
+block_centroids_2020_with_2020_gq_hu = db.get_dataframe_from_query(
+    'SELECT CONCAT(state,county,tract,block) AS "GEOID20", p5_001n+h1_001n AS gq_hu FROM _raw.tot_pops_and_hhs_2020_block'
+)  # Uses my function to bring in each 2020 block/centroid's total group quarters population and total housing units
+
+block_centroids_2020_with_2020_gq_hu = block_centroids_2020_geometries.merge(
+    block_centroids_2020_with_2020_gq_hu, on=["GEOID20"], how="left"
+)  # Makes it so each 2020 block centroid has its total group quarters population plus total housing units
 
 
 block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
@@ -127,16 +136,16 @@ data_for_tot_comm_sqft_thou_2mi_column = (
 )  # For each 2-mile buffer 2020 GEOID (block group ID/block group), gets the total commercial square feet (in thousands), thereby creating the eventual tot_comm_sqft_thou_2mi column
 
 
-block_centroids_2020_with_2020_total_pop_5mibuffers_overlay = gpd.overlay(
-    block_centroids_2020_with_2020_total_pop,
+block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay = gpd.overlay(
+    block_centroids_2020_with_2020_gq_hu,
     block_group_centroid_buffers_dvrpc_2020_5_mile,
     how="intersection",
-)  # Gives each 2020 block centroid in block_centroids_2020_with_2020_total_pop the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
+)  # Gives each 2020 block centroid in block_centroids_2020_with_2020_gq_hu the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
 data_for_tot_pop_5mi_column = (
-    block_centroids_2020_with_2020_total_pop_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
-    .agg({"POP20": "sum"})
-    .rename(columns={"POP20": "tot_pop_5mi"})
+    block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
+    .agg({"gq_hu": "sum"})
+    .rename(columns={"gq_hu": "tot_pop_5mi"})
 )  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total population, thereby creating the eventual tot_pop_5mi column
 
 data_for_accessibility_bones_columns = pd.merge(
