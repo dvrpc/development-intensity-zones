@@ -78,16 +78,16 @@ numerators_for_density_bones_calculations = (
     )
     .rename(
         columns={
-            "comm_sqft_thou": "total_employment",
+            "comm_sqft_thou": "total_comm_sqft_thou",
             "housing_units_d20": "total_housing_units",
         }
     )
 )  # For each (2020) GEOID (block group ID/block group), gets the total commercial square feet (in thousands) and total number of housing units
 
 numerators_for_density_bones_calculations["density_bones_numerator"] = (
-    numerators_for_density_bones_calculations["total_employment"]
+    numerators_for_density_bones_calculations["total_comm_sqft_thou"]
     + numerators_for_density_bones_calculations["total_housing_units"]
-)  # Gets the numerators for the density_bones calculations by adding together total_employment and total_housing_units
+)  # Gets the numerators for the density_bones calculations by adding together total_comm_sqft_thou and total_housing_units
 
 numerators_for_density_bones_calculations = numerators_for_density_bones_calculations[
     ["GEOID", "density_bones_numerator"]
@@ -142,29 +142,29 @@ block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay = gpd.overlay(
     how="intersection",
 )  # Gives each 2020 block centroid in block_centroids_2020_with_2020_gq_hu the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
-data_for_tot_pop_5mi_column = (
+data_for_tot_gq_hu_5mi_column = (
     block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"gq_hu": "sum"})
-    .rename(columns={"gq_hu": "tot_pop_5mi"})
-)  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total population, thereby creating the eventual tot_pop_5mi column
+    .rename(columns={"gq_hu": "tot_gq_hu_5mi"})
+)  # For each 5-mile buffer 2020 GEOID (block group ID/block group), gets the total group quarters population and total housing units, thereby creating the eventual tot_gq_hu_5mi column
 
 data_for_accessibility_bones_columns = pd.merge(
     data_for_tot_comm_sqft_thou_2mi_column,
-    data_for_tot_pop_5mi_column,
+    data_for_tot_gq_hu_5mi_column,
     on=["GEOID"],
     how="left",
-)  # Left joins data_for_tot_pop_5mi_column to data_for_tot_comm_sqft_thou_2mi_column to essentially start getting the data for the eventual accessibility_bones columns
+)  # Left joins data_for_tot_gq_hu_5mi_column to data_for_tot_comm_sqft_thou_2mi_column to essentially start getting the data for the eventual accessibility_bones columns
 
 
 data_for_accessibility_bones_columns["accessibility_bones"] = (
     (
         data_for_accessibility_bones_columns["tot_comm_sqft_thou_2mi"]
-        * data_for_accessibility_bones_columns["tot_pop_5mi"]
+        * data_for_accessibility_bones_columns["tot_gq_hu_5mi"]
     )
     * 2
 ) / (
     data_for_accessibility_bones_columns["tot_comm_sqft_thou_2mi"]
-    + data_for_accessibility_bones_columns["tot_pop_5mi"]
+    + data_for_accessibility_bones_columns["tot_gq_hu_5mi"]
 )  # Creates the actual eventual accessibility_bones column
 
 data_for_accessibility_bones_columns = data_for_accessibility_bones_columns[
