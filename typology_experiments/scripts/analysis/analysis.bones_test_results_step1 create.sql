@@ -1,6 +1,6 @@
-drop view if exists analysis.bones_test_results;
+drop view if exists analysis.bones_test_results_step1;
 
-create view analysis.bones_test_results as 
+create view analysis.bones_test_results_step1 as 
 with 
 	density_and_accessibility_table_without_crosswalk_density_column as (
 		
@@ -25,7 +25,7 @@ with
 	thresholds as (select * from _resources.bones_thresholds),
 	data_for_area_type_column as (select accessibility_levels as accessibility_level, density_levels as density_level, area_type from _resources.bones_classifications),
 	block_groups_dvrpc_2020_shp as (select "GEOID" as block_group20, geom from analysis.block_groups_dvrpc_2020),
-	bones_test_results_density_level_column as (
+	bones_test_results_step1_density_level_column as (
 	
 		select block_group20, density_bones, accessibility_bones, crosswalk_non_pos_water_density, 'very low' as density_level from density_and_accessibility_table where density_bones < (select density_thresholds from thresholds where levels = 'low') union
 		select block_group20, density_bones, accessibility_bones, crosswalk_non_pos_water_density, 'low' as density_level from density_and_accessibility_table where density_bones >= (select density_thresholds from thresholds where levels = 'low') and density_bones < (select density_thresholds from thresholds where levels = 'moderate') union
@@ -45,10 +45,10 @@ with
             d.crosswalk_non_pos_water_density,
             b.geom
         from block_groups_dvrpc_2020_shp b
-        	left join bones_test_results_density_level_column d
+        	left join bones_test_results_step1_density_level_column d
             on b.block_group20 = d.block_group20
     	),
-	bones_test_results_accessibility_level_column as (
+	bones_test_results_step1_accessibility_level_column as (
 	
 		select block_group20, 'very low' as accessibility_level from density_and_accessibility_table where accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'low') union
 		select block_group20, 'low' as accessibility_level from density_and_accessibility_table where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'low') and accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'moderate') union
@@ -69,7 +69,7 @@ with
             b.crosswalk_non_pos_water_density,
             b.geom
         from block_groups_dvrpc_2020_with_density_level_column b
-        	left join bones_test_results_accessibility_level_column d
+        	left join bones_test_results_step1_accessibility_level_column d
             on b.block_group20 = d.block_group20
     	),
     block_groups_dvrpc_2020_with_area_type_column_too as (
