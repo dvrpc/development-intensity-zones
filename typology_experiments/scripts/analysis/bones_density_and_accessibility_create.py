@@ -17,9 +17,9 @@ existing_density_and_accessibility_table = db.get_dataframe_from_query(
     "SELECT * FROM analysis.forecast_density_and_accessibility"
 )  # Uses my function to bring in the existing density ad accessibility table
 
-block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
-    "SELECT * FROM analysis.block_groups_dvrpc_2020"
-)  # Uses my function to bring in the analysis.block_groups_dvrpc_2020 shapefile
+block_groups_24co_2020 = db.get_geodataframe_from_query(
+    "SELECT * FROM analysis.block_groups_24co_2020"
+)  # Uses my function to bring in the analysis.block_groups_24co_2020 shapefile
 
 tot_hus_2020_bg = db.get_dataframe_from_query(
     'SELECT CONCAT(state,county,tract,block_group) AS "GEOID", p5_001n+h1_001n AS housing_units_d20 FROM _raw.tot_pops_and_hhs_2020_bg'
@@ -37,12 +37,12 @@ costar_property_locations = db.get_geodataframe_from_query(
     "SELECT rentable_building_area, shape AS geom FROM _raw.costarproperties"
 )  # Uses my function to bring in the shapefile containing the costar property locations
 
-block_group_centroid_buffers_dvrpc_2020_2_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_dvrpc_2020 WHERE buff_mi = 2'
+block_group_centroid_buffers_24co_2020_2_mile = db.get_geodataframe_from_query(
+    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 2'
 )  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 2-mile buffers
 
-block_group_centroid_buffers_dvrpc_2020_5_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_dvrpc_2020 WHERE buff_mi = 5'
+block_group_centroid_buffers_24co_2020_5_mile = db.get_geodataframe_from_query(
+    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 5'
 )  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers
 
 
@@ -59,17 +59,17 @@ block_centroids_2020_with_2020_gq_hu = block_centroids_2020_geometries.merge(
 )  # Makes it so each 2020 block centroid has its total group quarters population plus total housing units
 
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+block_groups_24co_2020 = block_groups_24co_2020.merge(
     tot_hus_2020_bg, on=["GEOID"], how="left"
-)  # Left joins tot_hus_2020_bg to block_groups_dvrpc_2020
+)  # Left joins tot_hus_2020_bg to block_groups_24co_2020
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+block_groups_24co_2020 = block_groups_24co_2020.merge(
     costarproperties_rentable_area_bg, on=["GEOID"], how="left"
-)  # Left joins costarproperties_rentable_area_bg to block_groups_dvrpc_2020 as well
+)  # Left joins costarproperties_rentable_area_bg to block_groups_24co_2020 as well
 
 
 numerators_for_density_bones_calculations = (
-    block_groups_dvrpc_2020.groupby(["GEOID"], as_index=False)
+    block_groups_24co_2020.groupby(["GEOID"], as_index=False)
     .agg(
         {
             "comm_sqft_thou": "sum",
@@ -93,9 +93,9 @@ numerators_for_density_bones_calculations = numerators_for_density_bones_calcula
     ["GEOID", "density_bones_numerator"]
 ]  # Just keeps the columns I want to keep and in the order I want to keep them in
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+block_groups_24co_2020 = block_groups_24co_2020.merge(
     numerators_for_density_bones_calculations, on=["GEOID"], how="left"
-)  # Left joins numerators_for_density_bones_calculations to block_groups_dvrpc_2020
+)  # Left joins numerators_for_density_bones_calculations to block_groups_24co_2020
 
 
 data_for_aland_acres_column = (
@@ -104,20 +104,15 @@ data_for_aland_acres_column = (
     .rename(columns={"aland_acres": "total_aland_acres"})
 )  # For each GEOID (block group ID/block group), gets the total aland_acres value (also makes data_for_aland_acres_column non-spatial in the process)
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+block_groups_24co_2020 = block_groups_24co_2020.merge(
     data_for_aland_acres_column, on=["GEOID"], how="left"
-)  # Left joins data_for_aland_acres_column to block_groups_dvrpc_2020
+)  # Left joins data_for_aland_acres_column to block_groups_24co_2020
 
 
-block_groups_dvrpc_2020["density_bones"] = (
-    block_groups_dvrpc_2020["density_bones_numerator"]
-    / block_groups_dvrpc_2020["total_aland_acres"]
+block_groups_24co_2020["density_bones"] = (
+    block_groups_24co_2020["density_bones_numerator"] / block_groups_24co_2020["total_aland_acres"]
 )  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual density_bones and accessibility_bones table's density_bones column
 
-
-costar_property_locations = costar_property_locations.to_crs(
-    "EPSG:32618"
-)  # Reprojects costar_property_locations to the EPSG 32618 CRS to match the CRS of the other shapefiles used in this analysis
 
 costar_property_locations.insert(
     1, "comm_sqft_thou", costar_property_locations["rentable_building_area"] / 1000
@@ -125,7 +120,7 @@ costar_property_locations.insert(
 
 costar_property_locations_2mibuffers_overlay = gpd.overlay(
     costar_property_locations,
-    block_group_centroid_buffers_dvrpc_2020_2_mile,
+    block_group_centroid_buffers_24co_2020_2_mile,
     how="intersection",
 )  # Gives each property location in costar_property_locations the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
 
@@ -138,7 +133,7 @@ data_for_tot_comm_sqft_thou_2mi_column = (
 
 block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay = gpd.overlay(
     block_centroids_2020_with_2020_gq_hu,
-    block_group_centroid_buffers_dvrpc_2020_5_mile,
+    block_group_centroid_buffers_24co_2020_5_mile,
     how="intersection",
 )  # Gives each 2020 block centroid in block_centroids_2020_with_2020_gq_hu the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
@@ -171,16 +166,16 @@ data_for_accessibility_bones_columns = data_for_accessibility_bones_columns[
     ["GEOID", "accessibility_bones"]
 ]  # Just keeps the columns I want to keep and in the order I want to keep them in
 
-block_groups_dvrpc_2020 = block_groups_dvrpc_2020.merge(
+block_groups_24co_2020 = block_groups_24co_2020.merge(
     data_for_accessibility_bones_columns, on=["GEOID"], how="left"
-)  # Left joins data_for_accessibility_bones_columns to block_groups_dvrpc_2020
+)  # Left joins data_for_accessibility_bones_columns to block_groups_24co_2020
 
 
 density_bones_and_accessibility_bones = pd.DataFrame(
-    block_groups_dvrpc_2020[["GEOID", "density_bones", "accessibility_bones"]]
+    block_groups_24co_2020[["GEOID", "density_bones", "accessibility_bones"]]
 ).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating the density_bones and accessibility_bones table's by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_dvrpc_2020 and in a non-spatial way
+)  # Starts creating the density_bones and accessibility_bones table's by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
 
 density_bones_and_accessibility_bones[
     ["density_bones", "accessibility_bones"]
