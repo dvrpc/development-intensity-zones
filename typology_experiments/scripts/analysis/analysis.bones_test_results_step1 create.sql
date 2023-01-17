@@ -9,7 +9,7 @@ with
 		),
 	crosswalk_density_column as (
 		
-		select "GEOID" as block_group20, crosswalk_non_pos_water_density from analysis.crosswalks_density_block_groups_dvrpc_2020
+		select "GEOID" as block_group20, crosswalk_non_pos_water_density from analysis.crosswalks_density_block_groups_24co_2020
 		
 		),
 	density_and_accessibility_table as (
@@ -24,7 +24,7 @@ with
     	),
 	thresholds as (select * from _resources.bones_thresholds),
 	data_for_area_type_column as (select accessibility_levels as accessibility_level, density_levels as density_level, area_type from _resources.bones_classifications),
-	block_groups_dvrpc_2020_shp as (select "GEOID" as block_group20, geom from analysis.block_groups_dvrpc_2020),
+	block_groups_24co_2020_shp as (select "GEOID" as block_group20, geom from analysis.block_groups_24co_2020),
 	bones_test_results_step1_density_level_column as (
 	
 		select block_group20, density_bones, accessibility_bones, crosswalk_non_pos_water_density, 'very low' as density_level from density_and_accessibility_table where density_bones < (select density_thresholds from thresholds where levels = 'low') union
@@ -36,7 +36,7 @@ with
 		select block_group20, density_bones, accessibility_bones, crosswalk_non_pos_water_density, 'low' as density_level from density_and_accessibility_table where density_bones is null
 		
 		), /*Note that the density_bones, accessibility_bones, and crosswalk_non_pos_water_density columns are brought up here only so that they can be carried over throughout the rest of the script, no operations are done on or related to those columns here. Also, basically figured out how to retrieve a cell value using SQL from https://stackoverflow.com/a/56322459 (in turn found on https://stackoverflow.com/questions/56322358/postgresql-how-to-copy-the-value-of-a-cell-in-a-row-and-paste-it-into-another-c )*/
-	block_groups_dvrpc_2020_with_density_level_column as (
+	block_groups_24co_2020_with_density_level_column as (
         select
             b.block_group20,
             d.density_bones,
@@ -44,7 +44,7 @@ with
             d.density_level,
             d.crosswalk_non_pos_water_density,
             b.geom
-        from block_groups_dvrpc_2020_shp b
+        from block_groups_24co_2020_shp b
         	left join bones_test_results_step1_density_level_column d
             on b.block_group20 = d.block_group20
     	),
@@ -59,7 +59,7 @@ with
 		select block_group20, 'low' as accessibility_level from density_and_accessibility_table where accessibility_bones is null
 		
 		),
-	block_groups_dvrpc_2020_with_accessibility_level_column_too as (
+	block_groups_24co_2020_with_accessibility_level_column_too as (
         select
             b.block_group20,
             b.density_bones,
@@ -68,11 +68,11 @@ with
             d.accessibility_level,
             b.crosswalk_non_pos_water_density,
             b.geom
-        from block_groups_dvrpc_2020_with_density_level_column b
+        from block_groups_24co_2020_with_density_level_column b
         	left join bones_test_results_step1_accessibility_level_column d
             on b.block_group20 = d.block_group20
     	),
-    block_groups_dvrpc_2020_with_area_type_column_too as (
+    block_groups_24co_2020_with_area_type_column_too as (
         select
             b.block_group20,
             b.density_bones,
@@ -82,11 +82,11 @@ with
             d.area_type,
             b.crosswalk_non_pos_water_density,
             b.geom
-        from block_groups_dvrpc_2020_with_accessibility_level_column_too b
+        from block_groups_24co_2020_with_accessibility_level_column_too b
         	left join data_for_area_type_column d
             on b.accessibility_level = d.accessibility_level
             and b.density_level = d.density_level
     	)
     
     
-    select row_number() over() as row_number, block_group20, density_bones, accessibility_bones, density_level, accessibility_level, area_type, crosswalk_non_pos_water_density, geom from block_groups_dvrpc_2020_with_area_type_column_too
+    select row_number() over() as row_number, block_group20, density_bones, accessibility_bones, density_level, accessibility_level, area_type, crosswalk_non_pos_water_density, geom from block_groups_24co_2020_with_area_type_column_too
