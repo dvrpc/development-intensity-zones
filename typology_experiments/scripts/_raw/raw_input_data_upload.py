@@ -130,7 +130,7 @@ pos_and_land_use_shplist = [
 # database later
 
 pos_and_land_use_shplist = [
-    i.to_crs(crs="EPSG:32618") for i in pos_and_land_use_shplist
+    i.to_crs(crs="EPSG:26918") for i in pos_and_land_use_shplist
 ]  # Puts both of those shapefiles in the standard DVRPC EPSG if they aren't in it already
 
 
@@ -172,7 +172,7 @@ blocks_and_bgs_shplist = [
 ]  # Turns multipolygon geometries into regular polygon geometries in all of the geo data frames/shapefiles
 
 blocks_and_bgs_shplist = [
-    i.to_crs(crs="EPSG:32618") for i in blocks_and_bgs_shplist
+    i.to_crs(crs="EPSG:26918") for i in blocks_and_bgs_shplist
 ]  # Puts all of those shapefiles in the standard DVRPC EPSG
 
 blocks_and_bgs_shpkeylist = [
