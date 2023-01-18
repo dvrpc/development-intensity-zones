@@ -13,10 +13,6 @@ from typology_experiments import Database, DATABASE_URL
 db = Database(DATABASE_URL)
 
 
-existing_density_and_accessibility_table = db.get_dataframe_from_query(
-    "SELECT * FROM analysis.forecast_density_and_accessibility"
-)  # Uses my function to bring in the existing density ad accessibility table
-
 block_groups_24co_2020 = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.block_groups_24co_2020"
 )  # Uses my function to bring in the analysis.block_groups_24co_2020 shapefile
@@ -171,25 +167,17 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
 )  # Left joins data_for_accessibility_bones_columns to block_groups_24co_2020
 
 
-density_bones_and_accessibility_bones = pd.DataFrame(
+bones_density_and_accessibility = pd.DataFrame(
     block_groups_24co_2020[["GEOID", "density_bones", "accessibility_bones"]]
 ).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating the density_bones and accessibility_bones table's by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
+)  # Starts creating the eventual analysis.bones_density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
 
-density_bones_and_accessibility_bones[
+bones_density_and_accessibility[
     ["density_bones", "accessibility_bones"]
-] = density_bones_and_accessibility_bones[["density_bones", "accessibility_bones"]].round(
+] = bones_density_and_accessibility[["density_bones", "accessibility_bones"]].round(
     2
 )  # Rounds density_bones and accessibility_bones to the nearest 2 decimal places
-
-
-bones_density_and_accessibility = pd.merge(
-    existing_density_and_accessibility_table,
-    density_bones_and_accessibility_bones,
-    on=["block_group20"],
-    how="left",
-)  # Left joins density_bones_and_accessibility_bones back to the the existing density ad accessibility table to create the final results
 
 db.import_dataframe(
     bones_density_and_accessibility,
