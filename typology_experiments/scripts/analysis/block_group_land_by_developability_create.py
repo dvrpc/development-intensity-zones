@@ -1,5 +1,5 @@
 """
-This script creates analysis.block_group_land_by_developability
+This script creates analysis.block_group_land_by_developability - NOTE THAT THIS ONLY USES PROTECTED LAND AND WATER DATA FOR THE DVRPC'S 9 COUNTIES, SO THIS WOULD EVENTUALLY HAVE TO BE REMADE ALSO USING PROTECTED LAND AND WATER DATA FOR THE 15 SURROUNDING COUNTIES 
 """
 
 import pandas as pd
@@ -16,9 +16,9 @@ dvrpc_protected_land_and_water = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.dvrpc_protected_land_and_water"
 )  # Uses my function to bring in the analysis.dvrpc_protected_land_and_water shapefile
 
-block_groups_dvrpc_2020 = db.get_geodataframe_from_query(
-    "SELECT * FROM analysis.block_groups_dvrpc_2020"
-)  # Uses my function to bring in the analysis.block_groups_dvrpc_2020 shapefile
+block_groups_24co_2020 = db.get_geodataframe_from_query(
+    "SELECT * FROM analysis.block_groups_24co_2020"
+)  # Uses my function to bring in the analysis.block_groups_24co_2020 shapefile
 
 
 dvrpc_protected_land_and_water.insert(
@@ -31,8 +31,8 @@ undevelopable_land = dvrpc_protected_land_and_water.dissolve(
 
 
 undevelopable_block_group_fragments = gpd.overlay(
-    block_groups_dvrpc_2020, undevelopable_land, how="intersection"
-)  # Intersects block_groups_dvrpc_2020 with undevelopable_land
+    block_groups_24co_2020, undevelopable_land, how="intersection"
+)  # Intersects block_groups_24co_2020 with undevelopable_land
 
 undevelopable_block_group_fragments[
     "developability"
@@ -59,8 +59,8 @@ undevelopable_block_group_fragments = undevelopable_block_group_fragments.rename
 
 
 developable_block_group_fragments = gpd.overlay(
-    block_groups_dvrpc_2020, undevelopable_land, how="difference"
-)  # Gets the difference between block_groups_dvrpc_2020 and undevelopable_land
+    block_groups_24co_2020, undevelopable_land, how="difference"
+)  # Gets the difference between block_groups_24co_2020 and undevelopable_land
 
 developable_block_group_fragments[
     "developability"
