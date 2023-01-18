@@ -9,7 +9,7 @@ with
 		),
 	crosswalk_density_column as (
 		
-		select "GEOID" as block_group20, crosswalk_non_pos_water_density from analysis.crosswalks_density_block_groups_24co_2020
+		select "GEOID" as block_group20, crosswalk_non_pos_water_density from analysis.crosswalks_density_block_groups_dvrpc_2020
 		
 		),
 	density_and_accessibility_table as (
