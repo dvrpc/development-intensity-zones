@@ -30,7 +30,7 @@ data_for_aland_acres_column = db.get_geodataframe_from_query(
 )  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
 
 costar_property_locations = db.get_geodataframe_from_query(
-    "SELECT rentable_building_area, shape AS geom FROM _raw.costarproperties"
+    "SELECT rentable_building_area, geom FROM analysis.costarproperties_region_plus_surrounding"
 )  # Uses my function to bring in the shapefile containing the costar property locations
 
 block_group_centroid_buffers_24co_2020_2_mile = db.get_geodataframe_from_query(
