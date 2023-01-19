@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density_and_accessibility
+This script creates analysis.bones_density_and_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_and_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS THAT DEPEND ON analysis.bones_density_and_accessibility
 """
 
 
@@ -33,13 +33,13 @@ costar_property_locations = db.get_geodataframe_from_query(
     "SELECT rentable_building_area, geom FROM analysis.costarproperties_region_plus_surrounding"
 )  # Uses my function to bring in the shapefile containing the costar property locations
 
-block_group_centroid_buffers_24co_2020_2_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 2'
-)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 2-mile buffers
+buffers_2_mile = db.get_geodataframe_from_query(
+    "SELECT * FROM analysis.incorp_del_river_bg_centroids_24co_2020_buffers WHERE buff_mi = 2"
+)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 2-mile buffers to use that Sean Lawrence created which incorporate the Delaware River
 
-block_group_centroid_buffers_24co_2020_5_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 5'
-)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers
+buffers_5_mile = db.get_geodataframe_from_query(
+    "SELECT * FROM analysis.incorp_del_river_bg_centroids_24co_2020_buffers WHERE buff_mi = 5"
+)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers to use that Sean Lawrence created which incorporate the Delaware River
 
 
 block_centroids_2020_geometries = db.get_geodataframe_from_query(
@@ -116,7 +116,7 @@ costar_property_locations.insert(
 
 costar_property_locations_2mibuffers_overlay = gpd.overlay(
     costar_property_locations,
-    block_group_centroid_buffers_24co_2020_2_mile,
+    buffers_2_mile,
     how="intersection",
 )  # Gives each property location in costar_property_locations the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
 
@@ -129,7 +129,7 @@ data_for_tot_comm_sqft_thou_2mi_column = (
 
 block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay = gpd.overlay(
     block_centroids_2020_with_2020_gq_hu,
-    block_group_centroid_buffers_24co_2020_5_mile,
+    buffers_5_mile,
     how="intersection",
 )  # Gives each 2020 block centroid in block_centroids_2020_with_2020_gq_hu the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
