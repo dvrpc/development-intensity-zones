@@ -4,7 +4,7 @@ create view analysis.bones_test_results_step1 as
 with 
 	density_and_accessibility_table_without_crosswalk_density_column as (
 		
-		select block_group20, density_bones, accessibility_bones from analysis.bones_density_and_accessibility
+		select block_group20, density_bones, accessibility_bones from analysis.bones_density_and_accessibility_step1
 		
 		),
 	crosswalk_density_column as (
