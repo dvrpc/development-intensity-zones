@@ -1,24 +1,11 @@
-/*drop table if exists analysis.costar_number_of_stories;
+drop table if exists analysis.costar_number_of_stories;
 
-create table analysis.costar_number_of_stories as*/
+create table analysis.costar_number_of_stories as
 with
-	costar_properties_surrounding_counties as (
-		
-		select "Number_Of_Stories" as number_of_stories, 
-		"Building_Status" as building_status,
-		"Year_Built" as year_built,
-		geom
-		
-		from _raw."CoStarProperties_Surrounding_Co_2023_01"
-		
-		where "Number_Of_Stories" is not null
-		and "Building_Status" in ('Converted', 'Existing', 'Under Construction', 'Under Renovation')
-		and "Year_Built" <= 2020
-		
-		),
 	costar_properties_dvrpc as (
 		
-		select number_of_stories, 
+		select propertyid, 
+		number_of_stories, 
 		building_status,
 		year_built,
 		shape as geom
@@ -30,11 +17,44 @@ with
 		and year_built <= 2020
 		
 		),
+	costar_properties_surrounding_counties as (
+		
+		select "PropertyID" as propertyid,
+		"Number_Of_Stories" as number_of_stories, 
+		"Building_Status" as building_status,
+		"Year_Built" as year_built,
+		geom
+		
+		from _raw."CoStarProperties_Surrounding_Co_2023_01"
+		
+		where "Number_Of_Stories" is not null
+		and "Building_Status" in ('Converted', 'Existing', 'Under Construction', 'Under Renovation')
+		and "Year_Built" <= 2020
+		
+		),
 	costar_number_of_stories_without_bg_2020_geoids as (
-	
-		select * from costar_properties_surrounding_counties union
-		select * from costar_properties_dvrpc
+		
+		select * from costar_properties_dvrpc union
+		select * from costar_properties_surrounding_counties
 		
 		),
 	bg_2020_geoids as (select "GEOID", geom from analysis.block_groups_24co_2020),
-	costar_number_of_stories as ()
+	costar_number_of_stories as (
+		select
+			b.propertyid,
+			d."GEOID",
+			b.number_of_stories,
+			b.building_status, 
+			b.year_built,
+			b.geom
+		from
+			costar_number_of_stories_without_bg_2020_geoids b,
+			bg_2020_geoids d
+		where
+			st_intersects(b.geom, d.geom) /*Basically found out how to spatial join in SQL from Sean Lawrence*/
+		order by
+			propertyid 
+		)
+		
+
+select * from costar_number_of_stories
