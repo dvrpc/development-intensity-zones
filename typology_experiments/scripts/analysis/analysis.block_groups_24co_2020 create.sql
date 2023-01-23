@@ -75,7 +75,8 @@ with
     "BLKGRPCE", 
     "GEOID",
     "NAMELSAD", 
-    "ALAND", 
+    "ALAND",
+    round(cast("ALAND"/4046.856 as numeric), 0) as aland_acres,
     "AWATER", 
     geom 
     from block_groups_de_md_nj_pa_2020_without_in_dvrpc_flag where county_id_5dig in (
