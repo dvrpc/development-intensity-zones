@@ -25,10 +25,6 @@ costarproperties_rentable_area_bg = db.get_dataframe_from_query(
     'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_bg'
 )  # Uses my function to bring in the shapefile containing the total commercial square feet (IN THOUSANDS) for each property location
 
-data_for_aland_acres_column = db.get_geodataframe_from_query(
-    'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
-)  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
-
 costar_property_locations = db.get_geodataframe_from_query(
     "SELECT rentable_building_area, geom FROM analysis.costarproperties_region_plus_surrounding"
 )  # Uses my function to bring in the shapefile containing the costar property locations
@@ -40,6 +36,10 @@ buffers_2_mile = db.get_geodataframe_from_query(
 buffers_5_mile = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.incorp_del_river_bg_centroids_24co_2020_buffers WHERE buff_mi = 5"
 )  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers to use that Sean Lawrence created which incorporate the Delaware River
+
+bones_density = db.get_dataframe_from_query(
+    "SELECT * FROM analysis.bones_density"
+)  # Uses my function to bring in the density figures I previously calculated
 
 
 block_centroids_2020_geometries = db.get_geodataframe_from_query(
@@ -62,52 +62,6 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
 block_groups_24co_2020 = block_groups_24co_2020.merge(
     costarproperties_rentable_area_bg, on=["GEOID"], how="left"
 )  # Left joins costarproperties_rentable_area_bg to block_groups_24co_2020 as well
-
-
-numerators_for_density_bones_calculations = (
-    block_groups_24co_2020.groupby(["GEOID"], as_index=False)
-    .agg(
-        {
-            "comm_sqft_thou": "sum",
-            "housing_units_d20": "sum",
-        }
-    )
-    .rename(
-        columns={
-            "comm_sqft_thou": "total_comm_sqft_thou",
-            "housing_units_d20": "total_housing_units",
-        }
-    )
-)  # For each (2020) GEOID (block group ID/block group), gets the total commercial square feet (in thousands) and total number of housing units
-
-numerators_for_density_bones_calculations["density_bones_numerator"] = (
-    numerators_for_density_bones_calculations["total_comm_sqft_thou"]
-    + numerators_for_density_bones_calculations["total_housing_units"]
-)  # Gets the numerators for the density_bones calculations by adding together total_comm_sqft_thou and total_housing_units
-
-numerators_for_density_bones_calculations = numerators_for_density_bones_calculations[
-    ["GEOID", "density_bones_numerator"]
-]  # Just keeps the columns I want to keep and in the order I want to keep them in
-
-block_groups_24co_2020 = block_groups_24co_2020.merge(
-    numerators_for_density_bones_calculations, on=["GEOID"], how="left"
-)  # Left joins numerators_for_density_bones_calculations to block_groups_24co_2020
-
-
-data_for_aland_acres_column = (
-    data_for_aland_acres_column.groupby(["GEOID"], as_index=False)
-    .agg({"aland_acres": "sum"})
-    .rename(columns={"aland_acres": "total_aland_acres"})
-)  # For each GEOID (block group ID/block group), gets the total aland_acres value (also makes data_for_aland_acres_column non-spatial in the process)
-
-block_groups_24co_2020 = block_groups_24co_2020.merge(
-    data_for_aland_acres_column, on=["GEOID"], how="left"
-)  # Left joins data_for_aland_acres_column to block_groups_24co_2020
-
-
-block_groups_24co_2020["density_bones"] = (
-    block_groups_24co_2020["density_bones_numerator"] / block_groups_24co_2020["total_aland_acres"]
-)  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual density_bones and accessibility_bones table's density_bones column
 
 
 costar_property_locations.insert(
@@ -167,17 +121,17 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
 )  # Left joins data_for_accessibility_bones_columns to block_groups_24co_2020
 
 
-bones_density_and_accessibility = pd.DataFrame(
-    block_groups_24co_2020[["GEOID", "density_bones", "accessibility_bones"]]
-).rename(
+bones_accessibility = pd.DataFrame(block_groups_24co_2020[["GEOID", "accessibility_bones"]]).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating the eventual analysis.bones_density_and_accessibility by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
+)  # Just simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way, and stores the results in a new object called bones_accessibility
 
-bones_density_and_accessibility[
-    ["density_bones", "accessibility_bones"]
-] = bones_density_and_accessibility[["density_bones", "accessibility_bones"]].round(
+bones_accessibility[["accessibility_bones"]] = bones_accessibility[["accessibility_bones"]].round(
     2
-)  # Rounds density_bones and accessibility_bones to the nearest 2 decimal places
+)  # Rounds accessibility_bones to the nearest 2 decimal places
+
+bones_density_and_accessibility = bones_density.merge(
+    bones_accessibility, on=["block_group20"], how="left"
+)  # Left joins bones_accessibility to bones_density to get the completed bones_density_and_accessibility
 
 db.import_dataframe(
     bones_density_and_accessibility,
