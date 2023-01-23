@@ -25,10 +25,6 @@ costarproperties_rentable_area_bg = db.get_dataframe_from_query(
     'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_bg'
 )  # Uses my function to bring in the shapefile containing the total commercial square feet (IN THOUSANDS) for each property location
 
-data_for_aland_acres_column = db.get_geodataframe_from_query(
-    'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
-)  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
-
 
 block_groups_24co_2020 = block_groups_24co_2020.merge(
     tot_hus_2020_bg, on=["GEOID"], how="left"
@@ -68,6 +64,10 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
     numerators_for_density_bones_calculations, on=["GEOID"], how="left"
 )  # Left joins numerators_for_density_bones_calculations to block_groups_24co_2020
 
+
+data_for_aland_acres_column = block_groups_24co_2020[
+    ["GEOID", "aland_acres", "geom"]
+]  # Gets the columns from block_groups_24co_2020 needed to make the eventual density column
 
 data_for_aland_acres_column = (
     data_for_aland_acres_column.groupby(["GEOID"], as_index=False)
