@@ -22,7 +22,7 @@ tot_hus_2020_bg = db.get_dataframe_from_query(
 )  # Uses my function to bring in the 2020 Decennial housing units by block group data (also, note how we're adding the total group quarters population to the total housing units here)
 
 costarproperties_rentable_area_bg = db.get_dataframe_from_query(
-    'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_BG'
+    'SELECT "GEOID", commercial_sqft AS comm_sqft_thou FROM analysis.costarproperties_rentable_area_bg'
 )  # Uses my function to bring in the shapefile containing the total commercial square feet (IN THOUSANDS) for each property location
 
 
