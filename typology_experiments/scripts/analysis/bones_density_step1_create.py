@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density BEFORE RUNNING THIS SCRIPT, THEN RERUN ANY SCRIPTS THAT CREATE ANY VIEWS WHICH DEPEND ON analysis.bones_density
+This script creates analysis.bones_density_step1. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_step1 BEFORE RUNNING THIS SCRIPT, THEN RERUN ANY SCRIPTS THAT CREATE ANY VIEWS WHICH DEPEND ON analysis.bones_density_step1
 """
 
 
@@ -81,20 +81,20 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
 
 block_groups_24co_2020["density_bones"] = (
     block_groups_24co_2020["density_bones_numerator"] / block_groups_24co_2020["total_aland_acres"]
-)  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual analysis.bones_density's density_bones column
+)  # Divides the numerator for density_bones calculations column by total_aland_acres to get the eventual analysis.bones_density_step1's density_bones column
 
 
-bones_density = pd.DataFrame(block_groups_24co_2020[["GEOID", "density_bones"]]).rename(
+bones_density_step1 = pd.DataFrame(block_groups_24co_2020[["GEOID", "density_bones"]]).rename(
     columns={"GEOID": "block_group20"}
-)  # Starts creating the eventual analysis.bones_density by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
+)  # Starts creating the eventual analysis.bones_density_step1 by creating a new object that simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way
 
-bones_density[["density_bones"]] = bones_density[["density_bones"]].round(
+bones_density_step1[["density_bones"]] = bones_density_step1[["density_bones"]].round(
     2
 )  # Rounds density_bones to the nearest 2 decimal places
 
 
 db.import_dataframe(
-    bones_density,
-    "analysis.bones_density",
+    bones_density_step1,
+    "analysis.bones_density_step1",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed bones_density
+)  # Exports the completed bones_density_step1
