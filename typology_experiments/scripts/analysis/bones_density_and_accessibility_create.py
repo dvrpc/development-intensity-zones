@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density_and_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_and_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS THAT DEPEND ON analysis.bones_density_and_accessibility
+This script creates analysis.bones_density_and_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_and_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_density_and_accessibility
 """
 
 

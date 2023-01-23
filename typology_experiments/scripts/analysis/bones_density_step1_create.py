@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density_step1. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_step1 BEFORE RUNNING THIS SCRIPT, THEN RERUN ANY SCRIPTS THAT CREATE ANY VIEWS WHICH DEPEND ON analysis.bones_density_step1
+This script creates analysis.bones_density_step1. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_step1 BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_density_step1
 """
 
 
