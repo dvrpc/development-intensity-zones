@@ -1,7 +1,7 @@
 drop table if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
 
 create table analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
-with /*The rest of this script from here on down was created by Sean Lawrence, I just wrote the 2 lines above, more indented most of the lines below, and changed "bones_test_results" to "bones_test_results_step2" to accommodate for the resulting scripting process change*/
+with /*The rest of this script from here on down was created by Sean Lawrence, I just wrote the 2 lines above, more indented most of the lines below, and changed "bones_test_results" to "bones_density" to accommodate for the resulting scripting process change*/
 	a as (
 		select
 			bg."GEOID",
@@ -21,7 +21,7 @@ with /*The rest of this script from here on down was created by Sean Lawrence, I
 			bda.density_level
 		from
 			a
-		join analysis.bones_test_results_step2 bda on
+		join analysis.bones_density bda on
 			a."GEOID" = bda.block_group20
 		),
 	c as (
