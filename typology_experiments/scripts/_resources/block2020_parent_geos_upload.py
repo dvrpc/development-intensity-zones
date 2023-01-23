@@ -6,6 +6,8 @@ import pandas as pd
 
 import gspread
 
+import re
+
 
 from typology_experiments import Database, DATABASE_URL
 
@@ -22,6 +24,14 @@ block2020_parent_geos = stream_in_google_sheets_table(
     "block2020_parent_geos",
     "./typology-experiments-11bfdbe8dac4.json",
 )  # Loads in block2020_parent_geos from Google Sheets using my stream_in_google_sheets_table() function. Also, note that the workbook and worksheet names are the same in this case
+
+block2020_parent_geos[
+    list(filter(re.compile(r"_id").search, list(block2020_parent_geos.columns)))
+] = block2020_parent_geos[
+    list(filter(re.compile(r"_id").search, list(block2020_parent_geos.columns)))
+].astype(
+    str
+)  # Makes all columns that have "_id" in their names string
 
 
 db.import_dataframe(
