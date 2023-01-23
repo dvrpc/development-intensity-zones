@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density BEFORE RUNNING THIS SCRIPT
+This script creates analysis.bones_density. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density BEFORE RUNNING THIS SCRIPT, THEN RERUN ANY SCRIPTS THAT CREATE ANY VIEWS WHICH DEPEND ON analysis.bones_density
 """
 
 
@@ -28,31 +28,6 @@ costarproperties_rentable_area_bg = db.get_dataframe_from_query(
 data_for_aland_acres_column = db.get_geodataframe_from_query(
     'SELECT "GEOID", aland_acres, geom FROM analysis.unprotected_land_area'
 )  # Uses my function to bring in the shapefile containing data needed to make the eventual density column
-
-costar_property_locations = db.get_geodataframe_from_query(
-    "SELECT rentable_building_area, geom FROM analysis.costarproperties_region_plus_surrounding"
-)  # Uses my function to bring in the shapefile containing the costar property locations
-
-block_group_centroid_buffers_24co_2020_2_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 2'
-)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 2-mile buffers
-
-block_group_centroid_buffers_24co_2020_5_mile = db.get_geodataframe_from_query(
-    'SELECT "GEOID", buff_mi, geom FROM analysis.block_group_centroid_buffers_24co_2020 WHERE buff_mi = 5'
-)  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers
-
-
-block_centroids_2020_geometries = db.get_geodataframe_from_query(
-    'SELECT "GEOID20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
-)  # Uses my function to bring in just the centroids of the 2020 blocks
-
-block_centroids_2020_with_2020_gq_hu = db.get_dataframe_from_query(
-    'SELECT CONCAT(state,county,tract,block) AS "GEOID20", p5_001n+h1_001n AS gq_hu FROM _raw.tot_pops_and_hhs_2020_block'
-)  # Uses my function to bring in each 2020 block/centroid's total group quarters population and total housing units
-
-block_centroids_2020_with_2020_gq_hu = block_centroids_2020_geometries.merge(
-    block_centroids_2020_with_2020_gq_hu, on=["GEOID20"], how="left"
-)  # Makes it so each 2020 block centroid has its total group quarters population plus total housing units
 
 
 block_groups_24co_2020 = block_groups_24co_2020.merge(
@@ -116,6 +91,7 @@ bones_density = pd.DataFrame(block_groups_24co_2020[["GEOID", "density_bones"]])
 bones_density[["density_bones"]] = bones_density[["density_bones"]].round(
     2
 )  # Rounds density_bones to the nearest 2 decimal places
+
 
 db.import_dataframe(
     bones_density,
