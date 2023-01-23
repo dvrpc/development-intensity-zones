@@ -4,10 +4,10 @@ select
 c."shape" as "geom",
 c."rentable_building_area"
 from "_raw"."costarproperties" c
-where (c.propertytype not like 'Multi-Fam%' or c.propertytype <> 'Student') and c.building_status in ('Existing', 'Under Construction', 'Under Renovation', 'Converted')
+where (c.propertytype not like 'Multi-Fam%' or c.propertytype <> 'Student') and c.building_status in ('Existing', 'Under Construction', 'Under Renovation', 'Converted') and c.year_built <= 2020
 union
 select 
 cspsc."geom",
 cspsc."Rentable_Building_Area"
 from "_raw"."CoStarProperties_Surrounding_Co_2023_01" cspsc
-where (cspsc."PropertyType" not like 'Multi-Fam%' or cspsc."PropertyType"  <> 'Student') and cspsc."Building_Status" in ('Existing', 'Under Construction', 'Under Renovation', 'Converted');
+where (cspsc."PropertyType" not like 'Multi-Fam%' or cspsc."PropertyType"  <> 'Student') and cspsc."Building_Status" in ('Existing', 'Under Construction', 'Under Renovation', 'Converted') and cspsc."Year_Built" <= 2020;
