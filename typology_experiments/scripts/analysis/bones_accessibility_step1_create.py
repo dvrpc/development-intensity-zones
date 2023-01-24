@@ -42,12 +42,12 @@ block_centroids_2020_geometries = db.get_geodataframe_from_query(
     'SELECT "GEOID20", geom FROM analysis.block_centroids_2020_with_2020_decennial_pop_and_hhs'
 )  # Uses my function to bring in just the centroids of the 2020 blocks
 
-block_centroids_2020_with_2020_gq_hu = db.get_dataframe_from_query(
+gq_hu_table = db.get_dataframe_from_query(
     'SELECT CONCAT(state,county,tract,block) AS "GEOID20", p5_001n+h1_001n AS gq_hu FROM _raw.tot_pops_and_hhs_2020_block'
 )  # Uses my function to bring in each 2020 block/centroid's total group quarters population and total housing units
 
 block_centroids_2020_with_2020_gq_hu = block_centroids_2020_geometries.merge(
-    block_centroids_2020_with_2020_gq_hu, on=["GEOID20"], how="left"
+    gq_hu_table, on=["GEOID20"], how="left"
 )  # Makes it so each 2020 block centroid has its total group quarters population plus total housing units
 
 
