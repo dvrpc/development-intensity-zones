@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_accessibility
+This script creates analysis.bones_accessibility_step1. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_accessibility_step1 BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_accessibility_step1
 """
 
 
@@ -117,16 +117,20 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
 )  # Left joins data_for_accessibility_bones_columns to block_groups_24co_2020
 
 
-bones_accessibility = pd.DataFrame(block_groups_24co_2020[["GEOID", "accessibility_bones"]]).rename(
+bones_accessibility_step1 = pd.DataFrame(
+    block_groups_24co_2020[["GEOID", "accessibility_bones"]]
+).rename(
     columns={"GEOID": "block_group20"}
-)  # Just simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way, and stores the results in a new object called bones_accessibility
+)  # Just simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way, and stores the results in a new object called bones_accessibility_step1
 
-bones_accessibility[["accessibility_bones"]] = bones_accessibility[["accessibility_bones"]].round(
+bones_accessibility_step1[["accessibility_bones"]] = bones_accessibility_step1[
+    ["accessibility_bones"]
+].round(
     2
 )  # Rounds accessibility_bones to the nearest 2 decimal places
 
 db.import_dataframe(
-    bones_accessibility,
-    "analysis.bones_accessibility",
+    bones_accessibility_step1,
+    "analysis.bones_accessibility_step1",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed bones_accessibility
+)  # Exports the completed bones_accessibility_step1
