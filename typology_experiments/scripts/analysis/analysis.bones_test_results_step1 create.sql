@@ -1,69 +1,69 @@
-drop view if exists analysis.bones_test_results_step1;
+drop view if exists analysis.transect_step1;
 
-create view analysis.bones_test_results_step1 as 
+create view analysis.transect_step1 as 
 with 
-	bones_density_and_accessibility as (
+	density_and_proximity_indices as (
         select
             b.block_group20,
-            b.density_bones,
-            d.accessibility_bones, /*Put the "_bones" columns next to each other and the "_level" columns next to each other*/
-            b.density_level,
-            d.accessibility_level
-        from analysis.bones_density b
-        	left join analysis.bones_accessibility d
+            b.density_index,
+            d.proximity_index, /*Put the "_index" columns next to each other and the "_index_level" columns next to each other*/
+            b.density_index_level,
+            d.proximity_index_level
+        from analysis.density_index b
+        	left join analysis.proximity_index d
             on b.block_group20 = d.block_group20
     	),
-    data_for_area_type_column as (
+    data_for_prelim_transect_zone_column as (
     	
-    	select accessibility_levels as accessibility_level, density_levels as density_level, area_type from _resources.bones_classifications
+    	select proximity_index_levels as proximity_index_level, density_index_levels as density_index_level, prelim_transect_zone from _resources.classifications
     	
     	),
-    bones_density_and_accessibility_with_area_type_column as (
+    density_and_proximity_indices_with_prelim_transect_zone_column as (
         select
             b.block_group20,
-            b.density_bones,
-            b.accessibility_bones,
-            b.density_level,
-            b.accessibility_level,
-            d.area_type
-        from bones_density_and_accessibility b
-        	left join data_for_area_type_column d
-            on b.accessibility_level = d.accessibility_level
-            and b.density_level = d.density_level
+            b.density_index,
+            b.proximity_index,
+            b.density_index_level,
+            b.proximity_index_level,
+            d.prelim_transect_zone
+        from density_and_proximity_indices b
+        	left join data_for_prelim_transect_zone_column d
+            on b.proximity_index_level = d.proximity_index_level
+            and b.density_index_level = d.density_index_level
     	),
-    bones_density_and_accessibility_crosswalk_density_column as (
+    density_and_proximity_indices_crosswalk_density_column as (
 		
-		select "GEOID" as block_group20, crosswalk_non_pos_water_density from analysis.crosswalks_density_block_groups_dvrpc_2020
+		select "GEOID" as block_group20, crosswalk_density from analysis.crosswalks_density_block_groups_dvrpc_2020
 		
 		),
-	bones_density_and_accessibility_with_crosswalk_density_column_too as (
+	density_and_proximity_indices_with_crosswalk_density_column_too as (
         select
             b.block_group20,
-            b.density_bones,
-            b.accessibility_bones,
-            b.density_level,
-            b.accessibility_level,
-            b.area_type,
-            d.crosswalk_non_pos_water_density
-        from bones_density_and_accessibility_with_area_type_column b
-        	left join bones_density_and_accessibility_crosswalk_density_column d
+            b.density_index,
+            b.proximity_index,
+            b.density_index_level,
+            b.proximity_index_level,
+            b.prelim_transect_zone,
+            d.crosswalk_density
+        from density_and_proximity_indices_with_prelim_transect_zone_column b
+        	left join density_and_proximity_indices_crosswalk_density_column d
             on b.block_group20 = d.block_group20
     	),
-    bones_density_and_accessibility_geometries as (select "GEOID" as block_group20, geom from analysis.block_groups_24co_2020),
-	bones_density_and_accessibility_with_geometries_too as (
+    density_and_proximity_indices_geometries as (select "GEOID" as block_group20, geom from analysis.block_groups_24co_2020),
+	density_and_proximity_indices_with_geometries_too as (
         select
             b.block_group20,
-            b.density_bones,
-            b.accessibility_bones,
-            b.density_level,
-            b.accessibility_level,
-            b.area_type,
-            b.crosswalk_non_pos_water_density,
+            b.density_index,
+            b.proximity_index,
+            b.density_index_level,
+            b.proximity_index_level,
+            b.prelim_transect_zone,
+            b.crosswalk_density,
             d.geom
-        from bones_density_and_accessibility_with_crosswalk_density_column_too b
-        	left join bones_density_and_accessibility_geometries d
+        from density_and_proximity_indices_with_crosswalk_density_column_too b
+        	left join density_and_proximity_indices_geometries d
             on b.block_group20 = d.block_group20
     	)
     
     
-    select row_number() over() as row_number, block_group20, density_bones, accessibility_bones, density_level, accessibility_level, area_type, crosswalk_non_pos_water_density, geom from bones_density_and_accessibility_with_geometries_too
+    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_transect_zone, crosswalk_density, geom from density_and_proximity_indices_with_geometries_too
