@@ -1,6 +1,6 @@
-drop table if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
+drop view if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
 
-create table analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
+create view analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
 with /*The rest of this script from here on down was created by Sean Lawrence, I just wrote the 2 lines above, more indented most of the lines below, and changed "bones_test_results" to "bones_density" to accommodate for the resulting scripting process change*/
 	a as (
 		select
