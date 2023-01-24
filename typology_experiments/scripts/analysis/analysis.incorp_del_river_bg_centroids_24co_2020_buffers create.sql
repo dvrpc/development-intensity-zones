@@ -1,7 +1,7 @@
 drop view if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
 
 create view analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
-with /*The rest of this script from here on down was created by Sean Lawrence, I just wrote the 2 lines above, more indented most of the lines below, and changed "bones_test_results" to "bones_density" to accommodate for the resulting scripting process change*/
+with /*Most of this script was created by Sean Lawrence*/
 	a as (
 		select
 			bg."GEOID",
@@ -18,10 +18,10 @@ with /*The rest of this script from here on down was created by Sean Lawrence, I
 			a."GEOID",
 			a.buff_mi,
 			a.geom,
-			bda.density_level
+			bda.density_index_level
 		from
 			a
-		join analysis.bones_density bda on
+		join analysis.density_index bda on
 			a."GEOID" = bda.block_group20
 		),
 	c as (
@@ -33,7 +33,7 @@ with /*The rest of this script from here on down was created by Sean Lawrence, I
 			b,
 			_raw.delaware_river_centerline drc
 		where
-			b.density_level in ('very low', 'low', 'moderate')
+			b.density_index_level in ('very low', 'low', 'moderate')
 		),
 	d as (
 		select
