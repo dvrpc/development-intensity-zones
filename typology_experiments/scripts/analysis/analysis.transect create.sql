@@ -46,7 +46,7 @@ with
         
 		select block_group20, prelim_transect_zone, prelim_transect_zone_plus_1, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus,
 		
-		case when prelim_transect_zone in (1,5,6) then prelim_transect_zone else prelim_transect_zone + crosswalk_bonus + stories_bonus end as crosswalk_promo_prelim_transect_zone
+		case when prelim_transect_zone in (1,5,6) then prelim_transect_zone else prelim_transect_zone + crosswalk_bonus + stories_bonus end as transect_zone
 		
 		from transect_additional_columns_step2
 		
@@ -63,7 +63,7 @@ with
             d.average_comm_stories, 
             d.crosswalk_bonus,
             d.stories_bonus,
-            d.crosswalk_promo_prelim_transect_zone,
+            d.transect_zone,
 			b.geom
         from transect_step1 b
         	left join transect_additional_columns d
@@ -72,4 +72,4 @@ with
     	)
     
     
-    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_transect_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, crosswalk_promo_prelim_transect_zone, geom from transect
+    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_transect_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, transect_zone, geom from transect
