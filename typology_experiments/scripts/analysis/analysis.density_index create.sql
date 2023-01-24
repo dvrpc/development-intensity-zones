@@ -68,7 +68,7 @@ with
     	
     	),
 	thresholds as (select levels, density_index_thresholds from _resources.thresholds),
-	density_index_density_index_level_column as (
+	density_index_level_column as (
 	
 		select block_group20, 'very low' as density_index_level from density_index_step1 where density_index < (select density_index_thresholds from thresholds where levels = 'low') union
 		select block_group20, 'low' as density_index_level from density_index_step1 where density_index >= (select density_index_thresholds from thresholds where levels = 'low') and density_index < (select density_index_thresholds from thresholds where levels = 'moderate') union
@@ -85,7 +85,7 @@ with
             b.density_index,
             d.density_index_level
         from density_index_step1 b
-        	left join density_index_density_index_level_column d
+        	left join density_index_level_column d
             on b.block_group20 = d.block_group20
     	)
     
