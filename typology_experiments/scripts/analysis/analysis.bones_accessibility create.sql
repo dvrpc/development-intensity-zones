@@ -1,6 +1,6 @@
-drop view if exists analysis.bones_accessibility;
+drop view if exists analysis.proximity_index;
 
-create view analysis.bones_accessibility as 
+create view analysis.proximity_index as 
 with 
 	block_groups_24co_2020 as (select "GEOID" as block_group20, aland_acres, geom from analysis.block_groups_24co_2020),
 	gq_hu_table as (
@@ -74,7 +74,7 @@ with
 		group by block_group20_5mibuff
 		
 		),
-	data_for_accessibility_bones_column as (
+	data_for_proximity_index_column as (
         select
             b.block_group20,
             b.tot_comm_sqft_thou_2mi,
@@ -83,32 +83,32 @@ with
         	left join data_for_tot_gq_hu_5mi_column d
             on b.block_group20 = d.block_group20
     	),
-    bones_accessibility_step1 as (
+    proximity_index_step1 as (
     	
-    	select block_group20, ((tot_comm_sqft_thou_2mi*tot_gq_hu_5mi)*2)/(tot_comm_sqft_thou_2mi+tot_gq_hu_5mi) as accessibility_bones from data_for_accessibility_bones_column
+    	select block_group20, ((tot_comm_sqft_thou_2mi*tot_gq_hu_5mi)*2)/(tot_comm_sqft_thou_2mi+tot_gq_hu_5mi) as proximity_index from data_for_proximity_index_column
     	
     	),
-	thresholds as (select levels, accessibility_thresholds from _resources.bones_thresholds),
-	bones_accessibility_accessibility_level_column as (
+	thresholds as (select levels, proximity_index_thresholds from _resources.thresholds),
+	proximity_index_level_column as (
 	
-		select block_group20, 'very low' as accessibility_level from bones_accessibility_step1 where accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'low') union
-		select block_group20, 'low' as accessibility_level from bones_accessibility_step1 where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'low') and accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'moderate') union
-		select block_group20, 'moderate' as accessibility_level from bones_accessibility_step1 where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'moderate') and accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'high') union
-		select block_group20, 'high' as accessibility_level from bones_accessibility_step1 where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'high') and accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'very high') union
-		select block_group20, 'very high' as accessibility_level from bones_accessibility_step1 where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'very high') and accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'extreme') union
-		select block_group20, 'extreme' as accessibility_level from bones_accessibility_step1 where accessibility_bones >= (select accessibility_thresholds from thresholds where levels = 'extreme') union
-		select block_group20, 'low' as accessibility_level from bones_accessibility_step1 where accessibility_bones is null
+		select block_group20, 'very low' as proximity_index_level from proximity_index_step1 where proximity_index < (select proximity_index_thresholds from thresholds where levels = 'low') union
+		select block_group20, 'low' as proximity_index_level from proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from thresholds where levels = 'low') and proximity_index < (select proximity_index_thresholds from thresholds where levels = 'moderate') union
+		select block_group20, 'moderate' as proximity_index_level from proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from thresholds where levels = 'moderate') and proximity_index < (select proximity_index_thresholds from thresholds where levels = 'high') union
+		select block_group20, 'high' as proximity_index_level from proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from thresholds where levels = 'high') and proximity_index < (select proximity_index_thresholds from thresholds where levels = 'very high') union
+		select block_group20, 'very high' as proximity_index_level from proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from thresholds where levels = 'very high') and proximity_index < (select proximity_index_thresholds from thresholds where levels = 'extreme') union
+		select block_group20, 'extreme' as proximity_index_level from proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from thresholds where levels = 'extreme') union
+		select block_group20, 'low' as proximity_index_level from proximity_index_step1 where proximity_index is null
 		
 		), /*Basically figured out how to retrieve a cell value using SQL from https://stackoverflow.com/a/56322459 (in turn found on https://stackoverflow.com/questions/56322358/postgresql-how-to-copy-the-value-of-a-cell-in-a-row-and-paste-it-into-another-c )*/
-	bones_accessibility as (
+	proximity_index as (
         select
             b.block_group20,
-            b.accessibility_bones,
-            d.accessibility_level
-        from bones_accessibility_step1 b
-        	left join bones_accessibility_accessibility_level_column d
+            b.proximity_index,
+            d.proximity_index_level
+        from proximity_index_step1 b
+        	left join proximity_index_level_column d
             on b.block_group20 = d.block_group20
     	)
     
     
-    select * from bones_accessibility
+    select * from proximity_index
