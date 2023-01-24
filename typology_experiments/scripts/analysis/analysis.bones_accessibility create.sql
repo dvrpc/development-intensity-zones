@@ -3,7 +3,7 @@ drop view if exists analysis.bones_accessibility;
 create view analysis.bones_accessibility as 
 with 
 	bones_accessibility_step1 as (select * from analysis.bones_accessibility_step1),
-	thresholds as (select * from _resources.bones_thresholds),
+	thresholds as (select levels, accessibility_thresholds from _resources.bones_thresholds),
 	bones_accessibility_accessibility_level_column as (
 	
 		select block_group20, 'very low' as accessibility_level from bones_accessibility_step1 where accessibility_bones < (select accessibility_thresholds from thresholds where levels = 'low') union
