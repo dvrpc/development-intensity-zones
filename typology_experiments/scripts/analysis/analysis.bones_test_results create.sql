@@ -37,7 +37,7 @@ with
             b.crosswalk_non_pos_water_density,
             d.average_comm_stories, /*average_comm_stories comes to the left of promo_40th*/
             b.promo_40th,
-            case when average_comm_stories >= 2.95 then 1 else 0 end as stories_bonus /*Also creates stories_bonus here. And it comes to the left of crosswalk_promo_area_type*/
+            case when average_comm_stories >= 2.95 then 1 else 0 end as stories_bonus /*Also creates stories_bonus here*/
         from bones_test_results_additional_columns_step1 b
         	left join average_stories_for_each_block_group d
             on b.block_group20 = d.block_group20
