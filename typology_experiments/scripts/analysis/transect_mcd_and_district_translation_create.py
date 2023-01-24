@@ -1,5 +1,5 @@
 """
-This script creates analysis.transect_mcd_and_district_translation
+This script creates analysis.transect_mcd_and_district_translation. AND REMEMBER TO DELETE THE CURRENT analysis.transect_mcd_and_district_translation FIRST BEFORE RERUNNING THIS SCRIPT
 """
 
 
