@@ -3,7 +3,7 @@ drop view if exists analysis.bones_density;
 create view analysis.bones_density as 
 with 
 	bones_density_step1 as (select * from analysis.bones_density_step1),
-	thresholds as (select * from _resources.bones_thresholds),
+	thresholds as (select levels, density_thresholds from _resources.bones_thresholds),
 	bones_density_density_level_column as (
 	
 		select block_group20, 'very low' as density_level from bones_density_step1 where density_bones < (select density_thresholds from thresholds where levels = 'low') union
