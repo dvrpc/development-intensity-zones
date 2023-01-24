@@ -1,5 +1,5 @@
 """
-This script creates analysis.bones_density_and_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_density_and_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_density_and_accessibility
+This script creates analysis.bones_accessibility. ALSO, REMEMBER TO FIRST CASCADE DELETE/DROP CASCADE analysis.bones_accessibility BEFORE RUNNING THIS SCRIPT, AND THEN AFTER FINISHING RUNNING THIS SCRIPT, RERUN THE SCRIPTS THAT CREATE THE VIEWS WHICH DEPEND ON analysis.bones_accessibility
 """
 
 
@@ -36,10 +36,6 @@ buffers_2_mile = db.get_geodataframe_from_query(
 buffers_5_mile = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.incorp_del_river_bg_centroids_24co_2020_buffers WHERE buff_mi = 5"
 )  # Uses my function to bring in the shapefile containing the 2020 block group centroids' 5-mile buffers to use that Sean Lawrence created which incorporate the Delaware River
-
-bones_density = db.get_dataframe_from_query(
-    "SELECT * FROM analysis.bones_density"
-)  # Uses my function to bring in the density figures I previously calculated
 
 
 block_centroids_2020_geometries = db.get_geodataframe_from_query(
@@ -129,12 +125,8 @@ bones_accessibility[["accessibility_bones"]] = bones_accessibility[["accessibili
     2
 )  # Rounds accessibility_bones to the nearest 2 decimal places
 
-bones_density_and_accessibility = bones_density.merge(
-    bones_accessibility, on=["block_group20"], how="left"
-)  # Left joins bones_accessibility to bones_density to get the completed bones_density_and_accessibility
-
 db.import_dataframe(
-    bones_density_and_accessibility,
-    "analysis.bones_density_and_accessibility",
+    bones_accessibility,
+    "analysis.bones_accessibility",
     df_import_kwargs={"if_exists": "replace", "index": False},
-)  # Exports the completed bones_density_and_accessibility
+)  # Exports the completed bones_accessibility
