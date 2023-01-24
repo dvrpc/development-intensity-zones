@@ -14,7 +14,7 @@ ula.aland_acres,
 ula.geom,
 ula.uid,
 cbgd.crosswalk_count / ula.aland_acres as crosswalk_aland_density,
-cbgd.crosswalk_count / ula.non_pos_water_acres as crosswalk_non_pos_water_density
+cbgd.crosswalk_count / ula.non_pos_water_acres as crosswalk_density
 from analysis.unprotected_land_area ula 
 left join analysis.crosswalks_block_groups_dvrpc_2020 cbgd 
 on ula."GEOID" = cbgd."GEOID";
