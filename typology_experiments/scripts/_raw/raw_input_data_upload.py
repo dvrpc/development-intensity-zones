@@ -186,56 +186,14 @@ blocks_and_bgs_shpkeylist = [
 # ORDERED IN THE blocks_and_bgs_shps_urls LIST)
 
 
-transect_translations_shplist = [
-    (
-        gpd.read_file(
-            "https://arcgis.dvrpc.org/portal/rest/services/Demographics/Census_MCDs_2020/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-        )
-        .to_crs(26918)
-        .rename(columns={"geoid": "mcd20_id"})
-        .explode(index_parts=False)
-    ),
-    (
-        gpd.read_file(
-            "https://arcgis.dvrpc.org/portal/rest/services/Demographics/Census_MCDs_PhiPD_2020/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-        )
-        .to_crs(26918)
-        .rename(columns={"geoid": "district_id"})
-        .explode(index_parts=False)
-    ),
-    (
-        gpd.read_file(
-            "https://arcgis.dvrpc.org/portal/rest/services/Demographics/TAZ_2010/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-        )
-        .to_crs(26918)
-        .rename(columns={"taz_2010": "taz_id"})
-    ),
-    (
-        gpd.read_file(
-            "https://arcgis.dvrpc.org/portal/rest/services/Demographics/Census_Tracts_2020/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-        )
-        .to_crs(26918)
-        .rename(columns={"geoid": "tract20_id"})
-        .explode(index_parts=False)
-    ),
-]  # Brings in all of the shapefiles needed for the eventual analysis.transect translations
-
-transect_translations_shpkeylist = [
-    "dvrpc_mcds_phillyas1_2020",
-    "dvrpc_mcds_with_philly_pds_2020",
-    "dvrpc_tazs_2010",
-    "dvrpc_tracts_2020",
-]  # Puts together the names of those shapefiles
-
-
 shps_to_upload_dictionary = dict(
     zip(
-        pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist + transect_translations_shpkeylist,
-        pos_and_land_use_shplist + blocks_and_bgs_shplist + transect_translations_shplist,
+        pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
+        pos_and_land_use_shplist + blocks_and_bgs_shplist,
     )
 )  # This and the next command repeat the process that was used for the non-spatial tables, but for the spatial tables/geo data frames/shapefiles
 
 [
     db.import_geodataframe(df, f"{tablename}", schema="_raw")
     for tablename, df in shps_to_upload_dictionary.items()
-]  # IGNORE THE "[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]" THAT GETS PRINTED HERE, THIS COMMAND STILL WORKS
+]
