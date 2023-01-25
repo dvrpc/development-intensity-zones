@@ -53,7 +53,7 @@ with
 		from transect_additional_columns_step2
 		
 		),
-	transect as (
+	transect_without_transect_zone_names as (
         select
             b.block_group20, 
             b.density_index, 
@@ -70,8 +70,28 @@ with
         from transect_step1 b
         	left join transect_additional_columns d
             on b.block_group20 = d.block_group20
+    	),
+	transect_zone_names as (select * from _resources.transect_zone_names),
+	transect as (
+        select
+            b.block_group20, 
+            b.density_index, 
+            b.proximity_index, 
+            b.density_index_level, 
+            b.proximity_index_level, 
+            b.prelim_transect_zone, 
+            b.crosswalk_density,
+            b.average_comm_stories, 
+            b.crosswalk_bonus,
+            b.stories_bonus,
+            b.transect_zone,
+            d.transect_zone_name,
+			b.geom
+        from transect_without_transect_zone_names b
+        	left join transect_zone_names d
+            on b.transect_zone = d.transect_zone
             order by block_group20
     	)
     
     
-    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_transect_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, transect_zone, geom from transect
+    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_transect_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, transect_zone, transect_zone_name, geom from transect
