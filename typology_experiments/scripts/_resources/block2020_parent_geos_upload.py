@@ -14,16 +14,9 @@ from typology_experiments import Database, DATABASE_URL
 db = Database(DATABASE_URL)
 
 
-from typology_experiments.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE
-
-# "from typology_experiments import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
-
-
-block2020_parent_geos = stream_in_google_sheets_table(
-    "block2020_parent_geos",
-    "block2020_parent_geos",
-    "./typology-experiments-11bfdbe8dac4.json",
-)  # Loads in block2020_parent_geos from Google Sheets using my stream_in_google_sheets_table() function. Also, note that the workbook and worksheet names are the same in this case
+block2020_parent_geos = pd.read_excel(
+    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/block2020_parent_geos.xlsx"
+)  # Reads in block2020_parent_geos
 
 block2020_parent_geos[
     list(filter(re.compile(r"_id").search, list(block2020_parent_geos.columns)))
