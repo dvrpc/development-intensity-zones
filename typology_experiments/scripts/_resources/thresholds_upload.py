@@ -1,5 +1,5 @@
 """
-This script uploads _resources.thresholds. AND REMEMBER TO FIRST DROP CASCADE _resources.thresholds BEFORE RERUNNING THIS
+This script uploads _resources.thresholds. ALSO, REMEMBER THAT THIS SCRIPT IS ONLY MEANT TO BE RUN JUST ONCE AND THAT'S IT. BUT IF I DO END UP HAVING TO RERUN THIS SCRIPT FOR SOME REASON, REMEMBER TO FIRST DROP CASCADE _resources.thresholds BEFORE RERUNNING THIS
 """
 
 import pandas as pd
