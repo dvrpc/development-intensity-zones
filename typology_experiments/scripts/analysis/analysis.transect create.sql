@@ -33,7 +33,7 @@ with
         select
             b.block_group20,
             b.density_index_level, 
-            proximity_index_level,
+            b.proximity_index_level,
             b.prelim_transect_zone, 
             b.prelim_transect_zone_plus_1,
             b.crosswalk_density,
