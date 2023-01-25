@@ -6,14 +6,14 @@ with
 		
 		select block_group20_id, 
 		
-		case when mcd20_id = '4210160000' then regexp_replace(district_id, '\.0', '0') else mcd20_id end as district_id,  /*Note that issue with _resources.block2020_parent_geos's district_id column where the district_id values have ".0"'s at the end of them, even though they're string*/
+		case when mcd20_id = '4210160000' then regexp_replace(district_id, '\.0', '0') else mcd20_id end as district_id, /*Note that issue with _resources.block2020_parent_geos's district_id column where the district_id values have ".0"'s at the end of them, even though they're string*/
 		
 		aland 
 		
 		from _resources.block2020_parent_geos
 		
 		),
-	transect_zones as (select block_group20 as block_group20_id, transect_zone from analysis.transect),
+	transect_zones as (select block_group20 as block_group20_id, transect_zone from analysis.transect), /*Note that due to an error that comes up later in this script, I will bring in the transect_zone_names column separately later in the script*/ 
 	block2020_parent_geos_with_transect_zone as (
         select
             b.district_id, 
