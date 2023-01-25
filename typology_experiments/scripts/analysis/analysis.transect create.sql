@@ -48,7 +48,7 @@ with
         
 		select block_group20, density_index_level, proximity_index_level, prelim_transect_zone, prelim_transect_zone_plus_1, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus,
 		
-		case when prelim_transect_zone in (1,5,6) then prelim_transect_zone else prelim_transect_zone + crosswalk_bonus + stories_bonus end as transect_zone
+		prelim_transect_zone + crosswalk_bonus + stories_bonus as transect_zone
 		
 		from transect_additional_columns_step2
 		
