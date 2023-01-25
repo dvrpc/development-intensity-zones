@@ -26,14 +26,14 @@ with
     	group by taz_id
     	
     	), /*Found out how to manually calculate weighted average of one column by another from https://stackoverflow.com/a/40078094 (in turn found on https://stackoverflow.com/questions/40078047/sql-weighted-average )*/
-	dvrpc_tazs_2010 as (select taz_id, geom from _raw.dvrpc_tazs_2010),
+	taz_2010_mcdaligned as (select tazt as taz_id, shape as geom from _raw.taz_2010_mcdaligned where dvrpc='yes'),
 	transect_taz_translation_without_transect_zone_names as (
         select
             b.taz_id, 
             d.transect_weighted_average,
             d.transect_zone,
             b.geom
-        from dvrpc_tazs_2010 b
+        from taz_2010_mcdaligned b
         	left join transect_weighted_averages d
             on b.taz_id = d.taz_id
     	),
