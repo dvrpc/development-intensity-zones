@@ -57,4 +57,4 @@ with
     	)
     
     
-    select * from transect_philadelphia_planning_district_translation
+    select row_number() over() as row_number, district_id, transect_weighted_average, transect_zone, transect_zone_name, geom from transect_philadelphia_planning_district_translation

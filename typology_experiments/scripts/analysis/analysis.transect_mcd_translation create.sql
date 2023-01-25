@@ -51,4 +51,4 @@ with
     	)
     
     
-    select * from transect_mcd_translation
+    select row_number() over() as row_number, mcd20_id, transect_weighted_average, transect_zone, transect_zone_name, geom from transect_mcd_translation
