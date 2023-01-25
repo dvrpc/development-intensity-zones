@@ -26,14 +26,14 @@ with
     	group by mcd20_id
     	
     	), /*Found out how to manually calculate weighted average of one column by another from https://stackoverflow.com/a/40078094 (in turn found on https://stackoverflow.com/questions/40078047/sql-weighted-average )*/
-	dvrpc_mcds_phillyas1_2020 as (select mcd20_id, geom from _raw.dvrpc_mcds_phillyas1_2020),
+	census_mcds_2020 as (select geoid as mcd20_id, shape as geom from _raw.census_mcds_2020),
 	transect_mcd_translation_without_transect_zone_names as (
         select
             b.mcd20_id, 
             d.transect_weighted_average,
             d.transect_zone,
             b.geom
-        from dvrpc_mcds_phillyas1_2020 b
+        from census_mcds_2020 b
         	left join transect_weighted_averages d
             on b.mcd20_id = d.mcd20_id
     	),
