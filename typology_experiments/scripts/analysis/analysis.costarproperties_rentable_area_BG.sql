@@ -10,7 +10,7 @@ with
 			join analysis.block_groups_24co_2020 bgd
 		    on st_intersects(crps.geom, bgd.geom)
 			group by bgd."GEOID"
-	),
+	), /*The script up to this point was written by Brian Carney, I just changed line indents, line spacing in one instance, and replaced "costarproperties_rentable_area_BG" with "costarproperties_rentable_area_bg"*/
 	costarproperties_rentable_area_bg as (
 		
 		select * from costarproperties_rentable_area_bg_step1 where "GEOID" <> '421010369021' union
