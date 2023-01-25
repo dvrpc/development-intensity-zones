@@ -13,17 +13,6 @@ with
         	left join transect_zones d
             on b.block_group20_id = d.block_group20_id
     	),
-	transect_zone_names as (select * from _resources.transect_zone_names),
-	block2020_parent_geos_with_transect_zone_names_too as (
-        select
-            b.mcd20_id, 
-            b.transect_zone,
-            b.aland,
-            d.transect_zone_name
-        from block2020_parent_geos_with_transect_zone b
-        	left join transect_zone_names d
-            on b.transect_zone = d.transect_zone
-    	),
     transect_weighted_averages as (
     	
     	select mcd20_id, 
@@ -32,13 +21,13 @@ with
     	
     	round(cast(sum(transect_zone * aland) / sum(aland) as numeric), 0) as transect_zone
     	
-    	from block2020_parent_geos_with_transect_zone_names_too
+    	from block2020_parent_geos_with_transect_zone
 
     	group by mcd20_id
     	
     	), /*Found out how to manually calculate weighted average of one column by another from https://stackoverflow.com/a/40078094 (in turn found on https://stackoverflow.com/questions/40078047/sql-weighted-average )*/
 	dvrpc_mcds_phillyas1_2020 as (select mcd20_id, geom from _raw.dvrpc_mcds_phillyas1_2020),
-	transect_mcd_translation as (
+	transect_mcd_translation_without_transect_zone_names as (
         select
             b.mcd20_id, 
             d.transect_weighted_average,
@@ -47,6 +36,18 @@ with
         from dvrpc_mcds_phillyas1_2020 b
         	left join transect_weighted_averages d
             on b.mcd20_id = d.mcd20_id
+    	),
+	transect_zone_names as (select * from _resources.transect_zone_names),
+	transect_mcd_translation as (
+        select
+            b.mcd20_id, 
+            b.transect_weighted_average,
+            b.transect_zone,
+            d.transect_zone_name,
+            b.geom
+        from transect_mcd_translation_without_transect_zone_names b
+        	left join transect_zone_names d
+            on b.transect_zone = d.transect_zone
     	)
     
     
