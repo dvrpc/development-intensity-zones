@@ -1,5 +1,5 @@
 """
-This script creates analysis.transect_mcd_and_district_translation. AND REMEMBER TO DELETE THE CURRENT analysis.transect_mcd_and_district_translation FIRST BEFORE RERUNNING THIS SCRIPT
+This script creates analysis.transect_mcd_and_district_translation
 """
 
 
@@ -58,8 +58,13 @@ transect_mcd_and_district_translation = dvrpc_mcds_with_philly_pds.merge(
     transect_weighted_averages, on=["district_id"], how="left"
 )  # Left joins transect_weighted_averages to dvrpc_mcds_with_philly_pds, and stores the result in a new object called transect_mcd_and_district_translation
 
+
+db.execute(
+    "DROP TABLE IF EXISTS analysis.transect_mcd_and_district_translation"
+)  # First deletes the current analysis.transect_mcd_and_district_translation (the import_geodataframe() function doesn't replace whatever's currently there for some reason)
+
 db.import_geodataframe(
     transect_mcd_and_district_translation,
     "transect_mcd_and_district_translation",
     schema="analysis",
-)  # Uploads the completed shapefile to analysis
+)  # Then uploads the completed transect_mcd_and_district_translation shapefile to analysis
