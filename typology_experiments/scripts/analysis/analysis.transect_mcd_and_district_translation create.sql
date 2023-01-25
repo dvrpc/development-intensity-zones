@@ -13,20 +13,14 @@ with
 		from _resources.block2020_parent_geos
 		
 		),
-	transect_zones_philly as (
-		
-		select block_group20 as block_group20_id, transect_zone from analysis.transect 
-		
-		where block_group20 in (select block_group20_id from block2020_parent_geos)
-		
-		),
+	transect_zones as (select block_group20 as block_group20_id, transect_zone from analysis.transect),
 	block2020_parent_geos_with_transect_zone as (
         select
             b.district_id, 
             d.transect_zone,
             b.aland
         from block2020_parent_geos b
-        	left join transect_zones_philly d
+        	left join transect_zones d
             on b.block_group20_id = d.block_group20_id
     	),
     transect_weighted_averages as (
