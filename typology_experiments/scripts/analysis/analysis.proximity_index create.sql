@@ -10,7 +10,7 @@ with
 		select block_group20, 'high' as proximity_index_level from analysis.proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'high') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'very high') union
 		select block_group20, 'very high' as proximity_index_level from analysis.proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'very high') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'extreme') union
 		select block_group20, 'extreme' as proximity_index_level from analysis.proximity_index_step1 where proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'extreme') union
-		select block_group20, 'low' as proximity_index_level from analysis.proximity_index_step1 where proximity_index is null
+		select block_group20, null as proximity_index_level from analysis.proximity_index_step1 where proximity_index is null
 		
 		) /*Basically figured out how to retrieve a cell value using SQL from https://stackoverflow.com/a/56322459 (in turn found on https://stackoverflow.com/questions/56322358/postgresql-how-to-copy-the-value-of-a-cell-in-a-row-and-paste-it-into-another-c )*/
 	
