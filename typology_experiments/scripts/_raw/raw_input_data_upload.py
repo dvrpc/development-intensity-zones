@@ -62,43 +62,10 @@ tot_pops_and_hhs_2020_tablekeylist = [
 ]  # Manually creates the keys for the dictionary
 
 
-lodes7_tables_urls = [
-    "https://lehd.ces.census.gov/data/lodes/LODES7/de/wac/de_wac_S000_JT00_2018.csv.gz",
-    "https://lehd.ces.census.gov/data/lodes/LODES7/md/wac/md_wac_S000_JT00_2018.csv.gz",
-    "https://lehd.ces.census.gov/data/lodes/LODES7/nj/wac/nj_wac_S000_JT00_2018.csv.gz",
-    "https://lehd.ces.census.gov/data/lodes/LODES7/pa/wac/pa_wac_S000_JT00_2018.csv.gz",
-]  # Creates a list of the URLs to use to get the LODES7 "wac_S000_JT00_2018" CSV GZ files for each state (DE, MD, NJ and PA)
-
-lodes7_tablelist = [
-    pd.read_csv(gzip.open(io.BytesIO(requests.get(i).content))) for i in lodes7_tables_urls
-]  # Streams in those LODES7 tables from their CSV GZ files
-
-lodes7_tablekeylist = [
-    re.sub(".*\/|\..*", "", i) for i in lodes7_tables_urls
-]  # Creates the keys for the dictionary by extracting just the CSV names from lodes7_tables_urls
-
-
-forecast_csv_file_paths = [
-    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/dvrpc_forecast_2020_emp_block10.csv",
-    "G:/Shared drives/Socioeconomic and Land Use Analytics/Forecasts/Final Forecast/Block Forecast/results_dvrpc_run_545_block_indicators_2020.csv",
-    "G:/Shared drives/Socioeconomic and Land Use Analytics/Forecasts/Final Forecast/Block Forecast/results_dvrpc_run_545_block_indicators_2050.csv",
-]  # Creates a list of the file paths to the forecast/UrbanSim CSVs
-
-forecast_tablelist = [
-    pd.read_csv(i) for i in forecast_csv_file_paths
-]  # Reads in those forecast/UrbanSim CSVs and puts them into a list
-
-forecast_tablekeylist = [
-    "dvrpc_forecast_2020_emp_block10",
-    "urbansim_2020_by_block_2010",
-    "urbansim_2050_by_block_2010",
-]  # Creates the key for that eventual dictionary
-
-
 nonspatial_tables_to_upload_dictionary = dict(
     zip(
-        tot_pops_and_hhs_2020_tablekeylist + lodes7_tablekeylist + forecast_tablekeylist,
-        tot_pops_and_hhs_2020_tablelist + lodes7_tablelist + forecast_tablelist,
+        tot_pops_and_hhs_2020_tablekeylist,
+        tot_pops_and_hhs_2020_tablelist,
     )
 )  # Creates the dictionary of tables to upload to the database/the eventual table names
 
@@ -110,27 +77,27 @@ nonspatial_tables_to_upload_dictionary = dict(
 ]  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
 
 
-pos_and_land_use_shpkeylist = [
+dvrpc_pos_and_land_use_shpkeylist = [
     "dvrpc_2015_water",
     "dvrpc_2020_pos",
 ]  # Creates the keys for the dictionary
 
-pos_and_land_use_shp_links = [
+dvrpc_pos_and_land_use_shp_links = [
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*",
     "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_ProtectedOpenSpace/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
 ]  # Creates a list that contains the links to the POS and land use shapefiles
 
-pos_and_land_use_shplist = [
-    gpd.read_file(i) for i in pos_and_land_use_shp_links
+dvrpc_pos_and_land_use_shplist = [
+    gpd.read_file(i) for i in dvrpc_pos_and_land_use_shp_links
 ]  # Streams in as geo data frames/shapefiles those links and puts them into a list
 
-pos_and_land_use_shplist = [
-    i.explode(ignore_index=True) for i in pos_and_land_use_shplist
+dvrpc_pos_and_land_use_shplist = [
+    i.explode(ignore_index=True) for i in dvrpc_pos_and_land_use_shplist
 ]  # Turns multipolygon geometries into regular polygon geometries in both geo data frames/shapefiles. This solves errors when importing the geo data frames/shapefiles into the
 # database later
 
-pos_and_land_use_shplist = [
-    i.to_crs(crs="EPSG:26918") for i in pos_and_land_use_shplist
+dvrpc_pos_and_land_use_shplist = [
+    i.to_crs(crs="EPSG:26918") for i in dvrpc_pos_and_land_use_shplist
 ]  # Puts both of those shapefiles in the standard DVRPC EPSG if they aren't in it already
 
 
@@ -188,8 +155,8 @@ blocks_and_bgs_shpkeylist = [
 
 shps_to_upload_dictionary = dict(
     zip(
-        pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
-        pos_and_land_use_shplist + blocks_and_bgs_shplist,
+        dvrpc_pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
+        dvrpc_pos_and_land_use_shplist + blocks_and_bgs_shplist,
     )
 )  # This and the next command repeat the process that was used for the non-spatial tables, but for the spatial tables/geo data frames/shapefiles
 
