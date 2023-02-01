@@ -8,7 +8,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 
 ## To do the analysis, run these scripts in order
 
-1. raw_input_data_upload.py - Note that I already wrote how _raw.delaware_river_centerline and _raw.pedestriannetwork_lines were created in this script's Obsidian comments file - UPDATE THIS SCRIPT TO ALSO UPLOAD THE 15 SURROUNDING COUNTIES' PROTECTED LAND AND WATER DATA TO _raw (SOURCES TABLE AND SHAPES FOR POS AND H2O FOUND AT G:\Shared drives\Long Range Plan\2050B Plan\Centers Update\typology_experiments\pos_h2o)
+1. raw_input_data_upload.py - *I also wrote how tables uploaded to _raw not using this script were created in this script's Obsidian comments file*
 2. analysis.block_groups_24co_2020 create.sql
 3. block_group_centroids_24co_2020_and_their_buffers_create.py
 4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
@@ -20,11 +20,11 @@ DVRPC staff first classified the region by levels of density and accessibility u
 10. analysis.crosswalks_block_groups_dvrpc_2020.sql
 11. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
 12. analysis.costarproperties_region_plus_surrounding.sql
-13. analysis.costarproperties_rentable_area_bg.sql - This script may take a long time to run because the joining of the costar property locations to the block groups takes a while
-14. analysis.costar_number_of_stories create.sql - This script may take a long time to run because the joining of the costar property locations to the block groups takes a while
+13. analysis.costarproperties_rentable_area_bg.sql - *This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+14. analysis.costar_number_of_stories create.sql - *This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
 15. analysis.density_index create.sql
 16. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-17. proximity_index_step1_create.py - This script will take a long time to run because the joining of the costar property locations to the buffers takes a while
+17. proximity_index_step1_create.py - *This script will take a long time to run because the joining of the costar property locations to the buffers takes a while*
 18. analysis.proximity_index create.sql
 19. analysis.transect_step1 create.sql
 20. analysis.crosswalk_density_summary create.sql
