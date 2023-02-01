@@ -1,6 +1,6 @@
-drop view if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
+drop table if exists analysis.incorp_del_river_bg_centroids_24co_2020_buffers;
 
-create view analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
+create table analysis.incorp_del_river_bg_centroids_24co_2020_buffers as 
 with /*Most of this script was created by Sean Lawrence*/
 	a as (
 		select
