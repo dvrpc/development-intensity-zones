@@ -59,6 +59,10 @@ block_groups_24co_2020 = block_groups_24co_2020.merge(
     costarproperties_rentable_area_bg, on=["GEOID"], how="left"
 )  # Left joins costarproperties_rentable_area_bg to block_groups_24co_2020 as well
 
+block_groups_24co_2020["comm_sqft_thou"] = block_groups_24co_2020["comm_sqft_thou"].fillna(
+    0
+)  # Makes the nulls in comm_sqft_thou 0
+
 
 costar_property_locations.insert(
     1, "comm_sqft_thou", costar_property_locations["rentable_building_area"] / 1000
@@ -69,6 +73,12 @@ costar_property_locations_2mibuffers_overlay = gpd.overlay(
     buffers_2_mile,
     how="intersection",
 )  # Gives each property location in costar_property_locations the GEOIDs of the 2020 block group centroid 2-mile buffers they're in (this also produces multiple records per property location, since 1 centroid can be in numerous 2-mile buffers)
+
+costar_property_locations_2mibuffers_overlay[
+    "comm_sqft_thou"
+] = costar_property_locations_2mibuffers_overlay["comm_sqft_thou"].fillna(
+    0
+)  # Makes the nulls in comm_sqft_thou 0
 
 data_for_tot_comm_sqft_thou_2mi_column = (
     costar_property_locations_2mibuffers_overlay.groupby(["GEOID"], as_index=False)
@@ -122,8 +132,8 @@ proximity_index_step1 = pd.DataFrame(block_groups_24co_2020[["GEOID", "proximity
 )  # Just simultaneously keeps only the columns I want and with the names I want them from block_groups_24co_2020 and in a non-spatial way, and stores the results in a new object called proximity_index_step1
 
 proximity_index_step1[["proximity_index"]] = proximity_index_step1[["proximity_index"]].round(
-    2
-)  # Rounds proximity_index to the nearest 2 decimal places
+    3
+)  # Rounds proximity_index to the nearest 3 decimal places
 
 db.import_dataframe(
     proximity_index_step1,
