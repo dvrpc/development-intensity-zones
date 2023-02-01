@@ -13,24 +13,31 @@ with
         	left join analysis.proximity_index d
             on b.block_group20 = d.block_group20
     	),
-    data_for_prelim_transect_zone_column as (
+    data_for_prelim_transect_zone_step1_column as (
     	
-    	select proximity_index_levels as proximity_index_level, density_index_levels as density_index_level, prelim_transect_zone from _resources.classifications
+    	select proximity_index_levels as proximity_index_level, density_index_levels as density_index_level, prelim_transect_zone as prelim_transect_zone_step1 from _resources.classifications
     	
     	),
-    density_and_proximity_indices_with_prelim_transect_zone_column as (
+    density_and_proximity_indices_with_prelim_transect_zone_column_step1 as (
         select
             b.block_group20,
             b.density_index,
             b.proximity_index,
             b.density_index_level,
             b.proximity_index_level,
-            d.prelim_transect_zone
+            d.prelim_transect_zone_step1
         from density_and_proximity_indices b
-        	left join data_for_prelim_transect_zone_column d
+        	left join data_for_prelim_transect_zone_step1_column d
             on b.proximity_index_level = d.proximity_index_level
             and b.density_index_level = d.density_index_level
     	),
+    density_and_proximity_indices_with_prelim_transect_zone_column as (
+        
+    	select block_group20, density_index, proximity_index, density_index_level, proximity_index_level,
+    	case when prelim_transect_zone_step1 is null then 0 else prelim_transect_zone_step1 end as prelim_transect_zone
+    	from density_and_proximity_indices_with_prelim_transect_zone_column_step1
+        
+        ),
     density_and_proximity_indices_crosswalk_density_column as (
 		
 		select "GEOID" as block_group20, crosswalk_density from analysis.crosswalks_density_block_groups_dvrpc_2020
