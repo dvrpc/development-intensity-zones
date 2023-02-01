@@ -6,7 +6,8 @@ The method the DVRPC region is classified by levels of density and accessibility
 
 DVRPC staff first classified the region by levels of density and accessibility using municipalities as part of the LRP creation process. Much of the data processing for that was done using GIS. As the exact methodology for classifying the region by levels of density and accessibility is refined, staff will be updating existing code within this repo.
 
-Also, to do the analysis, run these scripts in order:
+## To do the analysis, run these scripts in order
+
 1. raw_input_data_upload.py - Note that I already wrote how _raw.delaware_river_centerline and _raw.pedestriannetwork_lines were created in this script's Obsidian comments file - UPDATE THIS SCRIPT TO ALSO UPLOAD THE 15 SURROUNDING COUNTIES' PROTECTED LAND AND WATER DATA TO _raw (SOURCES TABLE AND SHAPES FOR POS AND H2O FOUND AT G:\Shared drives\Long Range Plan\2050B Plan\Centers Update\typology_experiments\pos_h2o)
 2. analysis.block_groups_24co_2020 create.sql
 3. block_group_centroids_24co_2020_and_their_buffers_create.py
