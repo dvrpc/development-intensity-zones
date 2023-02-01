@@ -12,9 +12,9 @@ DVRPC staff first classified the region by levels of density and accessibility u
 2. analysis.block_groups_24co_2020 create.sql
 3. block_group_centroids_24co_2020_and_their_buffers_create.py
 4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
-5. analysis.dvrpc_protected_land_and_water create.sql - UPDATE THIS SCRIPT TO INCORPORATE THE 15 SURROUNDING COUNTIES' PROTECTED LAND AND WATER DATA, WHICH WOULD LEAD TO THE FEATURE CLASS THIS SCRIPT CREATES TO BE CALLED analysis.protected_land_and_water_24co, AND THIS SCRIPT TO BE RENAMED analysis.protected_land_and_water_24co create.sql
-6. block_group_land_by_developability_create.py - UPDATE THIS SCRIPT TO INCORPORATE THE 15 SURROUNDING COUNTIES' PROTECTED LAND AND WATER DATA
-7. unprotected_land_area_create.py - UPDATE THIS SCRIPT TO INCORPORATE THE 15 SURROUNDING COUNTIES' PROTECTED LAND AND WATER DATA, AND THAT IT DOESN'T CREATE AN aland_acres FIELD
+5. analysis.dvrpc_protected_land_and_water create.sql
+6. block_group_land_by_developability_create.py
+7. unprotected_land_area_create.py
 8. crosswalks.sql
 9. analysis.block_groups_dvrpc_2020 create.sql
 10. analysis.crosswalks_block_groups_dvrpc_2020.sql
