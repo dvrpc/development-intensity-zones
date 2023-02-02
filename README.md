@@ -29,11 +29,10 @@ DVRPC staff first classified the region by levels of density and accessibility u
 19. analysis.transect_step1 create.sql
 20. analysis.crosswalk_density_summary create.sql
 21. analysis.transect create.sql
-22. block2020_parent_geos_upload.py
-23. analysis.transect_mcd_translation create.sql
-24. analysis.transect_taz_translation create.sql
-25. analysis.transect_tract_translation create.sql
-26. analysis.transect_philadelphia_planning_district_translation create.sql
+22. analysis.transect_mcd_translation create.sql
+23. analysis.transect_taz_translation create.sql
+24. analysis.transect_tract_translation create.sql
+25. analysis.transect_philadelphia_planning_district_translation create.sql
 
 ## Python environment
 
