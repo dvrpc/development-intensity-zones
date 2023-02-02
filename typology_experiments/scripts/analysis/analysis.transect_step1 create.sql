@@ -40,9 +40,11 @@ with
         ),
     density_and_proximity_indices_crosswalk_density_column as (
 		
-		select "GEOID" as block_group20, crosswalk_density from analysis.crosswalks_density_block_groups_dvrpc_2020
+		select "GEOID" as block_group20, sum(crosswalk_density) as crosswalk_density from analysis.crosswalks_density_block_groups_dvrpc_2020
 		
-		),
+		group by "GEOID"
+		
+		), /*There's at least 1 but not much more than 1 block group in analysis.crosswalks_density_block_groups_dvrpc_2020 that has more than 1 polygon, so I'll sum the crosswalk density for those*/
 	density_and_proximity_indices_with_crosswalk_density_column_too as (
         select
             b.block_group20,
