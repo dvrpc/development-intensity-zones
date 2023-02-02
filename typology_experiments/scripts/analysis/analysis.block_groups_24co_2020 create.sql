@@ -2,92 +2,19 @@ drop table if exists analysis.block_groups_24co_2020;
 
 create table analysis.block_groups_24co_2020 as
 with
-	block_groups_state_10_2020 as (
-		select 
-		"STATEFP", 
-		"COUNTYFP", 
-		concat("STATEFP","COUNTYFP") as county_id_5dig,
-		"TRACTCE",
-		"BLKGRPCE",
-		"GEOID",
-		"NAMELSAD",
-		"ALAND",
-		"AWATER",
-		geom
-		from _raw.tl_2020_10_bg
-	),
-	block_groups_state_24_2020 as (
-		select 
-		"STATEFP", 
-		"COUNTYFP", 
-		concat("STATEFP","COUNTYFP") as county_id_5dig,
-		"TRACTCE",
-		"BLKGRPCE",
-		"GEOID",
-		"NAMELSAD",
-		"ALAND",
-		"AWATER",
-		geom
-		from _raw.tl_2020_24_bg
-	),
-	block_groups_state_34_2020 as (
-		select 
-		"STATEFP", 
-		"COUNTYFP", 
-		concat("STATEFP","COUNTYFP") as county_id_5dig,
-		"TRACTCE",
-		"BLKGRPCE",
-		"GEOID",
-		"NAMELSAD",
-		"ALAND",
-		"AWATER",
-		geom
-		from _raw.tl_2020_34_bg
-	),
-	block_groups_state_42_2020 as (
-		select 
-		"STATEFP", 
-		"COUNTYFP", 
-		concat("STATEFP","COUNTYFP") as county_id_5dig,
-		"TRACTCE",
-		"BLKGRPCE",
-		"GEOID",
-		"NAMELSAD",
-		"ALAND",
-		"AWATER",
-		geom
-		from _raw.tl_2020_42_bg
-	),
-	block_groups_de_md_nj_pa_2020_without_in_dvrpc_flag as (
-		select * from block_groups_state_10_2020 union
-		select * from block_groups_state_24_2020 union
-		select * from block_groups_state_34_2020 union
-		select * from block_groups_state_42_2020
-	),
-	block_groups_dissolved as (
-		select 
+	block_groups_24co_2020_undissolved as (
+		select "STATEFP", "COUNTYFP", "GEOID", "ALAND", geom from _raw.tl_2020_10_bg union
+		select "STATEFP", "COUNTYFP", "GEOID", "ALAND", geom from _raw.tl_2020_24_bg union
+		select "STATEFP", "COUNTYFP", "GEOID", "ALAND", geom from _raw.tl_2020_34_bg union
+		select "STATEFP", "COUNTYFP", "GEOID", "ALAND", geom from _raw.tl_2020_42_bg
+	)
+
+	
+	select 
 		distinct "GEOID",
 		sum("ALAND") as "ALAND",
 		st_union(geom) as geom
-		from _raw.tl_2020_10_bg
-		group by "GEOID"
-	) select * from block_groups_dissolved/*
-    
-    
-    select 
-    "STATEFP", 
-    "COUNTYFP", 
-    county_id_5dig, 
-    case when county_id_5dig in (select county_id_5dig from _resources.county_key) then 1 else 0 end as in_dvrpc, 
-    "TRACTCE", 
-    "BLKGRPCE", 
-    "GEOID",
-    "NAMELSAD", 
-    "ALAND",
-    "ALAND"/4046.856 as aland_acres,
-    "AWATER", 
-    geom 
-    from block_groups_de_md_nj_pa_2020_without_in_dvrpc_flag where county_id_5dig in (
+		from block_groups_24co_2020_undissolved where concat("STATEFP","COUNTYFP") in (
 		'42101', 
 		'42029', 
 		'42045', 
@@ -112,5 +39,5 @@ with
 		'34001', 
 		'34029', 
 		'34011'
-    	) /*Got the 24 counties' FIPS codes/5-digit county IDs from https://dvrpc-dvrpcgis.opendata.arcgis.com/datasets/county-boundaries-polygon/explore?filters=eyJmaXBzIjpbIjQyMTAxIiwiNDIwMjkiLCI0MjA0NSIsIjQyMDkxIiwiNDIwMTciLCIzNDAyMSIsIjM0MDA1IiwiMzQwMDciLCIzNDAxNSIsIjM0MDMzIiwiMTAwMDMiLCIyNDAxNSIsIjQyMDcxIiwiNDIwMTEiLCI0MjA3NyIsIjQyMDk1IiwiMzQwMTkiLCIzNDA0MSIsIjM0MDM1IiwiMzQwMjMiLCIzNDAyNSIsIjM0MDAxIiwiMzQwMjkiLCIzNDAxMSJdfQ%3D%3D&location=39.725065%2C-75.630939%2C8.00 */
-	*/
+    	)
+		group by "GEOID" /*Found out how to dissolve a shapefile from https://gis.stackexchange.com/a/209715 (in turn found on https://gis.stackexchange.com/questions/209713/postgis-dissolve-geometries-from-shapefiles ), and got the 24 counties' FIPS codes/5-digit county IDs from https://dvrpc-dvrpcgis.opendata.arcgis.com/datasets/county-boundaries-polygon/explore?filters=eyJmaXBzIjpbIjQyMTAxIiwiNDIwMjkiLCI0MjA0NSIsIjQyMDkxIiwiNDIwMTciLCIzNDAyMSIsIjM0MDA1IiwiMzQwMDciLCIzNDAxNSIsIjM0MDMzIiwiMTAwMDMiLCIyNDAxNSIsIjQyMDcxIiwiNDIwMTEiLCI0MjA3NyIsIjQyMDk1IiwiMzQwMTkiLCIzNDA0MSIsIjM0MDM1IiwiMzQwMjMiLCIzNDAyNSIsIjM0MDAxIiwiMzQwMjkiLCIzNDAxMSJdfQ%3D%3D&location=39.725065%2C-75.630939%2C8.00 */
