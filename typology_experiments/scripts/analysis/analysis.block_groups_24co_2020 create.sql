@@ -63,7 +63,15 @@ with
 		select * from block_groups_state_24_2020 union
 		select * from block_groups_state_34_2020 union
 		select * from block_groups_state_42_2020
-	)
+	),
+	block_groups_dissolved as (
+		select 
+		distinct "GEOID",
+		sum("ALAND") as "ALAND",
+		st_union(geom) as geom
+		from _raw.tl_2020_10_bg
+		group by "GEOID"
+	) select * from block_groups_dissolved/*
     
     
     select 
@@ -105,3 +113,4 @@ with
 		'34029', 
 		'34011'
     	) /*Got the 24 counties' FIPS codes/5-digit county IDs from https://dvrpc-dvrpcgis.opendata.arcgis.com/datasets/county-boundaries-polygon/explore?filters=eyJmaXBzIjpbIjQyMTAxIiwiNDIwMjkiLCI0MjA0NSIsIjQyMDkxIiwiNDIwMTciLCIzNDAyMSIsIjM0MDA1IiwiMzQwMDciLCIzNDAxNSIsIjM0MDMzIiwiMTAwMDMiLCIyNDAxNSIsIjQyMDcxIiwiNDIwMTEiLCI0MjA3NyIsIjQyMDk1IiwiMzQwMTkiLCIzNDA0MSIsIjM0MDM1IiwiMzQwMjMiLCIzNDAyNSIsIjM0MDAxIiwiMzQwMjkiLCIzNDAxMSJdfQ%3D%3D&location=39.725065%2C-75.630939%2C8.00 */
+	*/
