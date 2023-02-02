@@ -93,6 +93,12 @@ block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay = gpd.overlay(
     how="intersection",
 )  # Gives each 2020 block centroid in block_centroids_2020_with_2020_gq_hu the GEOIDs of the 2020 block group centroid 5-mile buffers they're in (this also produces multiple records per 2010 block centroid, since 1 centroid can be in numerous 5-mile buffers)
 
+block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay[
+    "gq_hu"
+] = block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay["gq_hu"].fillna(
+    0
+)  # Makes the nulls in gq_hu 0
+
 data_for_tot_gq_hu_5mi_column = (
     block_centroids_2020_with_2020_gq_hu_5mibuffers_overlay.groupby(["GEOID"], as_index=False)
     .agg({"gq_hu": "sum"})
