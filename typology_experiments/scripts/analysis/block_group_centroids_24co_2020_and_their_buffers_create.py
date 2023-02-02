@@ -36,7 +36,7 @@ block_group_centroids_24co_2020_buffers_2_mile[
 )  # Finishes the process of getting all the block group centroids' 2 mile buffers. AND NOTE THAT 3218.69 METERS IS 2 MILES
 
 block_group_centroids_24co_2020_buffers_2_mile.insert(
-    8, "buff_mi", 2
+    2, "buff_mi", 2
 )  # Adds a column showing these buffers are 2 miles wide, and puts it to the left of geom
 
 block_group_centroids_24co_2020_buffers_5_mile = (
@@ -50,7 +50,7 @@ block_group_centroids_24co_2020_buffers_5_mile[
 )  # Finishes the process of getting all the block group centroids' 2 mile buffers. AND NOTE THAT 8046.72 METERS IS 5 MILES
 
 block_group_centroids_24co_2020_buffers_5_mile.insert(
-    8, "buff_mi", 5
+    2, "buff_mi", 5
 )  # Adds a column showing these buffers are 5 miles wide, and puts it to the left of geom
 
 block_group_centroid_buffers_24co_2020 = pd.concat(
