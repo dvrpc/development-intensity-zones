@@ -1,6 +1,6 @@
-/*drop view if exists analysis.density_index;
+drop view if exists analysis.density_index;
 
-create view analysis.density_index as*/
+create view analysis.density_index as
 with 
 	block_groups_24co_2020 as (select "GEOID" as block_group20, aland_acres from analysis.block_groups_24co_2020),
 	tot_hus_2020_bg as (
@@ -61,16 +61,13 @@ with
     	from density_index_step2
     	
     	),
-    density_index as (
+    density_index_step4 as (
     	
-    	select block_group20, density_index, concat(very_low,low,moderate,high,very_high,extreme,"null") as density_index_level from density_index_step3
+    	select block_group20, density_index, concat(very_low,low,moderate,high,very_high,extreme,"null") as density_index_level_step1 from density_index_step3
     	
-    	)select * from density_index where density_index_level='null'/*
+    	)
+
     	
-    select
-        b.block_group20,
-        b.density_index,
-        d.density_index_level
-    from density_index_step2 b
-    	left join density_index_level_column d
-        on b.block_group20 = d.block_group20*/
+	select block_group20, density_index, 
+	case when density_index_level_step1='null' then null else density_index_level_step1 end as density_index_level
+	from density_index_step4
