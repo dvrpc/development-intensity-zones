@@ -2,7 +2,7 @@ drop view if exists analysis.density_index;
 
 create view analysis.density_index as
 with 
-	block_groups_24co_2020 as (select "GEOID" as block_group20, aland_acres from analysis.block_groups_24co_2020),
+	block_groups_24co_2020 as (select "GEOID" as block_group20, "ALAND"/4046.856 as aland_acres from analysis.block_groups_24co_2020),
 	tot_hus_2020_bg as (
 		
 		select concat(state,county,tract,block_group) as block_group20, p5_001n+h1_001n as housing_units_d20 from _raw.tot_pops_and_hhs_2020_bg
