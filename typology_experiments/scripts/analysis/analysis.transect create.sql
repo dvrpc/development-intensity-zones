@@ -1,6 +1,6 @@
-/*drop view if exists analysis.transect;
+drop view if exists analysis.transect;
 
-create view analysis.transect as */
+create view analysis.transect as 
 with 
 	transect_step1 as (
 		
