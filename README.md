@@ -24,7 +24,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 14. analysis.costar_number_of_stories create.sql - *This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
 15. analysis.density_index create.sql
 16. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-17. proximity_index_step1_create.py - *This script will take a long time to run because the joining of the costar property locations to the buffers takes a while*
+17. proximity_index_step1_create.py - *Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
 18. analysis.proximity_index create.sql
 19. analysis.transect_step1 create.sql
 20. analysis.crosswalk_density_summary create.sql
