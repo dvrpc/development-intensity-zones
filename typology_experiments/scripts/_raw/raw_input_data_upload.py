@@ -40,6 +40,19 @@ tot_pops_and_hhs_2020_block = tot_pops_and_hhs_2020_block[
     ["state", "county", "tract", "block", "P1_001N", "P5_001N", "H1_001N", "H1_002N"]
 ]  # Reorders the columns
 
+tot_pops_and_hhs_2020_block.insert(
+    3, "block_1std", tot_pops_and_hhs_2020_block["block"].str[0]
+)  # Gets the first digit of each block ID, puts those values into a new column, and puts that column to the left of block
+
+tot_pops_and_hhs_2020_block.insert(
+    4,
+    "block_group20",
+    tot_pops_and_hhs_2020_block["state"]
+    + tot_pops_and_hhs_2020_block["county"]
+    + tot_pops_and_hhs_2020_block["tract"]
+    + tot_pops_and_hhs_2020_block["block_1std"],
+)  # Gets each block's block group ID, puts those values into a new column, and puts that column to the right of block_1std
+
 tot_pops_and_hhs_2020_bg = stream_in_census_data(
     "https://api.census.gov/data/2020/dec/pl?get=P1_001N,P5_001N,H1_001N,H1_002N&for=block%20group:*&in=state:10,24,34,42&in=county:*&in=tract:*&key="
     + os.environ["CENSUS_KEY"],
