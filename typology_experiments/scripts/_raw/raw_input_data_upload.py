@@ -90,30 +90,6 @@ nonspatial_tables_to_upload_dictionary = dict(
 ]  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
 
 
-dvrpc_pos_and_land_use_shpkeylist = [
-    "dvrpc_2015_water",
-    "dvrpc_2020_pos",
-]  # Creates the keys for the dictionary
-
-dvrpc_pos_and_land_use_shp_links = [
-    "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_LandUse_2015/FeatureServer/0/query?f=geojson&where=(lu15sub%20IN%20(%2713000%27))&outFields=*",
-    "https://arcgis.dvrpc.org/portal/rest/services/Planning/DVRPC_ProtectedOpenSpace/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson",
-]  # Creates a list that contains the links to the POS and land use shapefiles
-
-dvrpc_pos_and_land_use_shplist = [
-    gpd.read_file(i) for i in dvrpc_pos_and_land_use_shp_links
-]  # Streams in as geo data frames/shapefiles those links and puts them into a list
-
-dvrpc_pos_and_land_use_shplist = [
-    i.explode(ignore_index=True) for i in dvrpc_pos_and_land_use_shplist
-]  # Turns multipolygon geometries into regular polygon geometries in both geo data frames/shapefiles. This solves errors when importing the geo data frames/shapefiles into the
-# database later
-
-dvrpc_pos_and_land_use_shplist = [
-    i.to_crs(crs="EPSG:26918") for i in dvrpc_pos_and_land_use_shplist
-]  # Puts both of those shapefiles in the standard DVRPC EPSG if they aren't in it already
-
-
 blocks_and_bgs_shps_urls = [
     "https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2010/tl_2010_10_tabblock10.zip",
     "https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2010/tl_2010_24_tabblock10.zip",
@@ -168,8 +144,8 @@ blocks_and_bgs_shpkeylist = [
 
 shps_to_upload_dictionary = dict(
     zip(
-        dvrpc_pos_and_land_use_shpkeylist + blocks_and_bgs_shpkeylist,
-        dvrpc_pos_and_land_use_shplist + blocks_and_bgs_shplist,
+        pos_h2o_transect_zone_0_shpkeylist + blocks_and_bgs_shpkeylist,
+        pos_h2o_transect_zone_0_shplist + blocks_and_bgs_shplist,
     )
 )  # This and the next command repeat the process that was used for the non-spatial tables, but for the spatial tables/geo data frames/shapefiles
 
