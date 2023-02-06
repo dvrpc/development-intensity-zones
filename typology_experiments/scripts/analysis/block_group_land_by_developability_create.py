@@ -1,10 +1,12 @@
 """
-This script creates analysis.block_group_land_by_developability - NOTE THAT THIS ONLY USES PROTECTED LAND AND WATER DATA FOR THE DVRPC'S 9 COUNTIES, SO THIS WOULD EVENTUALLY HAVE TO BE REMADE ALSO USING PROTECTED LAND AND WATER DATA FOR THE 15 SURROUNDING COUNTIES 
+This script creates analysis.block_group_land_by_developability
 """
 
 import pandas as pd
 
 import geopandas as gpd
+
+from shapely.geometry import Polygon, MultiPolygon, shape, Point
 
 
 from typology_experiments import Database, DATABASE_URL
@@ -12,27 +14,18 @@ from typology_experiments import Database, DATABASE_URL
 db = Database(DATABASE_URL)
 
 
-dvrpc_protected_land_and_water = db.get_geodataframe_from_query(
-    "SELECT * FROM analysis.dvrpc_protected_land_and_water"
-)  # Uses my function to bring in the analysis.dvrpc_protected_land_and_water shapefile
+undevelopable_area = db.get_geodataframe_from_query(
+    "SELECT * FROM _raw.pos_h2o_transect_zone_0"
+)  # Uses my function to bring in the _raw.pos_h2o_transect_zone_0 shapefile, which is the undevelopable part of the study area
 
 block_groups_24co_2020 = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.block_groups_24co_2020"
 )  # Uses my function to bring in the analysis.block_groups_24co_2020 shapefile
 
 
-dvrpc_protected_land_and_water.insert(
-    4, "dissolve_field", 1
-)  # Adds a new column to the right of acres to just use for dissolving
-
-undevelopable_land = dvrpc_protected_land_and_water.dissolve(
-    by="dissolve_field"
-)  # Dissolves all the individual polygons in dvrpc_protected_land_and_water so that it's just 1 big polygon of undevelopable land
-
-
 undevelopable_block_group_fragments = gpd.overlay(
-    block_groups_24co_2020, undevelopable_land, how="intersection"
-)  # Intersects block_groups_24co_2020 with undevelopable_land
+    block_groups_24co_2020, undevelopable_area, how="intersection"
+)  # Intersects block_groups_24co_2020 with undevelopable_area
 
 undevelopable_block_group_fragments[
     "developability"
@@ -40,14 +33,8 @@ undevelopable_block_group_fragments[
 
 undevelopable_block_group_fragments = undevelopable_block_group_fragments[
     [
-        "STATEFP",
-        "COUNTYFP",
-        "TRACTCE",
-        "BLKGRPCE",
         "GEOID",
-        "NAMELSAD",
         "ALAND",
-        "AWATER",
         "developability",
         "geometry",
     ]
@@ -59,8 +46,8 @@ undevelopable_block_group_fragments = undevelopable_block_group_fragments.rename
 
 
 developable_block_group_fragments = gpd.overlay(
-    block_groups_24co_2020, undevelopable_land, how="difference"
-)  # Gets the difference between block_groups_24co_2020 and undevelopable_land
+    block_groups_24co_2020, undevelopable_area, how="difference"
+)  # Gets the difference between block_groups_24co_2020 and undevelopable_area
 
 developable_block_group_fragments[
     "developability"
@@ -68,14 +55,8 @@ developable_block_group_fragments[
 
 developable_block_group_fragments = developable_block_group_fragments[
     [
-        "STATEFP",
-        "COUNTYFP",
-        "TRACTCE",
-        "BLKGRPCE",
         "GEOID",
-        "NAMELSAD",
         "ALAND",
-        "AWATER",
         "developability",
         "geom",
     ]
@@ -90,9 +71,12 @@ block_group_land_by_developability = block_group_land_by_developability.set_geom
     "geom"
 )  # Tells Python the name of block_group_land_by_developability's geometry column
 
+
 block_group_land_by_developability = block_group_land_by_developability.explode(
     ignore_index=True
 )  # Turns multipolygon geometries into regular polygon geometries
+
+b
 
 db.import_geodataframe(
     block_group_land_by_developability, "block_group_land_by_developability", schema="analysis"
