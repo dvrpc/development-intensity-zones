@@ -1,5 +1,5 @@
 """
-This script creates analysis.unprotected_land_area - NOTE THAT THIS ONLY USES PROTECTED LAND AND WATER DATA FOR THE DVRPC'S 9 COUNTIES, SO THIS WOULD EVENTUALLY HAVE TO BE REMADE ALSO USING PROTECTED LAND AND WATER DATA FOR THE 15 SURROUNDING COUNTIES
+This script creates analysis.unprotected_land_area
 """
 
 import pandas as pd
@@ -41,16 +41,9 @@ unprotected_land_area["aland_acres"] = round(
 
 unprotected_land_area = unprotected_land_area[
     [
-        "STATEFP",
-        "COUNTYFP",
-        "TRACTCE",
-        "BLKGRPCE",
         "GEOID",
-        "NAMELSAD",
         "ALAND",
-        "AWATER",
-        "non_pos_water_acres",
-        "aland_acres",
+        "developability",
         "geom",
     ]
 ]  # Reorders the columns to be in the order I want them to be in
