@@ -6,10 +6,6 @@ import pandas as pd
 
 import geopandas as gpd
 
-import fiona
-
-import gzip
-
 import requests
 
 import io
@@ -17,6 +13,8 @@ import io
 import zipfile
 
 import tempfile
+
+from shapely.geometry import Polygon, MultiPolygon, shape, Point
 
 
 from typology_experiments import Database, DATABASE_URL
@@ -90,6 +88,34 @@ nonspatial_tables_to_upload_dictionary = dict(
 ]  # For each table in nonspatial_tables_to_upload_dictionary, exports it to _raw
 
 
+def convert_3D_2D(geometry):
+    new_geo = []
+    for p in geometry:
+        if p.has_z:
+            if p.geom_type == "Polygon":
+                lines = [xy[:2] for xy in list(p.exterior.coords)]
+                new_p = Polygon(lines)
+                new_geo.append(new_p)
+            elif p.geom_type == "MultiPolygon":
+                new_multi_p = []
+                for ap in p:
+                    lines = [xy[:2] for xy in list(ap.exterior.coords)]
+                    new_p = Polygon(lines)
+                    new_multi_p.append(new_p)
+                new_geo.append(MultiPolygon(new_multi_p))
+    return new_geo
+
+
+pos_h2o_transect_zone_0 = gpd.GeoDataFrame.from_file(
+    "U:_OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb",
+    layer="pos_h2o_transect_zone_0",
+)  # Reads in the POS and water data for all counties to use directly from the geodatabase it's stored in, and Gets rid of the Z-geometries from it
+
+pos_h2o_transect_zone_0 = pos_h2o_transect_zone_0.to_crs(
+    26918
+)  # Puts it in the standard DVRPC EPSG in case it isn't in it already
+
+
 blocks_and_bgs_shps_urls = [
     "https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2010/tl_2010_10_tabblock10.zip",
     "https://www2.census.gov/geo/tiger/TIGER2010/TABBLOCK/2010/tl_2010_24_tabblock10.zip",
@@ -128,7 +154,7 @@ blocks_and_bgs_shplist = [
 ]  # Turns multipolygon geometries into regular polygon geometries in all of the geo data frames/shapefiles
 
 blocks_and_bgs_shplist = [
-    i.to_crs(crs="EPSG:26918") for i in blocks_and_bgs_shplist
+    i.to_crs(26918) for i in blocks_and_bgs_shplist
 ]  # Puts all of those shapefiles in the standard DVRPC EPSG
 
 blocks_and_bgs_shpkeylist = [
@@ -144,8 +170,8 @@ blocks_and_bgs_shpkeylist = [
 
 shps_to_upload_dictionary = dict(
     zip(
-        pos_h2o_transect_zone_0_shpkeylist + blocks_and_bgs_shpkeylist,
-        pos_h2o_transect_zone_0_shplist + blocks_and_bgs_shplist,
+        ["pos_h2o_transect_zone_0"] + blocks_and_bgs_shpkeylist,
+        [pos_h2o_transect_zone_0] + blocks_and_bgs_shplist,
     )
 )  # This and the next command repeat the process that was used for the non-spatial tables, but for the spatial tables/geo data frames/shapefiles
 
