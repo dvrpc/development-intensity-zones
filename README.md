@@ -12,18 +12,18 @@ DVRPC staff first classified the region by levels of density and accessibility u
 2. analysis.block_groups_24co_2020 create.sql
 3. block_group_centroids_24co_2020_and_their_buffers_create.py
 4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
-5. block_group_land_by_developability_create.py
+5. block_group_land_by_developability_create.py - *Warning: This script will take a couple of hours to run because the intersecting of the block groups with the developable block group fragments takes a while*
 6. unprotected_land_area_create.py
 7. crosswalks.sql
 8. analysis.block_groups_dvrpc_2020 create.sql
 9. analysis.crosswalks_block_groups_dvrpc_2020.sql
 10. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
 11. analysis.costarproperties_region_plus_surrounding.sql
-12. analysis.costarproperties_rentable_area_bg.sql - *This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
-13. analysis.costar_number_of_stories create.sql - *This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+12. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+13. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
 14. analysis.density_index create.sql
 15. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-16. proximity_index_step1_create.py - *Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
+16. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
 17. analysis.proximity_index create.sql
 18. analysis.transect_step1 create.sql
 19. analysis.crosswalk_density_summary create.sql
