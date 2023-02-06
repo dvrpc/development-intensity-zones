@@ -76,8 +76,6 @@ block_group_land_by_developability = block_group_land_by_developability.explode(
     ignore_index=True
 )  # Turns multipolygon geometries into regular polygon geometries
 
-b
-
 db.import_geodataframe(
     block_group_land_by_developability, "block_group_land_by_developability", schema="analysis"
 )  # Uploads the completed shapefile to analysis. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
