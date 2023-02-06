@@ -12,7 +12,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 2. analysis.block_groups_24co_2020 create.sql
 3. block_group_centroids_24co_2020_and_their_buffers_create.py
 4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
-5. block_group_land_by_developability_create.py - *Warning: This script will take a couple of hours to run because the intersecting of the block groups with the developable block group fragments takes a while*
+5. block_group_land_by_developability_create.py - *Warning: This script will take roughly 2 hours and 10 minutes to run because the intersecting of the block groups with the developable block group fragments takes a while*
 6. unprotected_land_area_create.py
 7. crosswalks.sql
 8. analysis.block_groups_dvrpc_2020 create.sql
