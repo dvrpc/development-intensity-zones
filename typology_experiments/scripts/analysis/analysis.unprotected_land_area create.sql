@@ -20,6 +20,7 @@ with
 		
 	select
         b."GEOID",
+        b."ALAND",
         d.non_pos_water_acres,
         round(cast("ALAND"/4046.856 as numeric), 0) as aland_acres,
         b.geom
