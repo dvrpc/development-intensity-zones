@@ -20,6 +20,10 @@ block_groups_24co_2020 = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.block_groups_24co_2020"
 )  # Uses my function to bring in the analysis.block_groups_24co_2020 shapefile
 
+block_groups_24co_2020 = block_groups_24co_2020.explode(
+    ignore_index=True
+)  # Turns multipolygon geometries into regular polygon geometries
+
 
 developable_block_group_fragments["acres"] = round(
     developable_block_group_fragments.area / 4046.856, 0
@@ -43,7 +47,8 @@ unprotected_land_area = unprotected_land_area[
     [
         "GEOID",
         "ALAND",
-        "developability",
+        "non_pos_water_acres",
+        "aland_acres",
         "geom",
     ]
 ]  # Reorders the columns to be in the order I want them to be in
