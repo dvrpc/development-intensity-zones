@@ -6,8 +6,6 @@ import pandas as pd
 
 import geopandas as gpd
 
-from shapely.geometry import Polygon, MultiPolygon, shape, Point
-
 
 from typology_experiments import Database, DATABASE_URL
 
