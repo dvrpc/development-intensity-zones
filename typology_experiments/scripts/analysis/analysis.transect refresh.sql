@@ -1,1 +1,0 @@
-refresh materialized view analysis.transect /*Only run this script if _resources.transect_zone_names or _resources.thresholds are manually updated. Found out how to refresh a materialized view from https://www.postgresql.org/docs/current/rules-materializedviews.html */
