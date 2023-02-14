@@ -1,6 +1,6 @@
-drop table if exists analysis.transect;
+drop materialized view if exists analysis.transect;
 
-create table analysis.transect as 
+create materialized view analysis.transect as /*Found out how to create a materialized view, and what it is from https://www.postgresql.org/docs/current/rules-materializedviews.html */
 with 
 	transect_step1 as (
 		
