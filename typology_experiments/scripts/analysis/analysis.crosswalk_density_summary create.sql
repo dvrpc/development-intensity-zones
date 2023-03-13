@@ -6,7 +6,7 @@ with
 	crosswalk_density_summary as (
 		
 		select prelim_transect_zone, 
-		percentile_cont(0.40) within group (order by crosswalk_density asc) as percentile_40  
+		percentile_cont(0.50) within group (order by crosswalk_density asc) as percentile_50  
 		from transect_step1 
 		
 		group by prelim_transect_zone

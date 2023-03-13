@@ -36,7 +36,7 @@ with
     	),
 	crosswalk_density_summary as (
 		
-		select prelim_transect_zone as prelim_transect_zone_plus_1, percentile_40 from analysis.crosswalk_density_summary
+		select prelim_transect_zone as prelim_transect_zone_plus_1, percentile_50 from analysis.crosswalk_density_summary
 	
 		),
 	transect_with_crosswalk_bonus_and_stories_bonus_columns_too_step1 as (
@@ -50,8 +50,8 @@ with
             b.prelim_transect_zone_plus_1,
             b.crosswalk_density,
             b.average_comm_stories,
-            d.percentile_40,
-            case when crosswalk_density > percentile_40 then 1 else 0 end as crosswalk_bonus_step1,
+            d.percentile_50,
+            case when crosswalk_density > percentile_50 then 1 else 0 end as crosswalk_bonus_step1,
             case when average_comm_stories >= 3 and prelim_transect_zone = 5 and density_index_level = 'very high' and proximity_index_level = 'extreme' then 1 else 0 end as stories_bonus, /*Also creates stories_bonus here*/
 			b.geom
         from transect_with_average_comm_stories_column b
