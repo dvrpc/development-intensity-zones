@@ -25,7 +25,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 15. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
 16. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
 17. analysis.proximity_index create.sql
-18. Sean Lawrence's Python script that creates analysis.block_groups_24co_2020_area_calcs
+18. Sean Lawrence's Python script that creates analysis.block_groups_24co_2020_area_calcs located at https://github.com/dvrpc/typology-experiments/issues/3#issuecomment-1520862620 
 19. analysis.transect_step1 create.sql
 20. analysis.crosswalk_density_summary create.sql
 21. analysis.transect create.sql
