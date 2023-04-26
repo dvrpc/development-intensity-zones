@@ -34,7 +34,7 @@ with
     density_and_proximity_indices_with_prelim_transect_zone_column as (
         
     	select block_group20, density_index, proximity_index, density_index_level, proximity_index_level,
-    	case when prelim_transect_zone_step1 is null then 0 else prelim_transect_zone_step1 end as prelim_transect_zone
+    	case when block_group20 in (select "GEOID" from analysis.block_groups_24co_2020_area_calcs where percent_lu_h2o_pos >= 95) then 0 else prelim_transect_zone_step1 end as prelim_transect_zone
     	from density_and_proximity_indices_with_prelim_transect_zone_column_step1
         
         ),
