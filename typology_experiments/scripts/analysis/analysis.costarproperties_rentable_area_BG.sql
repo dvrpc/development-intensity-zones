@@ -1,4 +1,4 @@
-drop table if exists analysis.costarproperties_rentable_area_bg;
+drop table if exists analysis.costarproperties_rentable_area_bg cascade;
 
 create table analysis.costarproperties_rentable_area_bg as
 with
