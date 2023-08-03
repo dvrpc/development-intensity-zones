@@ -7,7 +7,7 @@ with
 	    sum(crps.rentable_building_area)/1000 as commercial_sqft
 	from (
 		select * from analysis.costarproperties_region_plus_surrounding crps union
-		select * from _raw.not_in_costar -- AS EXAMPLES, this contains those 2 really big Costar properties, that one in University City and the GSK campus in Montco (so more similar properties can get added to this in the future if need be). _raw.not_in_costar was originally manually made by Ben Gruswitz 
+		select geom, rentable_building_area from _raw.not_in_costar -- AS EXAMPLES, this contains those 2 really big Costar properties, that one in University City and the GSK campus in Montco (so more similar properties can get added to this in the future if need be). _raw.not_in_costar was originally manually made by Ben Gruswitz 
 		)
 		join analysis.block_groups_24co_2020 bgd
 	    on st_intersects(crps.geom, bgd.geom)
