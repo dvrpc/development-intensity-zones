@@ -10,23 +10,23 @@ DVRPC staff first classified the region by levels of density and accessibility u
 
 1. raw_input_data_upload.py - *I also wrote how tables uploaded to _raw not using this script were created in this script's Obsidian comments file*
 2. analysis.block_groups_24co_2020 create.sql
-3. block_group_centroids_24co_2020_and_their_buffers_create.py
-4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
-5. block_group_land_by_developability_create.py - *Warning: This script will take roughly 2 hours and 10 minutes to run because the intersecting of the block groups with the developable block group fragments takes a while*
-6. analysis.unprotected_land_area create.sql
-7. crosswalks.sql
-8. analysis.block_groups_dvrpc_2020 create.sql
-9. analysis.crosswalks_block_groups_dvrpc_2020.sql
-10. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
-11. analysis.costarproperties_region_plus_surrounding.sql
-12. not_in_costar_upload.py
-13. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
-14. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
-15. analysis.density_index create.sql
-16. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-17. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
-18. analysis.proximity_index create.sql
-19. Sean Lawrence's Python script that creates analysis.block_groups_24co_2020_area_calcs located at https://github.com/dvrpc/typology-experiments/issues/3#issuecomment-1520862620  - *Warning: This script will take roughly 1.5 hours to run*
+3. Sean Lawrence's Python script that creates analysis.block_groups_24co_2020_area_calcs located at https://github.com/dvrpc/typology-experiments/issues/3#issuecomment-1520862620  - *Warning: This script will take roughly 1.5 hours to run*
+4. block_group_centroids_24co_2020_and_their_buffers_create.py
+5. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
+6. block_group_land_by_developability_create.py - *Warning: This script will take roughly 2 hours and 10 minutes to run because the intersecting of the block groups with the developable block group fragments takes a while*
+7. analysis.unprotected_land_area create.sql
+8. crosswalks.sql
+9. analysis.block_groups_dvrpc_2020 create.sql
+10. analysis.crosswalks_block_groups_dvrpc_2020.sql
+11. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
+12. analysis.costarproperties_region_plus_surrounding.sql
+13. not_in_costar_upload.py
+14. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+15. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+16. analysis.density_index create.sql
+17. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
+18. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
+19. analysis.proximity_index create.sql
 20. analysis.transect_step1 create.sql
 21. analysis.crosswalk_density_summary create.sql
 22. analysis.transect create.sql
