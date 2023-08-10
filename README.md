@@ -34,7 +34,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 24. analysis.diz_mcd create.sql
 25. analysis.diz_taz create.sql
 26. analysis.diz_tract create.sql
-27. analysis.transect_philadelphia_planning_district_translation create.sql
+27. analysis.diz_philadelphia_planning_district create.sql
 
 ## Objects created manually
 
