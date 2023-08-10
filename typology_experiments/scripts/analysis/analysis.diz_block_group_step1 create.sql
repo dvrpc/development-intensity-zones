@@ -1,6 +1,6 @@
-drop view if exists analysis.diz_step1 cascade;
+drop view if exists analysis.diz_block_group_step1 cascade;
 
-create view analysis.diz_step1 as 
+create view analysis.diz_block_group_step1 as 
 with 
 	indices as (
         select
