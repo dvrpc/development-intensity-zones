@@ -9,10 +9,10 @@ import os
 from sqlalchemy import create_engine
 
 gis_engine = create_engine(
-    f"postgresql+psycopg2://{os.environ['DVRPC_GIS_POSTGRES_DB_USERNAME']}:{os.environ['DVRPC_GIS_POSTGRES_DB_PASSWORD']}@{os.environ['DVRPC_GIS_POSTGRES_DB_HOST']}/{os.environ['DVRPC_GIS_POSTGRES_DB_NAME']}"
+    f"postgresql+psycopg2://{os.getenv('DVRPC_GIS_POSTGRES_DB_USERNAME')}:{os.getenv('DVRPC_GIS_POSTGRES_DB_PASSWORD')}@{os.getenv('DVRPC_GIS_POSTGRES_DB_HOST')}/{os.getenv('DVRPC_GIS_POSTGRES_DB_NAME')}"
 )
 ian_engine = create_engine(
-    f"{os.environ['DATABASE_URL']}"
+    f"{os.getenv('DATABASE_URL')}"
 )  # In the .env file, I stored the typology-experiments DB connection info as 1 long string
 
 # create land use dataframe from gis-db
