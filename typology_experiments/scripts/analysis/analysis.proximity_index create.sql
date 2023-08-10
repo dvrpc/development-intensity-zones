@@ -6,12 +6,12 @@ with
     	
     	select block_group20, proximity_index,
     	
-    	case when proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'low') then 'very low' else null end as very_low,
-    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'low') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'moderate') then 'low' else null end as low,
-    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'moderate') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'high') then 'moderate' else null end as moderate,
-    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'high') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'very high') then 'high' else null end as high,
-    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'very high') and proximity_index < (select proximity_index_thresholds from _resources.thresholds where levels = 'extreme') then 'very high' else null end as very_high,
-    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where levels = 'extreme') then 'extreme' else null end as extreme,
+    	case when proximity_index < (select proximity_index_thresholds from _resources.thresholds where level_code = 2) then 'level_code 1' else null end as lc_1,
+    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where level_code = 2) and proximity_index < (select proximity_index_thresholds from _resources.thresholds where level_code = 3) then 'level_code 2' else null end as lc_2,
+    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where level_code = 3) and proximity_index < (select proximity_index_thresholds from _resources.thresholds where level_code = 4) then 'level_code 3' else null end as lc_3,
+    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where level_code = 4) and proximity_index < (select proximity_index_thresholds from _resources.thresholds where level_code = 5) then 'level_code 4' else null end as lc_4,
+    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where level_code = 5) and proximity_index < (select proximity_index_thresholds from _resources.thresholds where level_code = 6) then 'level_code 5' else null end as lc_5,
+    	case when proximity_index >= (select proximity_index_thresholds from _resources.thresholds where level_code = 6) then 'level_code 6' else null end as lc_6,
     	case when proximity_index is null then 'null' else null end as "null"
     	
     	from analysis.proximity_index_step1
@@ -19,7 +19,7 @@ with
     	),
     proximity_index_step2 as (
     	
-    	select block_group20, proximity_index, concat(very_low,low,moderate,high,very_high,extreme,"null") as proximity_index_level_step1 from proximity_index_step1
+    	select block_group20, proximity_index, concat(lc_1,lc_2,lc_3,lc_4,lc_5,lc_6,"null") as proximity_index_level_step1 from proximity_index_step1
     	
     	)
 
