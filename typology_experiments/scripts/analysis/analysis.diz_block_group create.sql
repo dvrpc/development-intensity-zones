@@ -2,13 +2,13 @@ drop materialized view if exists analysis.diz_block_group cascade;
 
 create materialized view analysis.diz_block_group as /*Found out how to create a materialized view, and what it is from https://www.postgresql.org/docs/current/rules-materializedviews.html */
 with 
-	diz_step1 as (
+	diz_bg_step1 as (
 		
 		select block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_diz_zone, crosswalk_density, 
 		
 		case when prelim_diz_zone < 6 and prelim_diz_zone > 0 then prelim_diz_zone + 1 else 7 end as prelim_diz_zone_plus_1, 
 		
-		geom from analysis.diz_step1
+		geom from analysis.diz_block_group_step1
 		
 		), --Found out how to conditionally create a column from https://stackoverflow.com/a/19029960 (in turn found on https://stackoverflow.com/questions/19029842/if-then-else-statements-in-postgresql )
 	diz_bg_av_com_s as (
@@ -30,7 +30,7 @@ with
             b.crosswalk_density,
             d.average_comm_stories,
 			b.geom
-        from diz_step1 b
+        from diz_bg_step1 b
         	left join diz_bg_av_com_s d
             on b.block_group20 = d.block_group20
     	),
