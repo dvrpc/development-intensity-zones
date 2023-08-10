@@ -1,6 +1,6 @@
-drop table if exists analysis.block_groups_24co_2020;
-
+drop table if exists analysis.block_groups_24co_2020 cascade;
 create table analysis.block_groups_24co_2020 as
+
 with
 	block_groups_24co_2020_undissolved as (
 		select "STATEFP", "COUNTYFP", "GEOID", "ALAND", geom from _raw.tl_2020_10_bg union
