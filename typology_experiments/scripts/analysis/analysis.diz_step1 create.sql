@@ -1,4 +1,4 @@
-drop view if exists analysis.diz_step1;
+drop view if exists analysis.diz_step1 cascade;
 
 create view analysis.diz_step1 as 
 with 
