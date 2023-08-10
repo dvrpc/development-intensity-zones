@@ -13,8 +13,8 @@ db = Database(DATABASE_URL)
 
 
 undevelopable_area = db.get_geodataframe_from_query(
-    "SELECT * FROM _raw.pos_h2o_transect_zone_0"
-)  # Uses my function to bring in the _raw.pos_h2o_transect_zone_0 shapefile, which is the undevelopable part of the study area
+    "SELECT * FROM _raw.pos_h2o_diz_zone_0"
+)  # Uses my function to bring in the _raw.pos_h2o_diz_zone_0 shapefile, which is the undevelopable part of the study area
 
 block_groups_24co_2020 = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.block_groups_24co_2020"
