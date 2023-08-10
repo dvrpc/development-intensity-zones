@@ -47,10 +47,10 @@ DVRPC staff first classified the region by levels of density and accessibility u
 - Ian Schwarzenberg manually exported demographics.taz_2010_mcdaligned from the DVRPC GIS Postsgres database as _raw.taz_2010_mcdaligned
 - Ian Schwarzenberg manually exported demographics.census_tracts_2020 from the DVRPC GIS Postsgres database as _raw.census_tracts_2020
 - Ian Schwarzenberg manually exported demographics.census_mcds_phipd_2020 from the DVRPC GIS Postsgres database as _raw.dvrpc_mcd_phicpa
-- Ian Schwarzenberg manually created _raw.pos_h2o_transect_zone_0 using these steps: 
+- Ian Schwarzenberg manually created _raw.pos_h2o_diz_zone_0 using these steps: 
 1) Brought U:/ OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb/ pos_h2o_transect_zone_0 straight into QGIS (in turn got the data from Ben Gruswitz), 
 2) Used QGIS' "Fix Geometries" tool to fix any geometry issues with it
-3) Loaded the resulting shapefile into the database as _raw.pos_h2o_transect_zone_0
+3) Loaded the resulting shapefile into the database as _raw.pos_h2o_diz_zone_0
 Ian Schwarzenberg found out how to fix a shapefile's geometries in QGIS from [step 10 here](https://www.qgistutorials.com/en/docs/3/handling_invalid_geometries.html).
 - Ben Gruswitz and Sean Lawrence uploaded the 15 surrounding counties' protected land and water data from G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/pos_h2o separately as _raw.surrounding_counties_waterbodies and _raw.surrounding_county_pos
 - Ben Gruswitz manually created and uploaded _resources.classifications and _resources.diz_zone_names
