@@ -7,7 +7,9 @@ import geopandas as gpd
 import pandas as pd
 import os
 from sqlalchemy import create_engine
+from dotenv import load_dotenv  # This and the next command load in the repository's .env file
 
+load_dotenv()
 gis_engine = create_engine(
     f"postgresql+psycopg2://{os.getenv('DVRPC_GIS_POSTGRES_DB_USERNAME')}:{os.getenv('DVRPC_GIS_POSTGRES_DB_PASSWORD')}@{os.getenv('DVRPC_GIS_POSTGRES_DB_HOST')}/{os.getenv('DVRPC_GIS_POSTGRES_DB_NAME')}"
 )
