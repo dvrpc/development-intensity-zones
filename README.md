@@ -8,7 +8,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 
 ## To do the analysis, run these scripts in order
 
-1. raw_input_data_upload.py - *I also wrote how tables uploaded to _raw not using this script were created in this script's Obsidian comments file*
+1. raw_input_data_upload.py
 2. analysis.block_groups_24co_2020 create.sql
 3. block_groups_24co_2020_area_calcs_create.py - *Warning: This script will take roughly 1 hour and 38 minutes to run*
 4. block_group_centroids_24co_2020_and_their_buffers_create.py
