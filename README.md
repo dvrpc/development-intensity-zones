@@ -20,19 +20,20 @@ DVRPC staff first classified the region by levels of density and accessibility u
 10. analysis.crosswalks_block_groups_dvrpc_2020.sql
 11. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
 12. analysis.costarproperties_region_plus_surrounding.sql
-13. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
-14. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
-15. analysis.density_index create.sql
-16. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-17. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
-18. analysis.proximity_index create.sql
-19. analysis.transect_step1 create.sql
-20. analysis.crosswalk_density_summary create.sql
-21. analysis.transect create.sql
-22. analysis.transect_mcd_translation create.sql
-23. analysis.transect_taz_translation create.sql
-24. analysis.transect_tract_translation create.sql
-25. analysis.transect_philadelphia_planning_district_translation create.sql
+13. not_in_costar_upload.py
+14. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+15. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
+16. analysis.density_index create.sql
+17. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
+18. proximity_index_step1_create.py - *Warning: Allow for about 45 minutes for this script to run because the joining of the costar property locations to the buffers takes a while*
+19. analysis.proximity_index create.sql
+20. analysis.transect_step1 create.sql
+21. analysis.crosswalk_density_summary create.sql
+22. analysis.transect create.sql
+23. analysis.transect_mcd_translation create.sql
+24. analysis.transect_taz_translation create.sql
+25. analysis.transect_tract_translation create.sql
+26. analysis.transect_philadelphia_planning_district_translation create.sql
 
 ## Python environment
 
