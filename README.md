@@ -30,7 +30,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 20. analysis.transect_step1 create.sql
 21. analysis.crosswalk_density_summary create.sql
 22. analysis.transect create.sql
-23. diz_create.py
+23. diz_create.py - *Warning: Allow for about 45 minutes for this script to run*
 24. analysis.transect_mcd_translation create.sql
 25. analysis.transect_taz_translation create.sql
 26. analysis.transect_tract_translation create.sql
