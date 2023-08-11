@@ -3,8 +3,8 @@ This script creates analysis.block_group_land_by_developability
 """
 
 import pandas as pd
-
 import geopandas as gpd
+from shapely.geometry import Point, LineString, Polygon
 
 
 from typology_experiments import Database, DATABASE_URL
@@ -40,7 +40,7 @@ undevelopable_block_group_fragments = undevelopable_block_group_fragments[
 
 undevelopable_block_group_fragments = undevelopable_block_group_fragments.rename(
     columns={"geometry": "geom"}
-)  # Renames the geometry column
+)  # Renames the geometry column so that it can later be merged/row binded/etc with developable_block_group_fragments
 
 
 developable_block_group_fragments = gpd.overlay(
@@ -65,10 +65,13 @@ block_group_land_by_developability = pd.concat(
     [undevelopable_block_group_fragments, developable_block_group_fragments]
 )  # Merges/row binds/etc undevelopable_block_group_fragments and developable_block_group_fragments to get block_group_land_by_developability. This completes the manual unioning of
 
-block_group_land_by_developability = block_group_land_by_developability.set_geometry(
-    "geom"
-)  # Tells Python the name of block_group_land_by_developability's geometry column
+block_group_land_by_developability = block_group_land_by_developability.rename(
+    columns={"geom": "geometry"}
+)  # Renames the geometry column because GEOPANDAS PREFERS THE GEOMETRY COLUMN BE CALLED geometry, THIS SOLVES ERRORS LATER
 
+block_group_land_by_developability = block_group_land_by_developability.set_geometry(
+    "geometry"
+)  # Tells Python the name of block_group_land_by_developability's geometry column
 
 block_group_land_by_developability = block_group_land_by_developability.explode(
     ignore_index=True
