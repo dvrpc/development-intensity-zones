@@ -12,7 +12,7 @@ db = Database(DATABASE_URL)
 
 thresholds = pd.read_csv(
     "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/thresholds.csv"
-)  # Brings in the thresholds CSV I madee
+)  # Brings in the thresholds CSV I made
 
 thresholds = thresholds.astype(
     {"density_index_thresholds": "float", "proximity_index_thresholds": "float"}
