@@ -96,7 +96,7 @@ te_raw_spatial_tables_dict = dict(
 
 [
     fc.to_postgis(
-        f'_raw."{fc_name}"',
+        f"{fc_name}",
         diz_engine,
         schema="_raw",
         if_exists="replace",
@@ -116,7 +116,7 @@ te_raw_nonspatial_tables_dict = dict(
 
 [
     df.to_sql(
-        f'_raw."{df_name}"',
+        f"{df_name}",
         diz_engine,
         schema="_raw",
         if_exists="replace",
