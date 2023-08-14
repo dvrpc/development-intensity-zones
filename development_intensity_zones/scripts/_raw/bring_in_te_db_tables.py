@@ -3,9 +3,11 @@ This script populates _raw by bringing in all of the _raw TABLES IN THE typology
 """
 
 import geopandas as gpd
+import pandas as pd
 import re
 import os
 import psycopg2
+from sqlalchemy import create_engine
 from dotenv import load_dotenv  # This and the next command load in the repository's .env file
 
 load_dotenv()
@@ -17,9 +19,11 @@ te_conn_string = re.sub(
     "development-intensity-zones", "typology-experiments", diz_conn_string
 )  # Gets the TE DB connection string simply by replacing the DB name (all other info remains the same)
 
-diz_conn = psycopg2.connect(diz_conn_string)  # This and the next command connect to both DBs
+diz_engine = create_engine(diz_conn_string)  # This and the next 2 commands connect to both DBs
 
 te_conn = psycopg2.connect(te_conn_string)
+
+te_engine = create_engine(te_conn_string)
 
 te_cursor = te_conn.cursor()  # Creates a cursor just for the TE DB, needed to query info from it
 
@@ -77,15 +81,36 @@ te_raw_table_geom_col_names = [
 ]  # Gets just the geometry column names (of the SPATIAL tables)
 
 
-te_raw_spatial_tables = gpd.read_postgis(
-    f'SELECT * FROM _raw."{spatial_te_raw_table_names_wo_schema[0]}"',
-    te_conn,
-    geom_col=te_raw_table_geom_col_names[0],
-)
+te_raw_spatial_tables = [
+    gpd.read_postgis(
+        f'SELECT * FROM _raw."{spatial_te_raw_table_names_wo_schema[i]}"',
+        te_engine,
+        geom_col=te_raw_table_geom_col_names[i],
+    )
+    for i in list(range(len(spatial_te_raw_table_names_wo_schema)))
+]  # Reads in all of the SPATIAL tables and puts them into a list of them
+
+te_raw_spatial_tables_dict = dict(
+    zip(spatial_te_raw_table_names_wo_schema, te_raw_spatial_tables)
+)  # Puts those spatial tables into a dictionary, where the keys are the table names, and the values are the spatial tables themselves
+
+[
+    fc.to_postgis(
+        f'_raw."{fc_name}"',
+        diz_engine,
+        schema="_raw",
+        if_exists="replace",
+    )
+    for fc_name, fc in te_raw_spatial_tables_dict.items()
+]  # For each table in te_raw_spatial_tables_dict, exports it to the _raw schema of the DIZ DB
+
+# df = pd.read_sql(
 
 
-diz_conn.close()  # This and the next 2 commands close the connections to both DBs now that I don't need to be connected to them anymore
+diz_engine.dispose()  # This and the next 3 commands close the connections to both DBs now that I don't need to be connected to them anymore
 
 te_conn.close()
+
+te_engine.dispose()
 
 te_cursor.close()
