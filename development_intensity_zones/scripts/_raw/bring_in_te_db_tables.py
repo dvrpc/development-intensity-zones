@@ -5,9 +5,9 @@ This script populates _raw by bringing in all of the _raw TABLES IN THE typology
 import geopandas as gpd
 import pandas as pd
 import re
-import os
 import psycopg2
 from sqlalchemy import create_engine
+import os
 from dotenv import load_dotenv  # This and the next command load in the repository's .env file
 
 load_dotenv()
