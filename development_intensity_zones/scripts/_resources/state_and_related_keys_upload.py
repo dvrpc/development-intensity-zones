@@ -3,18 +3,15 @@ This script creates _resources.state_key, _resources.dvrpc_key, _resources.count
 """
 
 import pandas as pd
-
 import numpy as np
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 
 
-from typology_experiments.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE
-
-# "from typology_experiments import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
+from development_intensity_zones.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE "from development_intensity_zones import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
 
 
 state_key = db.get_dataframe_from_query(

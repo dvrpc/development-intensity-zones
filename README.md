@@ -1,10 +1,10 @@
-# Typology Experiments
+# Development Intensity Zones
 
 ## What is this?
 
-The method the DVRPC region is classified by levels of density and accessibility is being updated. This repository was created for sharing code and documentation related to the process of grabbing and processing source data, then creating the density and accessibility table, assigning levels of density and accessibility to each 2020 block group in the DVRPC region.
+The method the DVRPC region is classified by levels of density and proximity is being updated. This repository was created for sharing code and documentation related to the process of grabbing and processing source data, then creating the density and proximity table, assigning levels of density and proximity to each 2020 block group in the DVRPC region.
 
-DVRPC staff first classified the region by levels of density and accessibility using municipalities as part of the LRP creation process. Much of the data processing for that was done using GIS. As the exact methodology for classifying the region by levels of density and accessibility is refined, staff will be updating existing code within this repo.
+DVRPC staff first classified the region by levels of density and proximity using municipalities as part of the LRP creation process. Much of the data processing for that was done using GIS. As the exact methodology for classifying the region by levels of density and proximity is refined, staff will be updating existing code within this repo.
 
 ## To do the analysis, run these scripts in order
 
@@ -52,7 +52,7 @@ DVRPC staff first classified the region by levels of density and accessibility u
 2) Used [these insturctions](https://support.esri.com/en-us/knowledge-base/how-to-convert-3d-shapefiles-to-2d-shapefiles-000008433), along with choosing EPSG 26918 as the coordinate system, to create a 2D shapefile version of that feature class, and store that shapefile as G:\Shared drives\Socioeconomic and Land Use Analytics\Tracking Progress\Data Preparation\postgres_db\pos_h2o_transect_zone_0_2D.shp
 3) Used the Repair Geometry tool to fix any geometry errors in that shapefile, and exported that shapefile as G:\Shared drives\Socioeconomic and Land Use Analytics\Tracking Progress\Data Preparation\postgres_db\pos_h2o_diz_zone_0_SHP.shp 
 4) Using pos_h2o_diz_zone_0_upload.py (only needed to be run once and that's it), loaded that shapefile into the database as _raw.pos_h2o_diz_zone_0
-- Ben Gruswitz and Sean Lawrence uploaded the 15 surrounding counties' protected land and water data from G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/pos_h2o separately as _raw.surrounding_counties_waterbodies and _raw.surrounding_county_pos
+- Ben Gruswitz and Sean Lawrence uploaded the 15 surrounding counties' protected land and water data from G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/development_intensity_zones/pos_h2o separately as _raw.surrounding_counties_waterbodies and _raw.surrounding_county_pos
 - Ben Gruswitz manually created and uploaded _resources.classifications and _resources.diz_zone_names
 
 ## Python environment
@@ -67,7 +67,7 @@ conda env create -f environment.yml
 - You can now activate the environment with:
 
 ```
-conda activate typology-experiments
+conda activate development-intensity-zones
 ```
 
 - However, then run these 2 commands in order in the terminal, in order to fix an error that comes up later with geopandas (found out how to fix that error from https://stackoverflow.com/a/69642315, which in turn was found on https://stackoverflow.com/questions/69630630/on-fresh-conda-installation-of-pyproj-pyproj-unable-to-set-database-path-pypr ):
@@ -86,7 +86,7 @@ python PATH/TO/FILE.py
 - You can import functions and classes from other files in this repo like this:
 
 ```python
-from typology_experiments.helpers import do_something
+from development_intensity_zones.helpers import do_something
 
 
 do_something(times=3)

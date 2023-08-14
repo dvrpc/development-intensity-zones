@@ -1,5 +1,5 @@
 """
-This script creates analysis.block_groups_24co_2020_area_calcs. THIS SCRIPT WAS ALMOST COMPLETELY WRITTEN BY SEAN LAWRENCE HERE: https://github.com/dvrpc/typology-experiments/issues/3#issuecomment-1520862620 . THE ONLY DIFFERENCES ARE THAT SEAN'S ORIGINAL SCRIPT REFERS TO _raw.pos_h2o_diz_zone_0 BY ITS OLD NAME OF _raw.pos_h2o_transect_zone_0, THIS DOESN'T, AND SEAN'S ORIGINAL SCRIPT PUTS THE DB CONNECTION INFO DIRECTLY INTO THE SCRIPT, THIS DOESN'T
+This script creates analysis.block_groups_24co_2020_area_calcs. THIS SCRIPT WAS ALMOST COMPLETELY WRITTEN BY SEAN LAWRENCE HERE: https://github.com/dvrpc/development-intensity-zones/issues/3#issuecomment-1520862620 . THE ONLY DIFFERENCES ARE THAT SEAN'S ORIGINAL SCRIPT REFERS TO _raw.pos_h2o_diz_zone_0 BY ITS OLD NAME OF _raw.pos_h2o_transect_zone_0, THIS DOESN'T, AND SEAN'S ORIGINAL SCRIPT PUTS THE DB CONNECTION INFO DIRECTLY INTO THE SCRIPT, THIS DOESN'T
 """
 
 
@@ -15,7 +15,7 @@ gis_engine = create_engine(
 )
 ian_engine = create_engine(
     f"{os.getenv('DATABASE_URL')}"
-)  # In the .env file, I stored the typology-experiments DB connection info as 1 long string
+)  # In the .env file, I stored the development-intensity-zones DB connection info as 1 long string
 
 # create land use dataframe from gis-db
 sql_query = "select st_force2d(shape) as geom, 0 as zone from planning.dvrpc_landuse_2015 where lu15sub in ('04010','04011','04020','50000','05030','07050','09000','14020')"

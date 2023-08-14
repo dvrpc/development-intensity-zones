@@ -3,19 +3,17 @@ This script uploads _resources.block2020_parent_geos
 """
 
 import pandas as pd
-
 import gspread
-
 import re
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 
 
 block2020_parent_geos = pd.read_excel(
-    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/typology_experiments/block2020_parent_geos.xlsx"
+    "G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/development_intensity_zones/block2020_parent_geos.xlsx"
 )  # Reads in block2020_parent_geos
 
 block2020_parent_geos[

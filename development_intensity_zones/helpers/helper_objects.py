@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

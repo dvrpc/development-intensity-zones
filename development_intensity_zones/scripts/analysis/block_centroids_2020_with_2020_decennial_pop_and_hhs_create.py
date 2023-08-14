@@ -3,11 +3,10 @@ This script creates analysis.block_centroids_2020_with_2020_decennial_pop_and_hh
 """
 
 import pandas as pd
-
 import geopandas as gpd
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

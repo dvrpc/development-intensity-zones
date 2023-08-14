@@ -4,10 +4,9 @@ This script creates analysis.block_group_land_by_developability
 
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import Point, LineString, Polygon
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

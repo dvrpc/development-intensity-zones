@@ -3,11 +3,10 @@ This script creates analysis.block_group_centroids_24co_2020 and analysis.block_
 """
 
 import pandas as pd
-
 import geopandas as gpd
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

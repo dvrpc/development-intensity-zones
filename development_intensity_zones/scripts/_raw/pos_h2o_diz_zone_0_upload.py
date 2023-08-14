@@ -5,7 +5,7 @@ This script uploads _raw.pos_h2o_diz_zone_0. ALSO, REMEMBER THAT THIS SCRIPT IS 
 import geopandas as gpd
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

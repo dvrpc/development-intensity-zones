@@ -3,11 +3,10 @@ This script creates _resources.geo_key
 """
 
 import pandas as pd
-
 import numpy as np
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

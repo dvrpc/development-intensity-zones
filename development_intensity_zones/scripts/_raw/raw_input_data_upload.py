@@ -1,28 +1,21 @@
 """
-This script uploads the raw input data that's needed to make the VisionEval (VE)-State typology method into _raw
+This script uploads the raw input data needed to make the Development Intensity Zones (DIZ) into _raw
 """
 
 import pandas as pd
-
 import geopandas as gpd
-
 import requests
-
 import io
-
 import zipfile
-
 import tempfile
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 
 
-from typology_experiments.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE
-
-# "from typology_experiments import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
+from development_intensity_zones.helpers.helper_functions import *  # Imports all functions from helper_functions.py. THIS MUST ALWAYS COME AFTER THE "from development_intensity_zones import Database, DATABASE_URL" AND "db = Database(DATABASE_URL)" COMMANDS IN THAT ORDER
 
 
 tot_pops_and_hhs_2020_block = stream_in_census_data(

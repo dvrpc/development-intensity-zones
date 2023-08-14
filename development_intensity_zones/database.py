@@ -4,7 +4,7 @@ translating data to and from Python/SQL.
 
 Example:
 
->>> from typology-experiments.database import Database
+>>> from development-intensity-zones.database import Database
 >>> my_uri ="postgresql://postgres:password@localhost:5432/indego_2021"
 >>> db = Database(my_uri)
 
@@ -250,5 +250,4 @@ class Database:
 
 
 if __name__ == "__main__":
-
     db = Database("postgresql://postgres:password@localhost:5432/indego_2021")

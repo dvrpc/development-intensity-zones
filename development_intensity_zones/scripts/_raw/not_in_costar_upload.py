@@ -6,7 +6,7 @@ This script uploads the feature class, THAT BEN GRUSWITZ MANUALLY CREATED, conta
 import geopandas as gpd
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 

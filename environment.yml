@@ -1,4 +1,4 @@
-name: typology-experiments
+name: development-intensity-zones
 channels:
   - conda-forge
 dependencies:

@@ -9,11 +9,11 @@ import requests
 
 from io import BytesIO
 
-import pdfplumber  # FIRST HAD TO RUN "conda activate typology-experiments" AND THEN 'python -m pip install "pdfplumber"' BEFORE RUNNING THIS COMMAND
+import pdfplumber  # FIRST HAD TO RUN "conda activate development-intensity-zones" AND THEN 'python -m pip install "pdfplumber"' BEFORE RUNNING THIS COMMAND
 
 import re
 
-import gspread  # FIRST HAD TO RUN "conda activate typology-experiments" AND THEN 'python -m pip install "gspread"' BEFORE RUNNING THIS COMMAND
+import gspread  # FIRST HAD TO RUN "conda activate development-intensity-zones" AND THEN 'python -m pip install "gspread"' BEFORE RUNNING THIS COMMAND
 
 import os
 
@@ -26,7 +26,7 @@ from pandas import DataFrame
 from geopandas import GeoDataFrame
 
 
-from typology_experiments import Database, DATABASE_URL
+from development_intensity_zones import Database, DATABASE_URL
 
 db = Database(DATABASE_URL)
 
@@ -37,7 +37,6 @@ def do_something(times: int) -> None:
 
 
 def duplicate_state_key(new_geo_key_values):
-
     if "state_key" in locals().keys():
         pass
     else:
@@ -60,7 +59,6 @@ def duplicate_state_key(new_geo_key_values):
 
 
 def sort_geo_names_by_year_and_geo_key(df: pd.DataFrame) -> pd.DataFrame:
-
     if "geo_key" in locals().keys():
         pass
     else:
@@ -87,7 +85,6 @@ def sort_geo_names_by_year_and_geo_key(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_county_grouping_totals_and_sort(df: pd.DataFrame) -> pd.DataFrame:
-
     if "geo_key" in locals().keys():
         pass
     else:
@@ -178,7 +175,6 @@ def add_county_grouping_totals_and_sort(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def stream_in_census_data(api_url, list_of_variables_to_keep_as_string):
-
     df = requests.get(
         api_url
     ).json()  # Streams in the census table the user wants using the user-defined census API
@@ -197,7 +193,6 @@ def stream_in_census_data(api_url, list_of_variables_to_keep_as_string):
 
 
 def get_folder_paths(directory_path, keep_or_remove, filtering_text_pattern):
-
     folder_paths_list = [
         x[0] for x in os.walk(directory_path)
     ]  # Gets a list of all folder paths within the general directory
@@ -423,7 +418,6 @@ def get_indicator_schemas_tables_field_info(
 
 
 def bring_in_bridge_owner_types(df: pd.DataFrame, maintenance_column_name) -> pd.DataFrame:
-
     owner_types = (
         pdfplumber.open(
             BytesIO(requests.get("https://www.fhwa.dot.gov/bridge/mtguide.pdf").content)
