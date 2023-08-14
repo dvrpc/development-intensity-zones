@@ -66,12 +66,12 @@ which_tables_arent_spatial = [
     i for i in range(len(which_tables_are_spatial)) if which_tables_are_spatial[i] == []
 ]  # Continues the process of highlighting which tables are spatial by getting the indexes of the table names which are NON-spatial
 
-non_spatial_te_raw_table_names_wo_schema = [
+nonspatial_te_raw_table_names_wo_schema = [
     te_raw_table_names_wo_schema[x] for x in which_tables_arent_spatial
 ]  # Gets just the names of the NON-spatial tables
 
 spatial_te_raw_table_names_wo_schema = sorted(
-    list(set(te_raw_table_names_wo_schema) - set(non_spatial_te_raw_table_names_wo_schema))
+    list(set(te_raw_table_names_wo_schema) - set(nonspatial_te_raw_table_names_wo_schema))
 )  # Gets the SPATIAL tables by getting the ones that are in the list of all of them but not the list of non-spatial ones, while keeping the tables' order so errors don't come up later
 
 te_raw_table_geom_col_names = [
@@ -104,7 +104,25 @@ te_raw_spatial_tables_dict = dict(
     for fc_name, fc in te_raw_spatial_tables_dict.items()
 ]  # For each table in te_raw_spatial_tables_dict, exports it to the _raw schema of the DIZ DB
 
-# df = pd.read_sql(
+
+te_raw_nonspatial_tables = [
+    pd.read_sql(f'SELECT * FROM _raw."{i}"', te_engine)
+    for i in nonspatial_te_raw_table_names_wo_schema
+]  # Reads in all of the NON-spatial tables and puts them into a list of them
+
+te_raw_nonspatial_tables_dict = dict(
+    zip(nonspatial_te_raw_table_names_wo_schema, te_raw_nonspatial_tables)
+)  # Puts those NON-spatial tables into a dictionary, where the keys are the table names, and the values are the NON-spatial tables themselves
+
+[
+    df.to_sql(
+        f'_raw."{df_name}"',
+        diz_engine,
+        schema="_raw",
+        if_exists="replace",
+    )
+    for df_name, df in te_raw_spatial_tables_dict.items()
+]  # For each table in te_raw_nonspatial_tables_dict, exports it to the _raw schema of the DIZ DB
 
 
 diz_engine.dispose()  # This and the next 3 commands close the connections to both DBs now that I don't need to be connected to them anymore
