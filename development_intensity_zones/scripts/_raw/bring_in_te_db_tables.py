@@ -121,7 +121,7 @@ te_raw_nonspatial_tables_dict = dict(
         schema="_raw",
         if_exists="replace",
     )
-    for df_name, df in te_raw_spatial_tables_dict.items()
+    for df_name, df in te_raw_nonspatial_tables_dict.items()
 ]  # For each table in te_raw_nonspatial_tables_dict, exports it to the _raw schema of the DIZ DB
 
 
