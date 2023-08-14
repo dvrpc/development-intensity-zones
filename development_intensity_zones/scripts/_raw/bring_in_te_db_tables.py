@@ -78,7 +78,7 @@ te_raw_table_geom_col_names = [
 
 
 te_raw_spatial_tables = gpd.read_postgis(
-    f"SELECT * FROM _raw.{spatial_te_raw_table_names_wo_schema[0]}",
+    f'SELECT * FROM _raw."{spatial_te_raw_table_names_wo_schema[0]}"',
     te_conn,
     geom_col=te_raw_table_geom_col_names[0],
 )
