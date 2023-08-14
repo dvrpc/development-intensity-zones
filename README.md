@@ -47,11 +47,9 @@ DVRPC staff first classified the region by levels of density and proximity using
 - Ian Schwarzenberg manually exported demographics.taz_2010_mcdaligned from the DVRPC GIS Postsgres database as _raw.taz_2010_mcdaligned
 - Ian Schwarzenberg manually exported demographics.census_tracts_2020 from the DVRPC GIS Postsgres database as _raw.census_tracts_2020
 - Ian Schwarzenberg manually exported demographics.census_mcds_phipd_2020 from the DVRPC GIS Postsgres database as _raw.dvrpc_mcd_phicpa
-- Ian Schwarzenberg manually created _raw.pos_h2o_diz_zone_0 using these steps: 
-1) Brought U:/_OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb/pos_h2o_transect_zone_0 straight into ArcMap (in turn got the data from Ben Gruswitz) 
-2) Used [these insturctions](https://support.esri.com/en-us/knowledge-base/how-to-convert-3d-shapefiles-to-2d-shapefiles-000008433), along with choosing EPSG 26918 as the coordinate system, to create a 2D shapefile version of that feature class, and store that shapefile as G:\Shared drives\Socioeconomic and Land Use Analytics\Tracking Progress\Data Preparation\postgres_db\pos_h2o_transect_zone_0_2D.shp
-3) Used the Repair Geometry tool to fix any geometry errors in that shapefile, and exported that shapefile as G:\Shared drives\Socioeconomic and Land Use Analytics\Tracking Progress\Data Preparation\postgres_db\pos_h2o_diz_zone_0_SHP.shp 
-4) Using pos_h2o_diz_zone_0_upload.py (only needed to be run once and that's it), loaded that shapefile into the database as _raw.pos_h2o_diz_zone_0
+- These steps were taken to create _raw.pos_h2o_diz_zone_0:
+1) Sean Lawrence manually made U:/_OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb/pos_h2o_transect_zone_0_v2, which is another version of U:/_OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb/pos_h2o_transect_zone_0, but with geometries he repaired
+2) Ian Schwarzenberg wrote pos_h2o_diz_zone_0_upload.py (only needed to be run once and that's it), which loaded U:/_OngoingProjects/CoStar/To be moved later/Transect for AGO/db_exports.gdb/pos_h2o_transect_zone_0_v2 into the database as _raw.pos_h2o_diz_zone_0
 - Ben Gruswitz and Sean Lawrence uploaded the 15 surrounding counties' protected land and water data from G:/Shared drives/Long Range Plan/2050B Plan/Centers Update/development_intensity_zones/pos_h2o separately as _raw.surrounding_counties_waterbodies and _raw.surrounding_county_pos
 - Ben Gruswitz manually created and uploaded _resources.classifications and _resources.diz_zone_names
 
