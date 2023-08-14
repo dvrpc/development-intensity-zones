@@ -102,7 +102,7 @@ te_raw_spatial_tables_dict = dict(
         if_exists="replace",
     )
     for fc_name, fc in te_raw_spatial_tables_dict.items()
-]  # For each table in te_raw_spatial_tables_dict, exports it to the _raw schema of the DIZ DB
+]  # For each table in te_raw_spatial_tables_dict, exports it to the _raw schema of the DIZ DB. ALSO IGNORE THE "[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]" THAT GETS PRINTED HERE, THIS COMMAND WORKS
 
 
 te_raw_nonspatial_tables = [
@@ -122,7 +122,7 @@ te_raw_nonspatial_tables_dict = dict(
         if_exists="replace",
     )
     for df_name, df in te_raw_nonspatial_tables_dict.items()
-]  # For each table in te_raw_nonspatial_tables_dict, exports it to the _raw schema of the DIZ DB
+]  # For each table in te_raw_nonspatial_tables_dict, exports it to the _raw schema of the DIZ DB. ALSO IGNORE THE "[353, 557, 982]" THAT GETS PRINTED HERE, THIS COMMAND WORKS
 
 
 diz_engine.dispose()  # This and the next 3 commands close the connections to both DBs now that I don't need to be connected to them anymore
