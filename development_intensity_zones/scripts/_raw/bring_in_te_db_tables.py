@@ -30,9 +30,9 @@ te_cursor.execute(
 
 te_raw_table_names_wo_schema = te_cursor.fetchall()
 
-te_raw_table_names_wo_schema = [
-    "".join(i) for i in te_raw_table_names_wo_schema
-]  # Converts all of the tuples in te_raw_table_names_wo_schema to strings
+te_raw_table_names_wo_schema = sorted(
+    ["".join(i) for i in te_raw_table_names_wo_schema]
+)  # Converts all of the tuples in te_raw_table_names_wo_schema to strings, and alphabetically sorts them
 
 te_raw_table_names_wo_schema = [
     i for i in te_raw_table_names_wo_schema if "pos_h2o_diz_zone_0" not in i
@@ -66,9 +66,9 @@ non_spatial_te_raw_table_names_wo_schema = [
     te_raw_table_names_wo_schema[x] for x in which_tables_arent_spatial
 ]  # Gets just the names of the NON-spatial tables
 
-spatial_te_raw_table_names_wo_schema = list(
-    set(te_raw_table_names_wo_schema) - set(non_spatial_te_raw_table_names_wo_schema)
-)  # Gets the SPATIAL tables by getting the ones that are in the list of all of them but not the list of non-spatial ones
+spatial_te_raw_table_names_wo_schema = sorted(
+    list(set(te_raw_table_names_wo_schema) - set(non_spatial_te_raw_table_names_wo_schema))
+)  # Gets the SPATIAL tables by getting the ones that are in the list of all of them but not the list of non-spatial ones, while keeping the tables' order so errors don't come up later
 
 te_raw_table_geom_col_names = [
     s
