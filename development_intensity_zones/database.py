@@ -156,7 +156,9 @@ class Database:
 
         # gdf = self.sanitize_df_for_sql(gdf) #Commented out because this command caused the function not to work, it's possible Aaron Fraint's sanitize_df_for_sql() function only works for non-spatial data frames
 
-        epsg_code = int(str(gdf.crs).split(":")[1])
+        epsg_code = (
+            gdf.crs.to_epsg()
+        )  # Gets the numeric EPSG of the geo data frame. This replaces a command Aaron Fraint wrote that's supposed to do the same thing but results in an error. FOUND OUT HOW TO GET THE NUMERIC EPSG OF A GEO DATA FRAME FROM https://stackoverflow.com/a/69798052 (IN TURN FOUND ON https://stackoverflow.com/questions/69797728/extract-epsg-code-from-geodataframe-crs-result )
 
         # Get a list of all geometry types in the dataframe
         geom_types = list(gdf.geometry.geom_type.unique())
