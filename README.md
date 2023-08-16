@@ -20,7 +20,7 @@ DVRPC staff first classified the region by levels of density and proximity using
 10. analysis.crosswalks_block_groups_dvrpc_2020.sql
 11. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
 12. analysis.costarproperties_region_plus_surrounding.sql
-13. not_in_costar_upload.py - *BEN GRUSWITZ SAID HOW WE MAY NEED TO REEVALUATE THE NEED FOR THE _raw.not_in_costar RECORDS BASED ON ANY NEW ADDITIONS TO COSTAR DATA IN FUTURE DOWNLOADS. WE DOWNLOAD A SNAPSHOT OF COSTAR DATA EVERY 6 MONTHS (AFTER 1ST AND 3RD QUARTER OF EACH YEAR)*
+13. not_in_costar_upload.py - *Ben Gruswitz said how we may need to reevaluate the need for the _raw.not_in_costar records based on any new additions to Costar data in future downloads. We download a snapshot of Costar data every 6 months (after the 1st and 3rd quarter of each year)*
 14. analysis.costarproperties_rentable_area_bg.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
 15. analysis.costar_number_of_stories create.sql - *Warning: This script may take a long time to run because the joining of the costar property locations to the block groups takes a while*
 16. analysis.density_index create.sql
