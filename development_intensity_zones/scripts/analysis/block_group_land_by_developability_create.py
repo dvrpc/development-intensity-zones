@@ -72,9 +72,11 @@ block_group_land_by_developability = block_group_land_by_developability.set_geom
     "geometry"
 )  # Tells Python the name of block_group_land_by_developability's geometry column
 
+"""
 block_group_land_by_developability = block_group_land_by_developability.explode(
     ignore_index=True
 )  # Turns multipolygon geometries into regular polygon geometries
+"""
 
 db.import_geodataframe(
     block_group_land_by_developability, "block_group_land_by_developability", schema="analysis"
