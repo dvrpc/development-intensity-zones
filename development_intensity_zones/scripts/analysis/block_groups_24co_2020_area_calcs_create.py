@@ -18,7 +18,7 @@ ian_engine = create_engine(
 )  # In the .env file, I stored the development-intensity-zones DB connection info as 1 long string
 
 # create land use dataframe from gis-db
-sql_query = "select st_force2d(shape) as geom, 0 as zone from planning.dvrpc_landuse_2015 where lu15sub in ('04010','04011','04020','50000','05030','07050','09000','14020')"
+sql_query = "select st_force2d(shape) as geom, 0 as zone from planning.dvrpc_landuse_2015 where lu15sub in ('04010','04011','04020','50000','05030','07050','09000','14020')" #Transportation: Highway Right-of-Way (04010), Transportation: Roadway (04011), Transportation: Rail Right-of-Way (04020), Utility: Right-of-Way (05000), Utility: Other Facility (05030), Institutional: Cemetery (07050), Recreation: General (09000), and Undeveloped: Drainage Basin (14020)
 lu = gpd.read_postgis(sql_query, gis_engine, geom_col="geom")
 
 # create pos_h2o dataframe
