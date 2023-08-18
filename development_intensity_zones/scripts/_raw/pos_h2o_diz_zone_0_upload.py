@@ -15,6 +15,10 @@ pos_h2o_diz_zone_0 = gpd.read_file(
     layer="pos_union_wDVRPC_hydro1_dissolve",
 )  # Brings in the POS and water feature class Sean Lawrence made
 
+pos_h2o_diz_zone_0["geometry"] = pos_h2o_diz_zone_0[
+    "geometry"
+].make_valid()  # Fixes any remaining geometry issues in pos_h2o_diz_zone_0
+
 
 db.execute(
     "TRUNCATE _raw.pos_h2o_diz_zone_0"
