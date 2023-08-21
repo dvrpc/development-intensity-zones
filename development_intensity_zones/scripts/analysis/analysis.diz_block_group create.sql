@@ -98,4 +98,7 @@ with
     	)
     
     
-    select row_number() over() as row_number, block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_diz_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, diz_zone, diz_zone_name, geom from diz_block_group
+    select row_number() over() as row_number, 
+    block_group20, density_index, proximity_index, density_index_level, proximity_index_level, prelim_diz_zone, crosswalk_density, average_comm_stories, crosswalk_bonus, stories_bonus, diz_zone, diz_zone_name, 
+    (st_dump(geom)).geom as geom --FOUND OUT HOW TO EXPLODE MULTIPOLYGONS INTO REGULAR ONES FROM https://gis.stackexchange.com/a/313155 (IN TURN FOUND ON https://gis.stackexchange.com/questions/307959/turning-a-single-multipolygon-into-many-small-polygons )
+    from diz_block_group
