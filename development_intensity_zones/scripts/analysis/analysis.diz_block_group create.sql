@@ -52,7 +52,7 @@ with
             b.average_comm_stories,
             d.percentile_50,
             case when crosswalk_density > percentile_50 then 1 else 0 end as crosswalk_bonus_step1,
-            case when average_comm_stories >= 3 and prelim_diz_zone = 5 and density_index_level = 'very high' and proximity_index_level = 'extreme' then 1 else 0 end as stories_bonus, /*Also creates stories_bonus here*/
+            case when average_comm_stories >= 3 and prelim_diz_zone = 5 and density_index_level = 'high' and proximity_index_level = 'highest' then 1 else 0 end as stories_bonus, /*Also creates stories_bonus here*/
 			b.geom
         from diz_bg_with_av_com_s b
         	left join cds d
