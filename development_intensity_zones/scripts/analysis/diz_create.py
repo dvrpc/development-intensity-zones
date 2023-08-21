@@ -17,7 +17,7 @@ diz_bg = db.get_geodataframe_from_query(
 
 diz_bg.insert(
     0, "dissolve", 1
-)  # This and the next command essentially make a copy of diz_big where all the block groups are dissolved into 1 big polygon
+)  # This and the next command essentially make a copy of diz_bg where all the block groups are dissolved into 1 big polygon
 
 diz_bg_dissolved = diz_bg.dissolve(by="dissolve_field")
 
