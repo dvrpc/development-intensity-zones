@@ -3,7 +3,7 @@
 
 The Development Intensity Zones (DIZ) geography as a block group-based assessment of existing development, largely formed from two analysis dimensions—density and proximity. Zones are classified from least to greatest development intensity, as follows:
 
-![Alt text](image.png)
+![Alt text](images/image.png)
 
 
 “Protected” zone cuts through the block group-based geographies to overwrite areas of water or protected open space as its own zone. 
@@ -40,11 +40,12 @@ For more information, see [Methodology](https://github.com/dvrpc/development-int
 19. analysis.diz_block_group_step1 create.sql
 20. analysis.crosswalk_density_summary create.sql
 21. analysis.diz_block_group create.sql
-22. diz_create.py - _Warning: Allow for about 45 minutes for this script to run_
-23. analysis.diz_mcd create.sql
-24. analysis.diz_taz create.sql
-25. analysis.diz_tract create.sql
-26. analysis.diz_philadelphia_planning_district create.sql
+22. analysis.diz_mcd create.sql
+23. analysis.diz_taz create.sql
+24. analysis.diz_tract create.sql
+25. analysis.diz_philadelphia_planning_district create.sql
+26. analysis.diz create.sql
+
 
 ## Python environment
 

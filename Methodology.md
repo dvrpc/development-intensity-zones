@@ -39,7 +39,7 @@ The following data sources are used to create the DIZ (vintages subject to chang
 The density dimension of the DIZ calculates the density of development within a block group. Housing units plus group quarters population are used for residential development. Group quarters population is population not living in households but at various facility types such as dormitories, military barracks, nursing homes, and correctional facilities. While less than ideal to use a population metric, it is the only data available to reflect these facilities and treats group quarters population as single occupancy units when paired summed housing units. Commercial square footage values are converted to thousands to be on a similar numeric scale and summed with housing units and group quarters population. The sum is divided by the land area of the block group to get a density index value. 
 
 
-![Density Index Formula](image-1.png)
+![Density Index Formula](images/image-1.png)
 
 
 Density index values are then grouped into six bins by various density index ranges, seen below:
@@ -59,21 +59,19 @@ Density index values are then grouped into six bins by various density index ran
 The proximity dimension of the DIZ reflects the fact that development has occurred in nearby areas outside the arbitrary statistical boundaries of block groups. Block group boundaries often divide places by major roads, but those living or working there identify the place by what’s on either side of that road. The proximity measure uses two buffer distances from the center point (centroid) of the block group: 2 miles and 5 miles. These distances represent nearby accessible places and markets. The 2-mile buffer captures the distance residents of the block group might walk or bike to nearby businesses, therefore commercial square footage (in thousands) within the 2-mile buffer is summed. The 5-mile distance represents the nearby market for customers for local businesses within the block group. The 5-mile buffer, therefore, sums the housing units and group quarter population intersecting with the buffer.
 
 
-![Proximity Index 2-mile Buffer](image-2.png)
-
-![Proximity Index 5-mile Buffer](images/image3.png)
+![Proximity Index 2-mile Buffer](images/image-2.png)
 
 
 To smooth the sums of these unlike distances and unlike items, a statistical formula called the _harmonic mean_ is employed to create the proximity index value. The harmonic mean is calculated by multiplying by 2 the sum of the 2-mile commercial value multiplied by the 5-mile residential value, then dividing that by the sum of the 2-mile commercial value multiplied by the 5-mile residential value.
 
 
-![Proximity Index Harmonic Mean Formula](image-3.png)
+![Proximity Index Harmonic Mean Formula](images/image-3.png)
 
 
 
 As a way to acknowledge the barrier to markets and local identities presented by the Delaware River within the region, the DIZ methodology prohibits some buffers from extending over the river to the other state. This is mainly meant to prevent lower density areas on one side of the river to graduate to higher intensity levels when the proximity and density levels are later used to determine development intensity levels. A higher density zone will likely have a higher proximity level and capturing less dense areas in its buffer area will not significantly impact that. However, a lower density area may not have a strong relationship with higher intensity areas across the river. Higher density areas on either side of the river are likely to have greater chances of interactions and relationships. With this in mind, if a zone has a density level of lowest, low, or medium-low, its buffers are cut off by the river, however a medium-high, high, or highest block group density on the opposite side of the river is allowed to capture the development on both sides.
 
-![Examples of block groups with and without buffer cut-off](image-6.png)
+![Examples of block groups with and without buffer cut-off](images/image-6.png)
 
 Proximity level names are identical to those used in density levels and are categories for grouping proximity index value ranges. The ranges are as follows: 
 
@@ -91,7 +89,7 @@ Proximity level names are identical to those used in density levels and are cate
 
 The density level and proximity level classifications of block groups are then placed into a matrix to determine a preliminary DIZ zone classification. The combinations of levels and which zones they get classified into are seen in the matrix diagram below. This also reflects the overriding of Protected zones, despite the underlying block group’s zone.
 
-![DIZ Zone Matrix](image-7.png)
+![DIZ Zone Matrix](images/image-7.png)
 
 
 ### Zone Bonuses
