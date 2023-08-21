@@ -18,10 +18,6 @@ thresholds = thresholds.astype(
     {"density_index_thresholds": "float", "proximity_index_thresholds": "float"}
 )  # Makes density_index_thresholds and proximity_index_thresholds float
 
-thresholds = thresholds.sort_values(
-    by=["level_code"], ascending=[True]
-)  # Sorts thresholds by level_code
-
 
 db.execute(
     "TRUNCATE _resources.thresholds"
