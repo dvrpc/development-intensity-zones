@@ -1,37 +1,45 @@
-drop table if exists analysis.diz cascade;
-create table analysis.diz as
-
-with
-	diz_region_boundary as (
-		select 1 as dissolve, st_union(geom) as geom 
-		from analysis.diz_block_group 
-		group by dissolve
-		),
-	pos_and_water as (
-		select zone as diz_zone, 'Protected' as diz_zone_name, geom 
-		from _raw.pos_h2o_diz_zone_0
-		),
-	pos_and_water_clipped as (
-		select 
-			b.diz_zone,
-			b.diz_zone_name,
-			st_intersection(b.geom, d.geom) as clipped_geom 
-		from pos_and_water b, diz_region_boundary d
-		where st_intersects(b.geom, d.geom)
-		),
-	diz_dissolved_by_zone as (
-		select diz_zone, diz_zone_name, st_union(geom) as geom 
-		from analysis.diz_block_group 
-		group by diz_zone, diz_zone_name
-		),
-	diz as (
-		diz_dissolved_by_zone union
-		(
-			select diz_zone, diz_zone_name, clipped_geom as geom 
-			from pos_and_water_clipped
-		)
-		order by diz_zone
-		)
-    
-    
-    select row_number() over() as row_number, diz_zone, diz_zone_name, geom from diz
+CREATE MATERIALIZED VIEW analysis.test3
+TABLESPACE pg_default
+AS WITH diz_region_boundary AS (
+         SELECT 1 AS dissolve,
+            st_union(diz_block_group.geom) AS geom
+           FROM analysis.diz_block_group
+          GROUP BY 1::integer
+        ), pos_and_water AS (
+         SELECT pos_h2o_diz_zone_0.zone AS diz_zone,
+            'Protected'::text AS diz_zone_name,
+            pos_h2o_diz_zone_0.geom
+           FROM _raw.pos_h2o_diz_zone_0
+        ), pos_and_water_clipped AS (
+         SELECT b.diz_zone,
+            b.diz_zone_name,
+            st_intersection(b.geom, d.geom) AS geom
+           FROM pos_and_water b,
+            diz_region_boundary d
+          WHERE st_intersects(b.geom, d.geom)
+        ), diz AS (
+         SELECT diz_block_group.diz_zone,
+            diz_block_group.diz_zone_name,
+            st_union(diz_block_group.geom) AS geom
+           FROM analysis.diz_block_group
+          GROUP BY diz_block_group.diz_zone, diz_block_group.diz_zone_name
+          ORDER BY diz_block_group.diz_zone
+        ), diz_pos AS (
+         SELECT 0 AS diz_zone,
+            'Protected'::character varying AS diz_zone_name,
+            st_intersection(pos_and_water_clipped.geom, diz.geom) AS geom
+           FROM diz,
+            pos_and_water_clipped
+        UNION
+         SELECT diz.diz_zone,
+            diz.diz_zone_name,
+            diz.geom
+           FROM diz
+        )
+ SELECT row_number() OVER () AS row_number,
+    diz_pos.diz_zone,
+    diz_pos.diz_zone_name,
+    st_union(diz_pos.geom) AS st_union
+   FROM diz_pos
+  GROUP BY diz_pos.diz_zone, diz_pos.diz_zone_name
+WITH DATA;
