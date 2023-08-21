@@ -1,4 +1,5 @@
-#Development Intensity Zones
+# Development Intensity Zones
+## Overview
 
 The Development Intensity Zones (DIZ) geography as a block group-based assessment of existing development, largely formed from two analysis dimensions—density and proximity. Zones are classified from least to greatest development intensity, as follows:
 
