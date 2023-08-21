@@ -1,6 +1,6 @@
 drop table if exists analysis.unprotected_land_area;
-
 create table analysis.unprotected_land_area as 
+
 with 
 	developable_block_group_fragments as (
 		

@@ -1,6 +1,6 @@
 drop table if exists analysis.costar_number_of_stories;
-
 create table analysis.costar_number_of_stories as
+
 with
 	costar_number_of_stories_without_bg_2020_geoids as (
 		

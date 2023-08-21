@@ -1,6 +1,6 @@
 drop table if exists analysis.costarproperties_rentable_area_bg cascade;
-
 create table analysis.costarproperties_rentable_area_bg as
+
 select 
     bgd."GEOID",
     sum(crps.rentable_building_area)/1000 as commercial_sqft

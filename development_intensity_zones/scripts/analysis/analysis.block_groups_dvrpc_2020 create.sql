@@ -1,6 +1,6 @@
 drop table if exists analysis.block_groups_dvrpc_2020;
-
 create table analysis.block_groups_dvrpc_2020 as
+
 with
 	block_groups_state_34_2020 as (
 		select "STATEFP", 

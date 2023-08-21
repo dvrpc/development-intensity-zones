@@ -1,6 +1,6 @@
 drop view if exists analysis.proximity_index;
-
 create view analysis.proximity_index as 
+
 with 
 	proximity_index_step1 as (
     	

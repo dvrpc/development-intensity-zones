@@ -1,6 +1,6 @@
 drop materialized view if exists analysis.diz_block_group cascade;
-
 create materialized view analysis.diz_block_group as /*Found out how to create a materialized view, and what it is from https://www.postgresql.org/docs/current/rules-materializedviews.html */
+
 with 
 	diz_bg_step1 as (
 		

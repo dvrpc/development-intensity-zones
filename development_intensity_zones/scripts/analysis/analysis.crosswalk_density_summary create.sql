@@ -1,6 +1,6 @@
 drop view if exists analysis.crosswalk_density_summary;
-
 create view analysis.crosswalk_density_summary as 
+
 with 
 	diz_bg_s1 as (
 		select prelim_diz_zone, crosswalk_density from analysis.diz_block_group_step1

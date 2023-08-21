@@ -1,6 +1,6 @@
 drop view if exists analysis.density_index;
-
 create view analysis.density_index as 
+
 with 
 	block_groups_24co_2020_land as (
 		
