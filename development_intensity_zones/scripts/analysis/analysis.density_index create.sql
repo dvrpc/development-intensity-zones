@@ -53,7 +53,7 @@ with
     	case when density_index >= (select density_index_thresholds from _resources.thresholds where level_code = 3) and density_index < (select density_index_thresholds from _resources.thresholds where level_code = 4) then (select levels from _resources.thresholds where level_code = 3) else null end as lc_3,
     	case when density_index >= (select density_index_thresholds from _resources.thresholds where level_code = 4) and density_index < (select density_index_thresholds from _resources.thresholds where level_code = 5) then (select levels from _resources.thresholds where level_code = 4) else null end as lc_4,
     	case when density_index >= (select density_index_thresholds from _resources.thresholds where level_code = 5) and density_index < (select density_index_thresholds from _resources.thresholds where level_code = 6) then (select levels from _resources.thresholds where level_code = 5) else null end as lc_5,
-    	case when density_index >= (select density_index_thresholds from _resources.thresholds where level_code = 6) then 'level_code 6' else null end as lc_6
+    	case when density_index >= (select density_index_thresholds from _resources.thresholds where level_code = 6) then (select levels from _resources.thresholds where level_code = 6) else null end as lc_6
     	
     	from density_index_land_step1
     	
