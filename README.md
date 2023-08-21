@@ -16,7 +16,7 @@ The DIZ covers the 9-county DVRPC region, along with surrounding counties for gr
 
 The DIZ can be used for a variety of purposes. It provides simple classifications of the region’s areas by which data can be summed and analyzed. It can be used for policy applications, such as incentivising where future growth or investment goes based on smart growth principles. It’s important to note that the DIZ classifications are based on the current presence of development, largely using housing units for residential intensity and commercial square feet for non-residential intensity. This captures used space and space with potential for use (vacant space) and the presence of infrastructure to build buildings, but if one’s analysis is more suited for the presence of people, other metrics such as population, households, and employment may be more appropriate. If future growth in development is desirable for one’s analysis, the DIZ does not capture that.
 
-For more information, see [Methodology](https://github.com/dvrpc/development-intensity-zones#methodology).
+For more information, see [Methodology]([https://github.com/dvrpc/development-intensity-zones#methodology](https://github.com/dvrpc/development-intensity-zones/blob/main/Methodology.md)).
 
 ## To build the DIZ, run these scripts in order
 
