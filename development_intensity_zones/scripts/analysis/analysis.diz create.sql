@@ -19,12 +19,13 @@ with
 		from pos_and_water b, diz_region_boundary d
 		where st_intersects(b.geom, d.geom)
 		),
+	diz_dissolved_by_zone as (
+		select diz_zone, diz_zone_name, st_union(geom) as geom 
+		from analysis.diz_block_group 
+		group by diz_zone, diz_zone_name
+		),
 	diz as (
-		(
-			select diz_zone, diz_zone_name, st_union(geom) as geom 
-			from analysis.diz_block_group 
-			group by diz_zone, diz_zone_name
-		) union
+		diz_dissolved_by_zone union
 		(
 			select diz_zone, diz_zone_name, clipped_geom as geom 
 			from pos_and_water_clipped
