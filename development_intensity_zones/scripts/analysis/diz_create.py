@@ -15,9 +15,19 @@ diz_bg_1bigpolygon = db.get_geodataframe_from_query(
     "SELECT 1 AS dissolve, ST_UNION(geom) as geom FROM analysis.diz_block_group GROUP BY dissolve"
 )  # Uses my function to bring in the analysis.diz_block_group feature class, but dissolved into 1 big polygon
 
+
 pos_and_water = db.get_geodataframe_from_query(
     "SELECT * FROM _raw.pos_h2o_diz_zone_0"
 )  # Uses my function to bring in the _raw.pos_h2o_diz_zone_0 feature class, which is the new POS and water data
+
+pos_and_water = pos_and_water.explode(
+    ignore_index=True
+)  # Turns multipolygon geometries into regular polygon geometries
+
+pos_and_water = pos_and_water.dissolve(
+    by="uid"
+)  # Dissolves all the individual polygons in pos_and_water so that it's just 1 big polygon of POS and water
+
 
 pos_and_water_within_region = pos_and_water.clip(
     diz_bg_1bigpolygon
