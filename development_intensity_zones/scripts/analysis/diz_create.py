@@ -55,6 +55,8 @@ pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0[
     ["diz_zone", "diz_zone_name", "geom"]
 ]  # Just keeps the columns I want from pos_and_water_reg_sep_from_z0 that I still need, and in the order I want them to be in
 
+diz_bg = diz_bg.dissolve(by="diz_zone")  # Dissolves diz_bg by diz_zone
+
 diz = pd.concat(
     [diz_bg, pos_and_water_reg_sep_from_z0]
 )  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get the UNDISSOLVED VERSION of what will become analysis.diz
@@ -62,8 +64,6 @@ diz = pd.concat(
 diz = diz.explode(
     ignore_index=True
 )  # Turns multipolygon geometries into regular polygon geometries
-
-diz = diz.dissolve(by="diz_zone")  # Dissolves diz by diz_zone to get the final analysis.diz
 
 db.import_geodataframe(
     diz, "diz", schema="analysis"
