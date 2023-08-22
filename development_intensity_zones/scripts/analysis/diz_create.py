@@ -44,8 +44,8 @@ diz_bg = diz_bg[
 ]  # Just keeps the columns I want from diz_bg that I still need, and in the order I want them to be in
 
 diz_bg = diz_bg.dissolve(
-    by="diz_zone"
-)  # Dissolves diz_bg by diz_zone. This will make the parts of the POS and water within the region which don't overlap with zone 0 of analysis.diz_block_group stick out in the final result later, and without making those parts that don't overlap their own zone
+    by=["diz_zone", "diz_zone_name"]
+)  # Dissolves diz_bg by diz_zone (and diz_zone_name too, this way the diz_zone_name values will also get carried over in the dissolution). This will make the parts of the POS and water within the region which don't overlap with zone 0 of analysis.diz_block_group stick out in the final result later, and without making those parts that don't overlap their own zone
 
 pos_and_water_reg_sep_from_z0[
     "diz_zone_name"
