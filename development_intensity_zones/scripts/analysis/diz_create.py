@@ -69,3 +69,11 @@ pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0[
 diz = pd.concat(
     [diz_bg, pos_and_water_reg_sep_from_z0]
 )  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get what will become analysis.diz
+
+diz = diz.explode(
+    ignore_index=True
+)  # Turns multipolygon geometries into regular polygon geometries
+
+db.import_geodataframe(
+    diz, "diz", schema="analysis"
+)  # Uploads the completed shapefile to analysis. And ignore the warning "Geometry column does not contain geometry" that comes up here, as it seems to load in to the database just fine, etc
