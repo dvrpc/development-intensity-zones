@@ -5,7 +5,6 @@ This script uses PYTHON to create analysis.diz
 
 import geopandas as gpd
 import pandas as pd
-import numpy as np
 
 
 from development_intensity_zones import Database, DATABASE_URL
@@ -40,39 +39,31 @@ pos_and_water_reg_sep_from_z0 = gpd.overlay(
 )  # Gets the parts of pos_and_water_reg which DON'T overlap with the zone 0 parts of diz_bg
 
 
-diz_bg = diz_bg.drop(
-    columns=["dissolve", "row_number"]
-)  # Drops any columns that are no longer needed from diz_bg
+diz_bg = diz_bg[
+    ["diz_zone", "diz_zone_name", "geom"]
+]  # Just keeps the columns I want from diz_bg that I still need, and in the order I want them to be in
+
+pos_and_water_reg_sep_from_z0[
+    "diz_zone_name"
+] = "Protected"  # Adds a DIZ zone name column to pos_and_water_reg_sep_from_z0
 
 pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0.rename(
     columns={"zone": "diz_zone"}
 )  # Renames zone to diz_zone in pos_and_water_reg_sep_from_z0
 
-pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0.assign(
-    block_group20=[""],
-    density_index=[np.nan],
-    proximity_index=[np.nan],
-    density_index_level=[""],
-    proximity_index_level=[""],
-    prelim_diz_zone=[np.nan],
-    crosswalk_density=[np.nan],
-    average_comm_stories=[np.nan],
-    crosswalk_bonus=[np.nan],
-    stories_bonus=[np.nan],
-    diz_zone_name=["Protected"],
-)  # Adds the columns that diz_big has but pos_and_water_reg_sep_from_z0 doesn't have to pos_and_water_reg_sep_from_z0
-
 pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0[
-    list(diz_bg.columns)
-]  # Keeps the same columns diz_bg has in pos_and_water_reg_sep_from_z0, and in the same order
+    ["diz_zone", "diz_zone_name", "geom"]
+]  # Just keeps the columns I want from pos_and_water_reg_sep_from_z0 that I still need, and in the order I want them to be in
 
 diz = pd.concat(
     [diz_bg, pos_and_water_reg_sep_from_z0]
-)  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get what will become analysis.diz
+)  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get the UNDISSOLVED VERSION of what will become analysis.diz
 
 diz = diz.explode(
     ignore_index=True
 )  # Turns multipolygon geometries into regular polygon geometries
+
+diz = diz.dissolve(by="diz_zone")  # Dissolves diz by diz_zone to get the final analysis.diz
 
 db.import_geodataframe(
     diz, "diz", schema="analysis"
