@@ -14,11 +14,11 @@ db = Database(DATABASE_URL)
 
 diz_bg = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.diz_block_group"
-)  # Uses my function to bring in the analysis.diz_block_group feature class, this time just the way it is originally
+)  # Uses my function to bring in analysis.diz_block_group, and just the way it is originally at this point
 
 pos_and_water = db.get_geodataframe_from_query(
     "SELECT * FROM _raw.pos_h2o_diz_zone_0"
-)  # Uses my function to bring in the _raw.pos_h2o_diz_zone_0 feature class, which is the new POS and water data
+)  # Uses my function to bring in _raw.pos_h2o_diz_zone_0
 
 
 diz_bg.insert(
