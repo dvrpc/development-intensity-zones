@@ -1,5 +1,5 @@
 """
-This script uses PYTHON to create analysis.diz
+This script uses Python to create analysis.diz
 """
 
 
