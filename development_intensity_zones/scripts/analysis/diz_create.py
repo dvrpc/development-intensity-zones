@@ -43,6 +43,10 @@ diz_bg = diz_bg[
     ["diz_zone", "diz_zone_name", "geom"]
 ]  # Just keeps the columns I want from diz_bg that I still need, and in the order I want them to be in
 
+diz_bg = diz_bg.dissolve(
+    by="diz_zone"
+)  # Dissolves diz_bg by diz_zone. This will make the parts of the POS and water within the region which don't overlap with zone 0 of analysis.diz_block_group stick out in the final result later, and without making those parts that don't overlap their own zone
+
 pos_and_water_reg_sep_from_z0[
     "diz_zone_name"
 ] = "Protected"  # Adds a DIZ zone name column to pos_and_water_reg_sep_from_z0
@@ -54,8 +58,6 @@ pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0.rename(
 pos_and_water_reg_sep_from_z0 = pos_and_water_reg_sep_from_z0[
     ["diz_zone", "diz_zone_name", "geom"]
 ]  # Just keeps the columns I want from pos_and_water_reg_sep_from_z0 that I still need, and in the order I want them to be in
-
-diz_bg = diz_bg.dissolve(by="diz_zone")  # Dissolves diz_bg by diz_zone
 
 diz = pd.concat(
     [diz_bg, pos_and_water_reg_sep_from_z0]
