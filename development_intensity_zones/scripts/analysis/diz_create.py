@@ -16,16 +16,16 @@ diz_bg = db.get_geodataframe_from_query(
     "SELECT * FROM analysis.diz_block_group"
 )  # Uses my function to bring in the analysis.diz_block_group feature class, this time just the way it is originally
 
+pos_and_water = db.get_geodataframe_from_query(
+    "SELECT * FROM _raw.pos_h2o_diz_zone_0"
+)  # Uses my function to bring in the _raw.pos_h2o_diz_zone_0 feature class, which is the new POS and water data
+
 
 diz_bg.insert(
     0, "dissolve", 1
 )  # This and the next command essentially make a copy of diz_bg where all the block groups are dissolved into 1 big polygon
 
 diz_bg_dis = diz_bg.dissolve(by="dissolve")
-
-pos_and_water = db.get_geodataframe_from_query(
-    "SELECT * FROM _raw.pos_h2o_diz_zone_0"
-)  # Uses my function to bring in the _raw.pos_h2o_diz_zone_0 feature class, which is the new POS and water data
 
 pos_and_water_reg = pos_and_water.clip(
     diz_bg_dis
