@@ -59,7 +59,7 @@ diz_bg = diz_bg.dissolve(by="diz_zone")  # Dissolves diz_bg by diz_zone
 
 diz = pd.concat(
     [diz_bg, pos_and_water_reg_sep_from_z0]
-)  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get the UNDISSOLVED VERSION of what will become analysis.diz
+)  # Unions/merges/row binds/etc diz_bg and pos_and_water_reg_sep_from_z0 to get what will become analysis.diz
 
 diz = diz.explode(
     ignore_index=True
