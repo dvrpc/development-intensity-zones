@@ -10,9 +10,13 @@ from development_intensity_zones import Database, DATABASE_URL
 db = Database(DATABASE_URL)
 
 
-schema_names = ["_raw", "analysis"]  # Makes a list of each feature class's schema name
+schema_names = ["_raw", "analysis", "analysis"]  # Makes a list of each feature class's schema name
 
-fc_names = ["pos_h2o_diz_zone_0", "diz_block_group"]  # Makes a list of each feature class's name
+fc_names = [
+    "pos_h2o_diz_zone_0",
+    "diz_block_group",
+    "diz",
+]  # Makes a list of each feature class's name
 
 [
     db.get_geodataframe_from_query(f"SELECT * FROM {schema_names[i]}.{fc_names[i]}").to_file(
