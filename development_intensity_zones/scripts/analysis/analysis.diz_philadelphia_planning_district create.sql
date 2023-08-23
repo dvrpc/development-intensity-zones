@@ -9,6 +9,7 @@ CREATE VIEW analysis.diz_philadelphia_planning_district AS WITH weighted_average
      LEFT JOIN analysis.diz_block_group t ON b.block_group20_id = t.block_group20
      WHERE b.district_id <> 'nan'
          AND b.district_id != '0.0'
+         AND t.diz_zone > 0
      GROUP BY d_id)
 SELECT w.d_id,
        w.diz_weighted_average,

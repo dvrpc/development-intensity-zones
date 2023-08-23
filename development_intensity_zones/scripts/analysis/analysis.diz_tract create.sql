@@ -7,6 +7,7 @@ CREATE VIEW analysis.diz_tract AS WITH weighted_averages AS
             round(sum(t.diz_zone * b.aland) / sum(b.aland), 0) AS diz_zone
      FROM _resources.block2020_parent_geos b
      LEFT JOIN analysis.diz_block_group t ON b.block_group20_id = t.block_group20
+     WHERE t.diz_zone > 0
      GROUP BY b.tract20_id)
 SELECT w.tract20_id,
        w.diz_weighted_average,
