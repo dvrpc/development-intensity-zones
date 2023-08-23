@@ -48,8 +48,8 @@ diff1 = diff1[
 
 
 diff2 = gpd.overlay(
-    diz_bg_z0, diff1, how="difference"
-)  # Gets the parts of diz_bg_z0 which DON'T overlap with the 1st geographic difference obtained (diff1) to obtain the 2nd geographic difference (diff2)
+    diz_bg, diff1, how="difference"
+)  # Gets the parts of diz_bg (as opposed to diz_bg_z0, because I want the rest of diz_bg represented) which DON'T overlap with the 1st geographic difference obtained (diff1) to obtain the 2nd geographic difference (diff2)
 
 diff2 = diff2[
     ["diz_zone", "diz_zone_name", "geom"]
