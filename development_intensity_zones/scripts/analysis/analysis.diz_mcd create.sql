@@ -4,7 +4,7 @@ DROP VIEW IF EXISTS analysis.diz_mcd;
 CREATE VIEW analysis.diz_mcd AS WITH weighted_averages AS
     (SELECT b.mcd20_id,
             sum(t.diz_zone * b.aland) / sum(b.aland) AS diz_weighted_average,
-            ceil(sum(t.diz_zone * b.aland) / sum(b.aland)) AS diz_zone --FOUND OUT HOW TO ROUND UP TO THE NEAREST WHOLE NUMBER FROM https://stackoverflow.com/a/52115860 (IN TURN FOUND ON https://stackoverflow.com/questions/52115813/how-do-i-round-up-to-a-whole-integer-postgres )
+            round(sum(t.diz_zone * b.aland) / sum(b.aland), 0) AS diz_zone
      FROM _resources.block2020_parent_geos b
      LEFT JOIN analysis.diz_block_group t ON b.block_group20_id = t.block_group20
      GROUP BY b.mcd20_id)
