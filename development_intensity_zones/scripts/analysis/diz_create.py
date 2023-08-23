@@ -49,11 +49,11 @@ diff1 = diff1[
 
 diff2 = gpd.overlay(
     diz_bg_z0, diff1, how="difference"
-)  # Gets the parts of diz_bg_z0 which DON'T overlap with the 1st geographic difference obtained (diff1)
+)  # Gets the parts of diz_bg_z0 which DON'T overlap with the 1st geographic difference obtained (diff1) to obtain the 2nd geographic difference (diff2)
 
 diff2 = diff2[
     ["diz_zone", "diz_zone_name", "geom"]
-]  # Just keeps the columns I want from the 2nd geographic difference obtained (diff2) that I still need, and in the order I want them to be in
+]  # Just keeps the columns I want from diff2 that I still need, and in the order I want them to be in
 
 diff2 = diff2.dissolve(
     by=["diz_zone", "diz_zone_name"]
