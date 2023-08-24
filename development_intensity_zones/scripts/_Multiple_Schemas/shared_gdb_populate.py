@@ -28,7 +28,8 @@ fc_names = [
     "diz_taz",
     "diz_tract",
     "diz",
-]  # Makes a list of the feature class names
+]  # Makes a list of the feature class' names
+
 
 [
     db.get_geodataframe_from_query(f"SELECT * FROM {schema_names[i]}.{fc_names[i]}").to_file(
