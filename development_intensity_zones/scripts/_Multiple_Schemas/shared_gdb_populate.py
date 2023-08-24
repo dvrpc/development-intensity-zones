@@ -45,7 +45,7 @@ for i in list(range(len(schema_names))):
             ignore_index=True
         )  # Turns multipolygon geometries into regular polygon geometries ONLY if any geometries in the feature class are multi-polygons AND there are at least 2 types of geometries in the feature class
 
-    if "uid" in list(fc.columns):
+    elif "uid" in list(fc.columns):
         fc = fc.drop(columns=["uid"])  # Drops uid if the feature class has that column
 
     else:
