@@ -36,10 +36,17 @@ for i in list(range(len(schema_names))):
         f"SELECT * FROM {schema_names[i]}.{fc_names[i]}"
     )  # Reads in the feature class
 
-    if list(fc.geom_type.unique()) == ["Polygon", "MultiPolygon"]:
+    if any(
+        "MultiPolygon" in i for i in list(fc.geom_type.unique())
+    ):  # Checks if any geometries in the feature class are multi-polygons
         fc = fc.explode(
             ignore_index=True
-        )  # Turns multipolygon geometries into regular polygon geometries, ONLY if there are multipolygon geometries in the feature class
+        )  # Turns multipolygon geometries into regular polygon geometries ONLY if any geometries in the feature class are multi-polygons
+
+    elif None in list(
+        fc.geom_type.unique()
+    ):  # Checks if there are any empty geometries in the feature class
+        fc = fc[~fc.is_empty]  # Drops any empty geometries ONLY if there are any
 
     else:
         pass
