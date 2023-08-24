@@ -1,5 +1,5 @@
 """
-This script exports _raw.pos_h2o_diz_zone_0 and analysis.diz_block_group as feature classes to a GDB on the file system
+This script populates a GDB on the DVRPC file system (therefore a shared GDB) with the main DIZ output feature classes from the Postgres DB
 """
 
 import geopandas as gpd
@@ -10,13 +10,25 @@ from development_intensity_zones import Database, DATABASE_URL
 db = Database(DATABASE_URL)
 
 
-schema_names = ["_raw", "analysis", "analysis"]  # Makes a list of each feature class's schema name
+schema_names = [
+    "_raw",
+    "analysis",
+    "analysis",
+    "analysis",
+    "analysis",
+    "analysis",
+    "analysis",
+]  # Makes a list of the feature class' schema names
 
 fc_names = [
     "pos_h2o_diz_zone_0",
     "diz_block_group",
+    "diz_mcd",
+    "diz_philadelphia_planning_district",
+    "diz_taz",
+    "diz_tract",
     "diz",
-]  # Makes a list of each feature class's name
+]  # Makes a list of the feature class names
 
 [
     db.get_geodataframe_from_query(f"SELECT * FROM {schema_names[i]}.{fc_names[i]}").to_file(
@@ -24,4 +36,4 @@ fc_names = [
         layer=fc_names[i],
     )
     for i in list(range(len(schema_names)))
-]  # For each feature class, reads it in and then exports it to the geodatabase as a feature class. AND IGNORE ANY WARNING MESSAGES THAT COME UP HERE, THIS COMMAND WORKS
+]  # For each feature class, reads it in and then exports it to the shared GDB, therefore also as a feature class. AND IGNORE ANY WARNING MESSAGES THAT COME UP HERE, THIS COMMAND WORKS
