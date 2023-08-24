@@ -25,7 +25,7 @@ diz_bg.insert(
     0, "dissolve", 1
 )  # This and the next command essentially make a copy of diz_bg where all the block groups are dissolved into 1 big polygon
 
-diz_bg_dis = diz_bg.dissolve(by="dissolve")
+diz_bg_dis = diz_bg.dissolve(by=["dissolve"])
 
 pos_and_water_reg = pos_and_water.clip(
     diz_bg_dis
@@ -64,9 +64,9 @@ diz = pd.concat(
     [diff2, diff1]
 )  # Unions/merges/row binds/etc diff2 and diff1 to get what will become analysis.diz (I don't think the order of objects matters, it just made more sense in my head spatially to write the order of objects this way)
 
-diz = diz.explode(
-    ignore_index=True
-)  # Turns multipolygon geometries into regular polygon geometries
+diz = diz.dissolve(
+    by=["diz_zone", "diz_zone_name"]
+).reset_index()  # Dissolves diz by 2 columns: diz_zone and diz_zone_name
 
 db.import_geodataframe(
     diz, "diz", schema="analysis"
