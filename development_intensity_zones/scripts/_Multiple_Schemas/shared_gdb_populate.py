@@ -18,7 +18,7 @@ schema_names = [
     "analysis",
     "analysis",
     "analysis",
-]  # Makes a list of the feature class' schema names
+]  # Makes a list of the feature class' schema names (update as accordingly when a new feature class needs to get exported)
 
 fc_names = [
     "pos_h2o_diz_zone_0",
@@ -28,7 +28,7 @@ fc_names = [
     "diz_taz",
     "diz_tract",
     "diz",
-]  # Makes a list of the feature class' names
+]  # Makes a list of the feature class' names (update as accordingly when a new feature class needs to get exported)
 
 
 for i in list(range(len(schema_names))):
