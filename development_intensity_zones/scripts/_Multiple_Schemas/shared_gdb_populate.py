@@ -49,7 +49,7 @@ for i in list(range(len(schema_names))):
         fc = fc.drop(columns=["uid"])  # Drops uid if the feature class has it
 
     elif "row_number" in list(fc.columns):
-        fc = fc.drop(columns=["row_number"])  # Drops row_number if the feature class has it
+        fc = fc.drop(columns=["row_number"])  # Also drops row_number if the feature class has it
 
     else:
         pass
