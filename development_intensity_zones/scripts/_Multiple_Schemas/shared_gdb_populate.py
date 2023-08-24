@@ -38,14 +38,15 @@ for i in list(range(len(schema_names))):
 
     fc = fc[~fc.is_empty]  # Drops any empty geometries if there are any
 
-    fc = fc.drop(columns=["uid"])  # Drops uid
-
     if (any("MultiPolygon" in i for i in list(fc.geom_type.unique()))) & (
         len(list(fc.geom_type.unique())) > 1
     ):  # Checks if any geometries in the feature class are multi-polygons AND there are at least 2 types of geometries in the feature class
         fc = fc.explode(
             ignore_index=True
         )  # Turns multipolygon geometries into regular polygon geometries ONLY if any geometries in the feature class are multi-polygons AND there are at least 2 types of geometries in the feature class
+
+    if "uid" in list(fc.columns):
+        fc = fc.drop(columns=["uid"])  # Drops uid if the feature class has that column
 
     else:
         pass
