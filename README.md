@@ -17,69 +17,38 @@ The DIZ can be used for a variety of purposes. It provides simple classification
 
 For more information, see [Methodology](https://github.com/dvrpc/development-intensity-zones/blob/main/Methodology.md).
 
-## To build the DIZ, run these scripts in order
+## To build the DIZ
 
-1. analysis.block_groups_24co_2020 create.sql
-2. block_groups_24co_2020_area_calcs_create.py - _Warning: This script will take roughly 1 hour and 38 minutes to run, because the calculation of the spatial difference between the block groups and protected open space and water takes a while_
-3. block_group_centroids_24co_2020_and_their_buffers_create.py
-4. block_centroids_2020_with_2020_decennial_pop_and_hhs_create.py
-5. block_group_land_by_developability_create.py - _Warning: This script will take roughly 2 hours and 10 minutes to run, because the intersecting of the block groups with the developable block group fragments takes a while_
-6. analysis.unprotected_land_area create.sql
-7. crosswalks.sql
-8. analysis.block_groups_dvrpc_2020 create.sql
-9. crosswalks_block_groups_dvrpc_2020_create.py
-10. analysis.crosswalks_density_block_groups_dvrpc_2020.sql
-11. analysis.costarproperties_region_plus_surrounding.sql
-12. not_in_costar_upload.py - _Ben Gruswitz said how we may need to reevaluate the need for _raw.not_in_costar based on any new additions to Costar data in future downloads. We download a snapshot of Costar data every 6 months (after the 1st and 3rd quarter of each year)_
-13. analysis.costarproperties_rentable_area_bg.sql
-14. analysis.costar_number_of_stories create.sql
-15. analysis.density_index create.sql
-16. analysis.incorp_del_river_bg_centroids_24co_2020_buffers create.sql
-17. proximity_index_step1_create.py
-18. analysis.proximity_index create.sql
-19. analysis.diz_block_group_step1 create.sql
-20. analysis.crosswalk_density_summary create.sql
-21. analysis.diz_block_group create.sql
-22. analysis.diz_mcd create.sql
-23. analysis.diz_taz create.sql
-24. analysis.diz_tract create.sql
-25. analysis.diz_philadelphia_planning_district create.sql
-26. analysis.diz create.sql
+### Requirements
+- PostgreSQL w/ PostGIS
+- Python 3.x
+- .env ([see sample](.env_sample)) with PostgreSQL/ArcGIS Portal credentials and Census key
 
+### Run
+1. Clone the repo
+    ``` cmd
+    git clone https://github.com/dvrpc/development-intensity-zones.git
+    ```
+2. Create a Python virtual environment with dependencies
 
-## Python environment
+    Working in the repo directory from your terminal:
 
-- Install [miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- Open a `conda` command prompt, `cd` into this folder, and run:
+    - create new venv
+    ```cmd
+    python -m venv venv
+    ```
+    - activate venv
+    ```
+    .\venv\scripts\activate
+    ```
+    - install requirements
+    ```
+    pip install -r requirements.txt
+    ```
+3. Start the process
+    ```
+    python run.py
+    ```
 
-```
-conda env create -f environment.yml
-```
-
-- You can now activate the environment with:
-
-```
-conda activate development-intensity-zones
-```
-
-- However, then run these 2 commands in order in the terminal, in order to fix an error that comes up later with geopandas (found out how to fix that error from https://stackoverflow.com/a/69642315, which in turn was found on https://stackoverflow.com/questions/69630630/on-fresh-conda-installation-of-pyproj-pyproj-unable-to-set-database-path-pypr ):
-
-```
-conda remove --force pyproj
-python -m pip install "pyproj"
-```
-
-- With the environment activated and fully created for that matter, you can run scripts with:
-
-```
-python PATH/TO/FILE.py
-```
-
-- You can import functions and classes from other files in this repo like this:
-
-```python
-from development_intensity_zones.helpers import do_something
-
-
-do_something(times=3)
-```
+### Output
+Will further document output here.

@@ -1,9 +1,3 @@
-*.egg-info
 __pycache__
 .env
-script_comments/
-typology-experiments-11bfdbe8dac4.json
-
-*.ipynb
-
-.ipynb_checkpoints
+venv

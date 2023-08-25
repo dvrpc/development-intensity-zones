@@ -1,6 +1,6 @@
 # Methodology
 
-The DIZ methodology was derived from classification methods for “[Area Types](https://github.com/VisionEval/VisionEval/blob/master/sources/modules/VESimLandUse/inst/module_docs/CreateSimBzoneModels.md)” employed in the [VisionEval](https://visioneval.org/) VE-State strategic model. The chief difference is that Area Types use density and proximity measures using the presence of people (i.e. population, households, employment), while DIZ uses the presence of structures (i.e. housing units, commercial square footage). DIZ also breaks density and proximity levels into more classifications, and the overall zone numbers are greater as a result. DIZ integrates an overwrite of block group geographies by water and protected open space polygons, as mentioned, unlike Area Types. Finally, DIZ integrates bonus points for block groups meeting certain criteria using the density of street crossings from DVRPC’s sidewalk network and building heights from CoStar
+The DIZ methodology was derived from classification methods for “[Area Types](https://github.com/VisionEval/VisionEval/blob/master/sources/modules/VESimLandUse/inst/module_docs/CreateSimBzoneModels.md)” employed in the [VisionEval](https://visioneval.org/) VE-State strategic model. The chief difference is that Area Types use density and proximity measures using the presence of people (i.e. population, households, employment), while DIZ uses the presence of structures (i.e. housing units, commercial square footage). DIZ also breaks density and proximity levels into more classifications, and the overall zone numbers are greater as a result. DIZ integrates an overwrite of block group geographies by water and protected open space polygons, as mentioned, unlike Area Types. Finally, DIZ integrates bonus points for block groups meeting certain criteria using the density of street crossings from DVRPC’s pedestrian network and building heights from CoStar
 
 
 ### Data Sources
@@ -15,7 +15,7 @@ The following data sources are used to create the DIZ (vintages subject to chang
 * Census 2020 block group shapes
 * Census 2020 block centroids with housing unit and group quarters population counts
 * [CoStar](https://www.costar.com/) commercial properties’ rentable building area (square footage) and number of stories (subscription data service)
-* [DVRPC Sidewalk Inventory](https://catalog.dvrpc.org/dataset/pedestrian-network-lines)
+* [DVRPC Pedestrian Network](https://catalog.dvrpc.org/dataset/pedestrian-network-lines)
 
 
 ##### Protected Zones
@@ -26,7 +26,6 @@ The following data sources are used to create the DIZ (vintages subject to chang
 * [New Jersey Open Space](https://gisdata-njdep.opendata.arcgis.com/datasets/njdep::state-local-and-nonprofit-open-space-of-new-jersey/explore?location=40.132535%2C-74.754550%2C8.99) (beyond DVRPC region)
 * [Chesapeake Bay Watershed Open Space](https://gis.chesapeakebay.net/ags/rest/services/ChesapeakeProgress/cpProtectedLands_2018/MapServer) (beyond DVRPC region)
 * [Delaware River Basin Open Space](https://www.ccgov.org/government/land-use-development-services/gis/available-gis-data) (beyond DVRPC region)
-* [DVRPC 2015 Land Use Inventory ](https://catalog.dvrpc.org/dataset/land-use-2015)for detailed areas of water and other uses that render a block group protected (see below)
 * DVRPC Water Bodies
 * [US Geological Survey National Hydrography Dataset (NHD)](https://www.usgs.gov/national-hydrography/national-hydrography-dataset)
 
@@ -97,11 +96,11 @@ The density level and proximity level classifications of block groups are then p
 After preliminary zones are determined two avenues to graduate to a higher intensity zone are afforded to block groups that meet particular criteria. These bonuses allow for more information about the built form that may not be captured in the density and proximity dimensions due to the shapes of block groups or other factors. 
 
 
-#### Sidewalk Network Crossings Density
+#### Pedestrian Network Crossings Density
 
-The crossing segments of DVRPC’s Sidewalk Network dataset were used to create a crossings density value for each block group. This was chosen as both an indication of walkability, in showing the presence of pedestrian facilities, and of form, by capturing the frequency of intersections. Intersection density can indicate greater likelihood of street grid connectivity and urbanization. Some crossings in the network were drawn where there are no painted crosswalks but that the sidewalk presence at corners suggests people will likely cross there.Only block groups with a preliminary intensity zone of low, medium-low, and medium-high can receive a sidewalk network crossings density bonus and can only gain the next higher intensity level. The criteria for a bonus is that the block group’s crossing density value is at least higher than the next zone up’s 50th percentile of crossing densities. 
+The crossing segments of DVRPC’s Pedestrian Network dataset were used to create a crossings density value for each block group. This was chosen as both an indication of walkability, in showing the presence of pedestrian facilities, and of form, by capturing the frequency of intersections. Intersection density can indicate greater likelihood of street grid connectivity and urbanization. Some crossings in the network were drawn where there are no painted crosswalks but that the sidewalk presence at corners suggests people will likely cross there.  Only block groups with a preliminary intensity zone of low, medium-low, and medium-high can receive a sidewalk network crossings density bonus and can only gain the next higher intensity level. The criteria for a bonus is that the block group’s crossing density value is at least higher than the next zone up’s 50th percentile of crossing densities. 
 
-Only 4% of block groups in the 9-county region receive a sidewalk network crossings density bonus. The sidewalk inventory is only available for the DVRPC region and only block groups within the region are eligible for this type of bonus. Since the purpose of the DIZ is for regional analysis and the surrounding county results are for context, this discrepancy was not seen as an issue.
+Only 4% of block groups in the 9-county region receive a sidewalk network crossings density bonus. The Pedestrian Network is only available for the DVRPC region and only block groups within the region are eligible for this type of bonus. Since the purpose of the DIZ is for regional analysis and the surrounding county results are for context, this discrepancy was not seen as an issue.
 
 
 #### A Note on Density Denominators
