@@ -131,7 +131,7 @@ join output.pos_h2o as pos on
 
 -- output pos/non pos block group area in acres
 create view output.bg_pos_area_calc as
-with a as (
+with area_calcs as (
 select
 	cb.geoid,
 	(SUM(ST_Area(i.intersection)))/ 4046.86 as pos_acres,
@@ -145,22 +145,23 @@ group by
 	cb.geoid,
 	cb.aland,
 	cb.geometry),
-b as (
+area_clean as (
 select
-	a.geoid,
-	a.bg_acres,
-	case when a.pos_acres is not null then a.pos_acres
-	else 0
+	area_calcs.geoid,
+	area_calcs.bg_acres,
+	case
+		when area_calcs.pos_acres is not null then area_calcs.pos_acres
+		else 0
 	end as pos_acres,
-	a.aland_acres
+	area_calcs.aland_acres
 from 
-	a)
+	area_calcs)
 select
-	b.*,
+	area_clean.*,
 	bg_acres-pos_acres as non_pos_acres,
 	(pos_acres/bg_acres) * 100 as percent_lu_pos
 from
-	b;
+	area_clean;
 
 
 /*
@@ -231,7 +232,7 @@ from
 where
 	(c.propertytype not like 'Multi-Fam%' or c.propertytype <> 'Student')
 	and c.building_status in ('Existing', 'Under Construction', 'Under Renovation', 'Converted')
-	and c.year_built <= 220
+	and c.year_built <= 2020
 -- !!!!! REMOVE WHEN COSTAR ADDS THESE RECORDS !!!!!
 union
 select
@@ -241,7 +242,7 @@ from
 	source.not_in_costar nic
 -- !!!!!
 	),
-a as (
+commsqft_calc as (
 select
 	cbg.geoid,
 	sum(rba) / 1000 as comm_sqft
@@ -251,11 +252,11 @@ join source.census_blockgroups_2020 cbg on
 	st_intersects (c.geometry, cbg.geometry)
 group by
 	cbg.geoid)	
--- updates the commercial_sqft value for some University City block
+-- updates the commercial_sqft value for some University City block??
 select
 	*
 from
-	a
+	commsqft_calc
 where
 	geoid <> '421010369021'
 union
@@ -263,7 +264,7 @@ select
 	geoid,
 	1901812 / 1000 as comm_sqft
 from
-	a
+	commsqft_calc
 where
 	geoid = '421010369021';
 
@@ -271,7 +272,8 @@ where
 apply density index values and levels to block groups 
 */
 create view output.bg_density_index_result as 
-with a as (
+--join housing units and group quarters to block group
+with bg_hu_gq as (
 select
 	census.geoid,
 	bg_area.aland_acres,
@@ -284,26 +286,27 @@ join (
 		p5_001n + h1_001n as housing_units_d20
 	from
 		source.tot_pops_and_hhs_2020_block_group as bg) as census 
-		on census.geoid = bg_area.geoid
+on census.geoid = bg_area.geoid
 where
 	bg_area.aland_acres <>0),
-	b as (
+-- join commercial sqft to table 
+bg_hu_gq_commsqft as (
 select
-	a.*,
+	bg_hu_gq.*,
 	case
 		when co.comm_sqft is null then 0
 		else co.comm_sqft
 	end as comm_sqft
 from
-	a
+	bg_hu_gq
 left join output.commercial_sqft_calcs co on
-	co.geoid = a.geoid),
-	c as (
+	co.geoid = bg_hu_gq.geoid),
+c as (
 select
 	geoid,
 	round(cast((housing_units_d20 + comm_sqft)/ aland_acres as numeric), 3) as density_index
 from
-	b),
+	bg_hu_gq_commsqft),
 d as(
 select
 	t.*,

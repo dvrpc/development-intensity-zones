@@ -8,6 +8,7 @@ from pyproj import CRS
 import pandas as pd
 from urllib.parse import urlparse
 from sqlalchemy import create_engine
+import fiona
 
 load_dotenv()
 
@@ -74,10 +75,10 @@ def gdb_data(dbname, target_schema, source_path, target_crs):
     """
     engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{dbname}")
 
-    for filename in os.listdir(source_path):
-        if filename.endswith(".gdb"):
-            gdb = os.path.join(source_path, filename)
-            layer_names = gpd.listlayers(gdb)
+    for folder_name in os.listdir(source_path):
+        if folder_name.endswith(".gdb"):
+            gdb = os.path.join(source_path, folder_name)
+            layer_names = fiona.listlayers(gdb)
 
             for layer_name in layer_names:
                 gdf = gpd.read_file(gdb, layer=layer_name)
@@ -86,8 +87,6 @@ def gdb_data(dbname, target_schema, source_path, target_crs):
                 print(f"Loading {layer_name}...\n")
 
                 gdf.to_postgis(f"{layer_name.lower()}", engine, schema=target_schema, if_exists='replace', index=False)
-        else:
-            print("No .gdb files found in the source directory.")
 
 
 def census_tables(dbname, target_schema, api_url, census_params, geo, variables_to_keep):
