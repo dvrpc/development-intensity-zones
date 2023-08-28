@@ -6,7 +6,8 @@ import geopandas as gpd
 from pyproj import CRS
 import pandas as pd
 from urllib.parse import urlparse
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
+import re
 
 load_dotenv()
 
@@ -68,3 +69,37 @@ def create_postgis_extension(dbname):
         cur.execute("CREATE EXTENSION POSTGIS;")
     cur.close()
     cmpconn.close()
+
+
+def execute_analysis(dbname, sql):
+    """
+    Executes the analysis sql.
+    """
+    engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{dbname}")
+
+    with open(sql, 'r') as sql_file:
+        sql_contents = sql_file.read()
+
+    sql_queries = sql_contents.split(';')
+
+    block_comments = re.findall(r'/\*([\s\S]*?)\*/', sql_contents)
+
+    with engine.connect() as connection:
+        transaction = connection.begin()
+
+        try:
+            for comment in block_comments:
+                print(f"\nSQL: {comment.strip()}\n")
+            for query in sql_queries:
+                query = query.strip()
+                if not query:
+                    continue
+                try:
+                    connection.execute(text(query))
+                    transaction.commit()
+                except Exception as e:
+                    print("Error message:", str(e))
+                    transaction.rollback()
+        except:
+            raise
+    engine.dispose()

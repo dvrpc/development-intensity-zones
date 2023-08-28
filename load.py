@@ -49,13 +49,13 @@ def dvrpc_data(dbname, target_schema, url, target_crs):
 
     gdf_list = []
 
-    total_chunks = math.ceil(total_features / 20000) # 2000 default esri record limit on feature services
+    total_chunks = math.ceil(total_features / 5000) # 2000 default esri record limit on feature services
 
     print(f"Loading {table_name}...\n")
 
     for chunk in range(total_chunks):
-        offset = chunk * 20000
-        query_url = f"{url}&resultOffset={offset}&resultRecordCount=20000&token={token}" # 2000 default
+        offset = chunk * 5000
+        query_url = f"{url}&resultOffset={offset}&resultRecordCount=5000&token={token}" # 2000 default
         response = requests.get(query_url)
         data = response.json()
         chunk_gdf = gpd.GeoDataFrame.from_features(data['features'])

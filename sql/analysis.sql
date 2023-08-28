@@ -1,112 +1,125 @@
+/*
+creating initial buffers and centroids for blockgroup geometries
+*/
 create view output.blockgroup_centroid as
 select
 	geoid,
-	st_centroid(geometry) as geom
+	ST_Centroid(geometry) as geom
 from
 	source.census_blockgroups_2020;
-
 create view output.blockgroup_buffers as 
 select
 	geoid,
-	st_buffer(geom, 3218.69) as geom, -- 2 miles
+	ST_Buffer(geom, 3218.69) as geom, -- 2 miles
 	2 as buff_mi
 from
 	output.blockgroup_centroid
 union
 select
 	geoid,
-	st_buffer(geom, 8046.72) as geom, -- 5 miles
+	ST_Buffer(geom, 8046.72) as geom, -- 5 miles
 	5 as buff_mi
 from
 	output.blockgroup_centroid;
-
 create view output.block_centroid as 
 select
 	geoid20,
-	st_centroid(geometry) as geom
+	ST_Centroid(geometry) as geom
 from
 	source.census_blocks_2020;
-
-
 /*
-create the full pos and h2o layer
+creating the full pos and h2o layer
 */
 -- source pos union geoms
-create TEMP TABLE union_pos as (
+create temp table union_pos as (
 select
+	0 as zone,
 	a.clipped_geometry as geom
 from
 	(
 	select
-		ST_Intersection(st_force2D(pos.geometry), d.geometry) as clipped_geometry
+		ST_Intersection(ST_Force2D(pos.geometry), d.geometry) as clipped_geometry
 	from
 		source.ches_bay_watershed_pos pos,
 		source.countyboundaries d
 	where
-		ST_Intersects(st_force2D(pos.geometry), d.geometry)) as a
+		ST_Intersects(ST_Force2D(pos.geometry), d.geometry)) as a
 union
 select
+	0 as zone,
 	a.clipped_geometry as geom
 from
 	(
 	select
-		ST_Intersection(st_force2D(pos.geometry), d.geometry) as clipped_geometry
+		ST_Intersection(ST_Force2D(pos.geometry), d.geometry) as clipped_geometry
 	from
 		source.del_river_basin_pos pos,
 		source.countyboundaries d
 	where
-		ST_Intersects(st_force2D(pos.geometry), d.geometry)) as a
+		ST_Intersects(ST_Force2D(pos.geometry), d.geometry)) as a
 union
 select
+	0 as zone,
 	a.clipped_geometry as geom
 from
 	(
 	select
-		ST_Intersection(st_force2D(pos.geometry), d.geometry) as clipped_geometry
+		ST_Intersection(ST_Force2D(pos.geometry), d.geometry) as clipped_geometry
 	from
 		source.nj_pos pos,
 		source.countyboundaries d
 	where
-		ST_Intersects(st_force2D(pos.geometry),
+		ST_Intersects(ST_Force2D(pos.geometry),
 		d.geometry)) as a);
-	
--- removes outside source pos geom inside of dvrpc region boundary
-create TEMP table minus_pos as 
+-- removes outside source pos geom inside of dvrpc region boundary	
+create temp table minus_pos as 
 select
-	ST_Difference(pos.geom,
-	d.geometry) as geom
+	ST_Difference(pos.geom, cb.geometry) as difference_geom
 from
-	union_pos pos,
-	source.countyboundaries d
-where
-	d.dvrpc_reg = 'Yes';
-
+	(select 
+		ST_Union(union_pos.geom) as geom 
+	from union_pos 
+	group by 
+		zone) pos,
+	(select ST_Union(geometry) as geometry 
+	from source.countyboundaries d 
+	where 
+		d.dvrpc_reg = 'Yes') cb;
 -- adds the dvrpc pos file to the source union
-create TEMP table add_dvrpc_pos as
+create temp table add_dvrpc_pos as
 select
 	geometry as geom
 from
 	source.dvrpc_protectedopenspace2020 dpos
 union
 select
-	geom
+	difference_geom as geom
 from
 	minus_pos;
-
+-- adds filtered dvrpc land use file
+create temp table add_dvrpc_lu as
+select
+	geometry as geom
+from
+	source.dvrpc_landuse_2015 dlu
+union
+select
+	geom
+from
+	add_dvrpc_pos;
 -- add in the dvrpc hydro to the pos union
-create TEMP table pos_h2o as
+create temp table pos_h2o as
 select
 	0 as zone,
 	geom
 from
-	add_dvrpc_pos
+	add_dvrpc_lu
 union
 select
 	0 as zone,
 	geometry as geom
 from
 	source.regional_water_bodies;
-
 -- dissolve the geoms to zone 0
 create table output.pos_h2o as
 select
@@ -116,7 +129,9 @@ from
 	pos_h2o
 group by
 	zone;
-
+create index output.pos_h2o_idx
+  on pos_h2o
+  using GIST (geom);
 /*
 calculate intersection of pos and block group polygons to get areas of pos in block group
 */
@@ -128,7 +143,6 @@ from
 	source.census_blockgroups_2020 as cb
 join output.pos_h2o as pos on
 	ST_Intersects(cb.geometry, pos.geom);
-
 -- output pos/non pos block group area in acres
 create view output.bg_pos_area_calc as
 with area_calcs as (
@@ -162,10 +176,8 @@ select
 	(pos_acres/bg_acres) * 100 as percent_lu_pos
 from
 	area_clean;
-
-
 /*
-crosswalk density (not sure if this is even used)
+crosswalk density
 */
 create view output.crosswalk_density as
 with blockgroups as (
@@ -186,13 +198,12 @@ select
 from
 	source.pedestriannetwork_lines c
 join blockgroups bg on
-	st_intersects(c.geometry, bg.geom)
+	ST_Intersects(c.geometry, bg.geom)
 where non_pos_acres > 0
 group by
 	bg.geoid,
 	bg.aland_acres,
 	bg.non_pos_acres;
-
 /*
 average commercial stories costar data to block group
 */
@@ -212,12 +223,10 @@ select
 from
 	costar
 join source.census_blockgroups_2020 cb on
-	st_intersects(costar.geometry,
+	ST_Intersects(costar.geometry,
 	cb.geometry)
 group by
-	cb.geoid;
-	
-	
+	cb.geoid;	
 /*
 commerical square ft calcs from costar data to block group
 */
@@ -249,7 +258,7 @@ select
 from
 	costar_rba c
 join source.census_blockgroups_2020 cbg on
-	st_intersects (c.geometry, cbg.geometry)
+	ST_Intersects (c.geometry, cbg.geometry)
 group by
 	cbg.geoid)	
 -- updates the commercial_sqft value for some University City block??
@@ -267,9 +276,8 @@ from
 	commsqft_calc
 where
 	geoid = '421010369021';
-
 /*
-apply density index values and levels to block groups 
+applying density index values and levels to block groups 
 */
 create view output.bg_density_index_result as 
 --join housing units and group quarters to block group
@@ -301,13 +309,15 @@ from
 	bg_hu_gq
 left join output.commercial_sqft_calcs co on
 	co.geoid = bg_hu_gq.geoid),
-c as (
+-- calculate density index 
+calc_den_indx as (
 select
 	geoid,
 	round(cast((housing_units_d20 + comm_sqft)/ aland_acres as numeric), 3) as density_index
 from
 	bg_hu_gq_commsqft),
-d as(
+-- match density index values to values in thresholds source table
+match_values as(
 select
 	t.*,
 	lag(t.density_index_thresholds,0,0) over (order by t.density_index_thresholds) as prev_threshold,
@@ -324,56 +334,59 @@ from
 		else 'highest'
 	end as density_level
 from
-	c
-join d on
+	calc_den_indx c
+join match_values d on
 	c.density_index >= d.prev_threshold
 	and c.density_index < d.next_threshold;
-
 /*
-make a rule that 'high or greater' density are allowed buffers that reach across the river 
+'high or greater' density are allowed buffers that reach across the river 
 (if their buffer intersects with it). If it is 'moderate, low, or very low' its buffer, 
 if intersecting with the river centerline, should be erased on the opposite side. Perhaps the shape of states whose 
 IDs don't match the first two digits of the block group ID can be the "eraser shape".
 */
 create table output.river_buff_adjustment as
-with a as (
+-- block group buffers that intersect with the dissolved del river centerline
+with riv_buffs as (
 select
 	bg.geoid,
 	bg.buff_mi, 
 	bg.geom
 from
 	output.blockgroup_buffers bg,
-	(select st_union(geometry) as geom from source.state_streams group by gnis_name) drc
+	(select ST_Union(geometry) as geom from source.state_streams group by gnis_name) drc
 where
-	st_intersects(bg.geom,drc.geom)),
-b as (
+	ST_Intersects(bg.geom,drc.geom)),
+-- join density index to river blockgroup buffers
+riv_buff_density as (
 select
 	a.geoid,
 	a.buff_mi,
 	a.geom,
 	bda.density_level
 from
-	a
+	riv_buffs a
 join output.bg_density_index_result bda on
 	a.geoid = bda.geoid),
-c as (
+-- split and cut blockgroup river buffers with that have a very low, low, moderate density index
+riv_buff_split as (
 select
 	b.geoid,
 	b.buff_mi,
-	(st_dump(st_collectionextract(st_split(b.geom, drc.geom)))).geom as geom
+	(ST_Dump(ST_Collectionextract(st_split(b.geom, drc.geom)))).geom as geom
 from
-	b,
-	(select st_union(geometry) as geom from source.state_streams group by gnis_name) drc
+	riv_buff_density b,
+	(select ST_Union(geometry) as geom from source.state_streams group by gnis_name) drc
 where
 	b.density_level in ('very low', 'low', 'moderate')),
+-- need to clean up below
 d as (
 select
 	c.*
 from
-	c,
+	riv_buff_split c,
 	output.blockgroup_centroid bgc
 where
-	st_intersects(c.geom, bgc.geom)
+	ST_Intersects(c.geom, bgc.geom)
 	and 
 	bgc.geoid = c.geoid)
 select
@@ -390,7 +403,6 @@ full join d on
 	and d.buff_mi = bg.buff_mi
 order by
 	bg.geoid;
-	
 /*
 proxmity analysis on 2 and 5 mile block group buffers	
 */
@@ -446,7 +458,7 @@ select
 from
 	a
 join b on
-	st_intersects(b.geometry, a.geom)
+	ST_Intersects(b.geometry, a.geom)
 group by
 	a.geoid,
 	a.buff_mi)
@@ -459,7 +471,6 @@ from
 left join c on
 	c.geoid = a.geoid
 	and c.buff_mi = a.buff_mi;
-
 -- 5 mile buffer analysis
 create materialized view output.gq_hu_5mi as
 with a as (
@@ -501,8 +512,7 @@ select
 from
 	a
 join b on
-	st_intersects(a.geom,
-	b.geom)
+	ST_Intersects(a.geom, b.geom)
 group by
 	a.geoid,
 	a.buff_mi)
@@ -514,7 +524,6 @@ from
 left join c on
 	c.geoid = a.geoid
 	and c.buff_mi = a.buff_mi;
-
 -- calculate the proximity index
 create view output.bg_proximity_index_result as
 with a as
@@ -563,7 +572,6 @@ from
 join c on
 	b.proximity_index >= c.prev_threshold
 	and b.proximity_index < c.next_threshold;
-
 /*
 creates development intensity zones by block group	
 */
