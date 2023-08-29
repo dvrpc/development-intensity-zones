@@ -690,3 +690,120 @@ left join source.diz_zone_names dzn on
 	dzn.diz_zone = h.diz_zone
 left join source.census_blockgroups_2020 cb on
 	cb.geoid = h.geoid
+/*
+translation of block group to various geometries
+*/
+create view source.geometry_translation as
+-- initial translation table 
+select 
+	geoid20 as block_id, 
+	aland20 as block_aland, 
+	left(geoid20, -3) as blockg_id,
+	mcd.geoid as mcd_id,
+	left(geoid20, -4) as tract_id,
+	pd.geoid as phil_id,
+	taz.tazt as taz_id
+from
+	source.census_blocks_2020 cb
+left join source.census_mcds_2020 mcd on
+	ST_Intersects(mcd.geometry, ST_Centroid (cb.geometry))
+left join source.census_mcds_phipd_2020 pd on
+	ST_Intersects(pd.geometry, ST_Centroid (cb.geometry))
+left join source.taz taz on
+	ST_Intersects(taz.geometry, ST_Centroid (cb.geometry));
+-- mcd translation w/ weighted average
+create view output.diz_mcd as
+with weighted_average as (
+select
+	b.mcd_id,
+	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
+	0) as diz_zone
+from
+	source.geometry_translation b
+left join output.diz_zone t on
+	b.blockg_id = t.geoid
+where
+	t.diz_zone > 0
+	and block_aland > 0
+group by
+	b.mcd_id)
+select
+	wa.*,
+	mcd.geometry
+from
+	weighted_average wa
+join source.census_mcds_2020 mcd on
+	mcd.geoid = wa.mcd_id;
+-- tract translation w/ weighted average
+create view output.diz_tract as
+with weighted_average as (
+select
+	b.tract_id,
+	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
+	0) as diz_zone
+from
+	source.geometry_translation b
+left join output.diz_zone t on
+	b.blockg_id = t.geoid
+where
+	t.diz_zone > 0
+	and block_aland > 0
+group by
+	b.tract_id)
+select
+	wa.*,
+	ct.geometry
+from
+	weighted_average wa
+join source.census_tracts_2020 ct on
+	ct.geoid = wa.tract_id;
+-- philly cpa translation w/ weighted average
+create view output.diz_phil as 
+with weighted_average as (
+select
+	b.phil_id,
+	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
+	0) as diz_zone
+from
+	source.geometry_translation b
+left join output.diz_zone t on
+	b.blockg_id = t.geoid
+where
+	t.diz_zone > 0
+	and block_aland > 0
+group by
+	b.phil_id)
+select
+	wa.*,
+	phi.geometry
+from
+	weighted_average wa
+join source.census_mcds_phipd_2020 phi on
+	phi.geoid = wa.phil_id;
+-- taz translation w/ weighted average
+create view output.diz_taz as 
+with weighted_average as (
+select
+	b.taz_id,
+	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
+	0) as diz_zone
+from
+	source.geometry_translation b
+left join output.diz_zone t on
+	b.blockg_id = t.geoid
+where
+	t.diz_zone > 0
+	and block_aland > 0
+group by
+	b.taz_id)
+select
+	wa.*,
+	taz.geometry
+from
+	weighted_average wa
+join source.taz on
+	taz.tazt = wa.taz_id;
