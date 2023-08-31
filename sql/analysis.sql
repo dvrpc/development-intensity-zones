@@ -354,7 +354,7 @@ select
 	round(cast((housing_units_d20 + comm_sqft)/ aland_acres as numeric), 3) as density_index
 from
 	bg_hu_gq_commsqft),
--- match density index values to values in thresholds source table
+-- creates threshold ranges
 match_values as(
 select
 	t.*,
@@ -362,7 +362,8 @@ select
 	lead(t.density_index_thresholds,1,200000.0) over (order by t.density_index_thresholds) as next_threshold
 from
 	source.thresholds t)
-    select
+-- match density index values to values in thresholds ranges
+select
 	c.geoid,
 	c.density_index,
 	case
@@ -451,7 +452,7 @@ proxmity analysis on 2 and 5 mile block group buffers
 -- do analysis for 2mi buffers
 begin;
 create materialized view output.costar_bg_2mi as
-with a as 
+with buff_2mi as 
 (
 select
 	bb.*
@@ -468,7 +469,7 @@ as nowater on
 	nowater.geoid = bb.geoid
 where
 	bb.buff_mi = 2),
-b as (
+costar as (
 select
 	propertyid,
 	rba,
@@ -489,34 +490,34 @@ select
 	nic.rentable_building_area / 1000 as comm_sqft,
 	ST_GeomFromText(nic.geom, 26918) AS geometry
 from
-	source.not_in_costar nic 
+	source.not_in_costar nic --these are the records added
 -- !!!!!
 		),
-c as (
+buff2_costar as (
 select
-	a.geoid,
-	a.buff_mi,
-	count(b.geometry) as tot_costar,
-	sum(b.comm_sqft) as sum_comm_sqft
+	buff_2mi.geoid,
+	buff_2mi.buff_mi,
+	count(costar.geometry) as tot_costar,
+	sum(costar.comm_sqft) as sum_comm_sqft
 from
-	a
-join b on
-	ST_Intersects(b.geometry, a.geom)
+	buff_2mi
+join costar on
+	ST_Intersects(costar.geometry, buff_2mi.geom)
 group by
-	a.geoid,
-	a.buff_mi)
+	buff_2mi.geoid,
+	buff_2mi.buff_mi)
 select
-	a.*,
-	c.tot_costar,
-	c.sum_comm_sqft
+	buff_2mi.*,
+	buff2_costar.tot_costar,
+	buff2_costar.sum_comm_sqft
 from
-	a
-left join c on
-	c.geoid = a.geoid
-	and c.buff_mi = a.buff_mi;
+	buff_2mi
+left join buff2_costar on
+	buff2_costar.geoid = buff_2mi.geoid
+	and buff2_costar.buff_mi = buff_2mi.buff_mi;
 -- 5 mile buffer analysis
 create materialized view output.gq_hu_5mi as
-with a as (
+with buff_5mi as (
 select
 	bb.*
 from
@@ -532,7 +533,7 @@ as nowater on
 	nowater.geoid = bb.geoid
 where
 	bb.buff_mi = 5),
-b as
+census_data as
 (
 select
 	bc.geoid20,
@@ -547,29 +548,29 @@ join (
 	from
 		source.tot_pops_and_hhs_2020_block as bg) as census on
 	census.geoid20 = bc.geoid20),
-c as (
+buff5_census as (
 select
-	a.geoid,
-	a.buff_mi,
+	buff_5mi.geoid,
+	buff_5mi.buff_mi,
 	sum(housing_units_d20) as sum_gq_hu
 from
-	a
-join b on
-	ST_Intersects(a.geom, b.geom)
+	buff_5mi
+join census_data on
+	ST_Intersects(buff_5mi.geom, census_data.geom)
 group by
-	a.geoid,
-	a.buff_mi)
+	buff_5mi.geoid,
+	buff_5mi.buff_mi)
 select
-	a.*,
-	c.sum_gq_hu
+	buff_5mi.*,
+	buff5_census.sum_gq_hu
 from
-	a
-left join c on
-	c.geoid = a.geoid
-	and c.buff_mi = a.buff_mi;
+	buff_5mi
+left join buff5_census on
+	buff5_census.geoid = buff_5mi.geoid
+	and buff5_census.buff_mi = buff_5mi.buff_mi;
 -- calculate the proximity index
 create view output.bg_proximity_index_result as
-with a as
+with bg_values as
 (
 select
 	bg.geoid,
@@ -586,19 +587,21 @@ left join output.gq_hu_5mi ghm on
 	ghm.geoid = bg.geoid
 where
 	ghm.sum_gq_hu is not null),
-b as (
+calc_proximity as (
 select
-	a.*,
-	(2 * a.sum_comm_sqft * a.sum_gq_hu) / (a.sum_comm_sqft + a.sum_gq_hu) as proximity_index
+	bg_values.*,
+	(2 * sum_comm_sqft * sum_gq_hu) / (sum_comm_sqft + sum_gq_hu) as proximity_index
 from
-	a),
-c as (
+	bg_values),
+-- creates threshold ranges
+threshold_ranges as (
 select
 	t.*,
 	lag(t.proximity_index_thresholds, 0, 0) over (order by t.proximity_index_thresholds) as prev_threshold,
 	lead(t.proximity_index_thresholds, 1, 500000.0) over (order by t.proximity_index_thresholds) as next_threshold
 from
 	source.thresholds t)
+-- match proximity index values to values in thresholds ranges
 select
 	b.geoid,
 	b.sum_comm_sqft,
@@ -611,8 +614,8 @@ select
 		else 'highest'
 	end as proximity_level
 from
-	b
-join c on
+	calc_proximity b
+join threshold_ranges c on
 	b.proximity_index >= c.prev_threshold
 	and b.proximity_index < c.next_threshold;
 commit;
@@ -621,7 +624,7 @@ creating development intensity zones by block group
 */
 begin;
 create table output.diz_zone as
-with a as (
+with all_indexes as (
 select
 	bdir.geoid,
 	bdir.density_index,
@@ -632,24 +635,25 @@ from
 	output.bg_density_index_result bdir
 left join output.bg_proximity_index_result bpig on
 	bpig.geoid = bdir.geoid),
-b as (
+-- uses the classification matrix table to assign diz zone	
+add_classification as (
 select
 	a.*,
 	cls.prelim_diz_zone
 from
-	a
+	all_indexes a
 left join source.classifications cls on
 	cls.proximity_index_levels = a.proximity_level
 	and cls.density_index_levels = a.density_level),
-c as (
+diz_w_0_zone as (
 select
-	b.geoid,
-	b.density_index,
-	b.density_level,
-	b.proximity_index,
-	b.proximity_level,
+	c.geoid,
+	c.density_index,
+	c.density_level,
+	c.proximity_index,
+	c.proximity_level,
 	case
-		when b.geoid in (
+		when c.geoid in (
 		select
 			geoid
 		from
@@ -659,15 +663,17 @@ select
 		else prelim_diz_zone
 	end as prelim_diz_zone
 from
-	b),
-d as (
+	add_classification c),
+-- join the crosswalk density
+diz_w_cw as (
 select
-	c.*,
+	d.*,
 	cd.cw_dev_density
 from
-	c
+	diz_w_0_zone d
 left join output.crosswalk_density cd on
-	cd.geoid = c.geoid),
+	cd.geoid = d.geoid),
+-- create 50th percentile for crosswalk density by diz zone
 crosswalk_summary as (
 select
 	prelim_diz_zone,
@@ -675,33 +681,36 @@ select
 order by
 	cw_dev_density asc) as percentile_50
 from
-	d
+	diz_w_cw d
 group by
 	prelim_diz_zone),
-e as (
+-- adds +1 to the preliminary diz zone
+diz_adjusted as (
 select
 	d.*,
 	case
-		when prelim_diz_zone < 6
-			and prelim_diz_zone > 0 then prelim_diz_zone + 1
+		when prelim_diz_zone < 6 and prelim_diz_zone > 0 then prelim_diz_zone + 1
+		when prelim_diz_zone = 0 then prelim_diz_zone
 			else 7
 		end as prelim_diz_zone_plus_1
 	from
-		d),
-f as (
+		diz_w_cw d),
+-- joins the average stories of costar by bg and cw percentile to the diz+1
+diz_adjusted2 as (
 select
-	e.*,
+	da.*,
 	cs.avg_stories,
 	cws.percentile_50
 from
-	e
+	diz_adjusted da
 left join output.costar_stories cs on
-	cs.geoid = e.geoid
+	cs.geoid = da.geoid
 left join crosswalk_summary cws on
-	cws.prelim_diz_zone = e.prelim_diz_zone_plus_1),
-g as (
+	cws.prelim_diz_zone = da.prelim_diz_zone_plus_1),
+-- more adjustments to zone numbering to sw density and costar average stories
+diz_adjusted3 as (
 select 
-	f.*, 
+	da2.*, 
 	case
 		when cw_dev_density > percentile_50
 			and prelim_diz_zone not in (1, 5) then 1
@@ -715,30 +724,31 @@ select
 				else 0
 			end as stories_bonus
 		from
-			f),
-h as (
+			diz_adjusted2 da2),
+-- 
+diz_calcs as (
 select
-	g.*,
+	da3.*,
 	case
 		when prelim_diz_zone <> 0 then prelim_diz_zone + crosswalk_bonus + stories_bonus
 		else 0
 	end as diz_zone
 from
-	g)
+	diz_adjusted3 da3)
 select
-	h.*,
+	dc.*,
 	dzn.diz_zone_name,
 	cb.geometry
 from
-	h
+	diz_calcs dc
 left join source.diz_zone_names dzn on
-	dzn.diz_zone = h.diz_zone
+	dzn.diz_zone = dc.diz_zone
 left join source.census_blockgroups_2020 cb on
-	cb.geoid = h.geoid;
+	cb.geoid = dc.geoid;
 create index diz_zone_idx on output.diz_zone using GIST (geometry);
 -- merge diz blockgroups with undevelopable land as protected zone 0
 create table output.diz_all as 
-with a as (
+with diz_undev_diff as (
 select
 	ST_Difference(diz.geom, undev.geom) as geom,
 	diz.diz_zone
@@ -756,11 +766,12 @@ from
 		ST_Union(undev.geom) as geom
 	from
 		output.bg_undev_intersection undev) undev),
-b as (
+-- union back difference to cut dizz
+add_diff as (
 select
 	*
 from
-	a
+	diz_undev_diff
 union
 select
 	undev.geom,
@@ -768,15 +779,15 @@ select
 from
 	output.bg_undev_intersection undev)
 select
-	st_union(b.geom) as geom,
-	b.diz_zone,
+	st_union(ad.geom) as geom,
+	ad.diz_zone,
 	dzn.diz_zone_name 
 from
-	b
+	add_diff ad
 join source.diz_zone_names dzn on
-	dzn.diz_zone = b.diz_zone
+	dzn.diz_zone = ad.diz_zone
 group by
-	b.diz_zone,
+	ad.diz_zone,
 	dzn.diz_zone_name;
 create index diz_all_idx on output.diz_all using GIST (geom);
 commit;
