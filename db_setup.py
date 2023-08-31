@@ -73,33 +73,35 @@ def create_postgis_extension(dbname):
 
 def execute_analysis(dbname, sql):
     """
-    Executes the analysis sql.
+    Executes the analysis sql.  Messy but working....
     """
     engine = create_engine(f"postgresql://{user}:{password}@{host}:{port}/{dbname}")
 
     with open(sql, 'r') as sql_file:
         sql_contents = sql_file.read()
 
-    sql_queries = sql_contents.split(';')
-
-    block_comments = re.findall(r'/\*([\s\S]*?)\*/', sql_contents)
+    transaction_blocks = re.split(r'commit;\s*\n', sql_contents)
 
     with engine.connect() as connection:
-        transaction = connection.begin()
-
         try:
-            for comment in block_comments:
-                print(f"\nSQL: {comment.strip()}\n")
-            for query in sql_queries:
-                query = query.strip()
-                if not query:
+            for transaction_block in transaction_blocks:
+                transaction_block = transaction_block.strip()
+                if not transaction_block:
                     continue
                 try:
-                    connection.execute(text(query))
-                    transaction.commit()
+                    comment_match = re.search(r'/\*([\s\S]*?)\*/', transaction_block)
+                    if comment_match:
+                        comment = comment_match.group(1).strip()
+                        print(f"\nSQL: {comment}\n")
+                    connection.execute(text(transaction_block))
                 except Exception as e:
                     print("Error message:", str(e))
-                    transaction.rollback()
+                    break
+                try:
+                    connection.execute(text('commit;'))
+                except Exception as e:
+                    print("Error during commit:", str(e))
+                    break
         except:
             raise
-    engine.dispose()
+        

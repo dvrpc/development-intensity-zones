@@ -1,6 +1,7 @@
 /*
 creating initial buffers and centroids for blockgroup geometries
 */
+begin;
 create view output.blockgroup_centroid as
 select
 	geoid,
@@ -27,10 +28,12 @@ select
 	ST_Centroid(geometry) as geom
 from
 	source.census_blocks_2020;
+commit;
 /*
-creating the full pos and h2o layer
+creating the full undevelopable land layer (pos, h2o, landuse)
 */
--- source pos union geoms
+-- union outside source pos geoms
+begin;
 create temp table union_pos as (
 select
 	0 as zone,
@@ -71,7 +74,7 @@ from
 	where
 		ST_Intersects(ST_Force2D(pos.geometry),
 		d.geometry)) as a);
--- removes outside source pos geom inside of dvrpc region boundary	
+-- removes outside source pos inside of dvrpc region boundary	
 create temp table minus_pos as 
 select
 	ST_Difference(pos.geom, cb.geometry) as difference_geom
@@ -85,7 +88,7 @@ from
 	from source.countyboundaries d 
 	where 
 		d.dvrpc_reg = 'Yes') cb;
--- adds the dvrpc pos file to the source union
+-- adds the dvrpc pos file to the source pos union
 create temp table add_dvrpc_pos as
 select
 	geometry as geom
@@ -97,6 +100,10 @@ select
 from
 	minus_pos;
 -- adds filtered dvrpc land use file
+-- Transportation: Highway Right-of-Way (04010), Transportation: Roadway (04011), 
+-- Transportation: Rail Right-of-Way (04020), Utility: Right-of-Way (05000), 
+-- Utility: Other Facility (05030), Institutional: Cemetery (07050), 
+-- Recreation: General (09000), and Undeveloped: Drainage Basin (14020), Water (13000)
 create temp table add_dvrpc_lu as
 select
 	geometry as geom
@@ -108,7 +115,7 @@ select
 from
 	add_dvrpc_pos;
 -- add in the dvrpc hydro to the pos union
-create temp table pos_h2o as
+create temp table add_h2o as
 select
 	0 as zone,
 	geom
@@ -121,39 +128,62 @@ select
 from
 	source.regional_water_bodies;
 -- dissolve the geoms to zone 0
-create table output.pos_h2o as
+create table output.undevelopable as
 select
 	zone,
 	st_union(geom) as geom
 from
-	pos_h2o
+	add_h2o
 group by
 	zone;
-create index output.pos_h2o_idx
-  on pos_h2o
-  using GIST (geom);
+create index undevelopable_idx on output.undevelopable using GIST (geom);
+-- MAYBE DISREGARD pos and h2o only (no landuse stuff)
+create temp table add_h2o_2 as
+select
+	0 as zone,
+	geom
+from
+	add_dvrpc_pos
+union
+select
+	0 as zone,
+	geometry as geom
+from
+	source.regional_water_bodies;
+-- MAYBE DISREGARD dissolve the geoms to zone 0
+create table output.pos_h2o_only as
+select
+	zone,
+	st_union(geom) as geom
+from
+	add_h2o_2
+group by
+	zone;
+create index pos_h2o_only_idx on output.pos_h2o_only using GIST (geom);
+commit;
 /*
-calculate intersection of pos and block group polygons to get areas of pos in block group
+calculate intersection of undevelopable land and block group polygons to get areas of undevelopable land in block group
 */
-create materialized view output.bg_pos_intersection_geom as
+begin;
+create materialized view output.bg_undev_intersection as
 select
 	cb.geoid,
-	ST_Intersection(cb.geometry, pos.geom) as intersection
+	ST_Intersection(cb.geometry, undev.geom) as geom
 from
 	source.census_blockgroups_2020 as cb
-join output.pos_h2o as pos on
-	ST_Intersects(cb.geometry, pos.geom);
--- output pos/non pos block group area in acres
-create view output.bg_pos_area_calc as
+join output.undevelopable as undev on
+	ST_Intersects(cb.geometry, undev.geom);
+-- output undevelopable/developable block group area in acres
+create view output.bg_undev_area_calc as
 with area_calcs as (
 select
 	cb.geoid,
-	(SUM(ST_Area(i.intersection)))/ 4046.86 as pos_acres,
+	(SUM(ST_Area(i.geom)))/ 4046.86 as undev_acres,
 	ST_Area(cb.geometry)/4046.86 as bg_acres,
 	cb.aland/4046.86 as aland_acres
 from
 	source.census_blockgroups_2020 as cb
-left join output.bg_pos_intersection_geom i on
+left join output.bg_undev_intersection i on
 	cb.geoid = i.geoid
 group by
 	cb.geoid,
@@ -164,21 +194,23 @@ select
 	area_calcs.geoid,
 	area_calcs.bg_acres,
 	case
-		when area_calcs.pos_acres is not null then area_calcs.pos_acres
+		when area_calcs.undev_acres is not null then area_calcs.undev_acres
 		else 0
-	end as pos_acres,
+	end as undev_acres,
 	area_calcs.aland_acres
 from 
 	area_calcs)
 select
 	area_clean.*,
-	bg_acres-pos_acres as non_pos_acres,
-	(pos_acres/bg_acres) * 100 as percent_lu_pos
+	bg_acres-undev_acres as dev_acres,
+	(undev_acres/bg_acres) * 100 as percent_undev
 from
 	area_clean;
+commit;
 /*
 crosswalk density
 */
+begin;
 create view output.crosswalk_density as
 with blockgroups as (
 select
@@ -186,7 +218,7 @@ select
 	cbg.geometry as geom
 from
 	source.census_blockgroups_2020 cbg
-join output.bg_pos_area_calc a on
+join output.bg_undev_area_calc a on
 	a.geoid = cbg.geoid
 where
 	dvrpc_reg = 'y')
@@ -194,19 +226,21 @@ select
 	bg.geoid,
 	count(c.geometry) as crosswalk_count,
 	count(c.geometry)/aland_acres as cw_total_density,
-	count(c.geometry)/non_pos_acres as cw_nonpos_density
+	count(c.geometry)/dev_acres as cw_dev_density
 from
 	source.pedestriannetwork_lines c
 join blockgroups bg on
 	ST_Intersects(c.geometry, bg.geom)
-where non_pos_acres > 0
+where dev_acres > 0
 group by
 	bg.geoid,
 	bg.aland_acres,
-	bg.non_pos_acres;
+	bg.dev_acres;
+commit;
 /*
 average commercial stories costar data to block group
 */
+begin;
 create view output.costar_stories as 
 with costar as (
 select
@@ -226,10 +260,12 @@ join source.census_blockgroups_2020 cb on
 	ST_Intersects(costar.geometry,
 	cb.geometry)
 group by
-	cb.geoid;	
+	cb.geoid;
+commit;
 /*
 commerical square ft calcs from costar data to block group
 */
+begin;
 create view output.commercial_sqft_calcs as
 with costar_rba as
 (
@@ -276,9 +312,11 @@ from
 	commsqft_calc
 where
 	geoid = '421010369021';
+commit;
 /*
 applying density index values and levels to block groups 
 */
+begin;
 create view output.bg_density_index_result as 
 --join housing units and group quarters to block group
 with bg_hu_gq as (
@@ -287,7 +325,7 @@ select
 	bg_area.aland_acres,
 	census.housing_units_d20
 from
-	output.bg_pos_area_calc bg_area
+	output.bg_undev_area_calc bg_area
 join (
 	select
 		concat(bg.state, bg.county, bg.tract, bg.block_group) as geoid,
@@ -296,7 +334,7 @@ join (
 		source.tot_pops_and_hhs_2020_block_group as bg) as census 
 on census.geoid = bg_area.geoid
 where
-	bg_area.aland_acres <>0),
+	bg_area.aland_acres <> 0),
 -- join commercial sqft to table 
 bg_hu_gq_commsqft as (
 select
@@ -338,12 +376,14 @@ from
 join match_values d on
 	c.density_index >= d.prev_threshold
 	and c.density_index < d.next_threshold;
+commit;
 /*
 'high or greater' density are allowed buffers that reach across the river 
 (if their buffer intersects with it). If it is 'moderate, low, or very low' its buffer, 
 if intersecting with the river centerline, should be erased on the opposite side. Perhaps the shape of states whose 
 IDs don't match the first two digits of the block group ID can be the "eraser shape".
 */
+begin;
 create table output.river_buff_adjustment as
 -- block group buffers that intersect with the dissolved del river centerline
 with riv_buffs as (
@@ -367,7 +407,7 @@ from
 	riv_buffs a
 join output.bg_density_index_result bda on
 	a.geoid = bda.geoid),
--- split and cut blockgroup river buffers with that have a very low, low, moderate density index
+-- split and cut blockgroup river buffers that have a very low, low, moderate density index
 riv_buff_split as (
 select
 	b.geoid,
@@ -378,8 +418,8 @@ from
 	(select ST_Union(geometry) as geom from source.state_streams group by gnis_name) drc
 where
 	b.density_level in ('very low', 'low', 'moderate')),
--- need to clean up below
-d as (
+-- only keep piece of cut buffer where the block group resides
+cut_buffs as (
 select
 	c.*
 from
@@ -389,24 +429,27 @@ where
 	ST_Intersects(c.geom, bgc.geom)
 	and 
 	bgc.geoid = c.geoid)
+-- output all the normal buffers and cut ones
 select
 	bg.geoid,
 	bg.buff_mi,
 	case 
-		when d.geom is null then bg.geom
-		else d.geom
+		when cut_buffs.geom is null then bg.geom
+		else cut_buffs.geom
 	end as geom
 from
 	output.blockgroup_buffers bg
-full join d on
-	d.geoid = bg.geoid
-	and d.buff_mi = bg.buff_mi
+full join cut_buffs on
+	cut_buffs.geoid = bg.geoid
+	and cut_buffs.buff_mi = bg.buff_mi
 order by
 	bg.geoid;
+commit;
 /*
 proxmity analysis on 2 and 5 mile block group buffers	
 */
 -- do analysis for 2mi buffers
+begin;
 create materialized view output.costar_bg_2mi as
 with a as 
 (
@@ -572,9 +615,11 @@ from
 join c on
 	b.proximity_index >= c.prev_threshold
 	and b.proximity_index < c.next_threshold;
+commit;
 /*
-creates development intensity zones by block group	
+creating development intensity zones by block group	
 */
+begin;
 create table output.diz_zone as
 with a as (
 select
@@ -608,9 +653,9 @@ select
 		select
 			geoid
 		from
-			output.bg_pos_area_calc bg
+			output.bg_undev_area_calc undev
 		where
-			bg.percent_lu_pos >= 95) then 0
+			undev.percent_undev >= 95) then 0
 		else prelim_diz_zone
 	end as prelim_diz_zone
 from
@@ -618,7 +663,7 @@ from
 d as (
 select
 	c.*,
-	cd.cw_nonpos_density
+	cd.cw_dev_density
 from
 	c
 left join output.crosswalk_density cd on
@@ -628,7 +673,7 @@ select
 	prelim_diz_zone,
 	percentile_cont(0.50) within group (
 order by
-	cw_nonpos_density asc) as percentile_50
+	cw_dev_density asc) as percentile_50
 from
 	d
 group by
@@ -658,7 +703,7 @@ g as (
 select 
 	f.*, 
 	case
-		when cw_nonpos_density > percentile_50
+		when cw_dev_density > percentile_50
 			and prelim_diz_zone not in (1, 5) then 1
 			else 0
 		end as crosswalk_bonus,
@@ -689,11 +734,57 @@ from
 left join source.diz_zone_names dzn on
 	dzn.diz_zone = h.diz_zone
 left join source.census_blockgroups_2020 cb on
-	cb.geoid = h.geoid
+	cb.geoid = h.geoid;
+create index diz_zone_idx on output.diz_zone using GIST (geometry);
+-- merge diz blockgroups with undevelopable land as protected zone 0
+create table output.diz_all as 
+with a as (
+select
+	ST_Difference(diz.geom, undev.geom) as geom,
+	diz.diz_zone
+from
+	(
+	select
+		ST_Union(diz_zone.geometry) as geom,
+		diz_zone
+	from
+		output.diz_zone
+	group by
+		diz_zone) diz,
+	(
+	select
+		ST_Union(undev.geom) as geom
+	from
+		output.bg_undev_intersection undev) undev),
+b as (
+select
+	*
+from
+	a
+union
+select
+	undev.geom,
+	0 as diz_zone
+from
+	output.bg_undev_intersection undev)
+select
+	st_union(b.geom) as geom,
+	b.diz_zone,
+	dzn.diz_zone_name 
+from
+	b
+join source.diz_zone_names dzn on
+	dzn.diz_zone = b.diz_zone
+group by
+	b.diz_zone,
+	dzn.diz_zone_name;
+create index diz_all_idx on output.diz_all using GIST (geom);
+commit;
 /*
-translation of block group to various geometries
+translating block group diz to various geometries
 */
-create view source.geometry_translation as
+begin;
+create view output.geometry_translation as
 -- initial translation table 
 select 
 	geoid20 as block_id, 
@@ -712,15 +803,14 @@ left join source.census_mcds_phipd_2020 pd on
 left join source.taz taz on
 	ST_Intersects(taz.geometry, ST_Centroid (cb.geometry));
 -- mcd translation w/ weighted average
-create view output.diz_mcd as
+create table output.diz_mcd as
 with weighted_average as (
 select
 	b.mcd_id,
 	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
-	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
-	0) as diz_zone
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland), 0) as diz_zone
 from
-	source.geometry_translation b
+	output.geometry_translation b
 left join output.diz_zone t on
 	b.blockg_id = t.geoid
 where
@@ -735,16 +825,16 @@ from
 	weighted_average wa
 join source.census_mcds_2020 mcd on
 	mcd.geoid = wa.mcd_id;
+create index diz_mcd_idx on output.diz_mcd using GIST (geometry);
 -- tract translation w/ weighted average
-create view output.diz_tract as
+create table output.diz_tract as
 with weighted_average as (
 select
 	b.tract_id,
 	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
-	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
-	0) as diz_zone
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland), 0) as diz_zone
 from
-	source.geometry_translation b
+	output.geometry_translation b
 left join output.diz_zone t on
 	b.blockg_id = t.geoid
 where
@@ -759,16 +849,16 @@ from
 	weighted_average wa
 join source.census_tracts_2020 ct on
 	ct.geoid = wa.tract_id;
+create index diz_tract_idx on output.diz_tract using GIST (geometry);
 -- philly cpa translation w/ weighted average
-create view output.diz_phil as 
+create table output.diz_phil as 
 with weighted_average as (
 select
 	b.phil_id,
 	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
-	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
-	0) as diz_zone
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland), 0) as diz_zone
 from
-	source.geometry_translation b
+	output.geometry_translation b
 left join output.diz_zone t on
 	b.blockg_id = t.geoid
 where
@@ -783,16 +873,16 @@ from
 	weighted_average wa
 join source.census_mcds_phipd_2020 phi on
 	phi.geoid = wa.phil_id;
+create index diz_phil_idx on output.diz_phil using GIST (geometry);
 -- taz translation w/ weighted average
-create view output.diz_taz as 
+create table output.diz_taz as 
 with weighted_average as (
 select
 	b.taz_id,
 	sum(t.diz_zone * b.block_aland) / sum(b.block_aland) as diz_weighted_average,
-	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland),
-	0) as diz_zone
+	round(sum(t.diz_zone * b.block_aland) / sum(b.block_aland), 0) as diz_zone
 from
-	source.geometry_translation b
+	output.geometry_translation b
 left join output.diz_zone t on
 	b.blockg_id = t.geoid
 where
@@ -807,3 +897,5 @@ from
 	weighted_average wa
 join source.taz on
 	taz.tazt = wa.taz_id;
+create index diz_taz_idx on output.diz_taz using GIST (geometry);
+commit;
