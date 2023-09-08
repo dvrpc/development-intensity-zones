@@ -74,6 +74,7 @@ from
 	where
 		ST_Intersects(ST_Force2D(pos.geometry),
 		d.geometry)) as a);
+create index union_pos_idx on union_pos using GIST (geom);
 -- removes outside source pos inside of dvrpc region boundary	
 create temp table minus_pos as 
 select
@@ -88,6 +89,7 @@ from
 	from source.countyboundaries d 
 	where 
 		d.dvrpc_reg = 'Yes') cb;
+create index minus_pos_idx on minus_pos using GIST (difference_geom);
 -- adds the dvrpc pos file to the source pos union
 create temp table add_dvrpc_pos as
 select
@@ -99,6 +101,7 @@ select
 	difference_geom as geom
 from
 	minus_pos;
+create index add_dvrpc_pos_idx on add_dvrpc_pos using GIST (geom);
 -- adds filtered dvrpc land use file
 -- Transportation: Highway Right-of-Way (04010), Transportation: Roadway (04011), 
 -- Transportation: Rail Right-of-Way (04020), Utility: Right-of-Way (05000), 
@@ -114,6 +117,7 @@ select
 	geom
 from
 	add_dvrpc_pos;
+create index add_dvrpc_lu_idx on add_dvrpc_lu using GIST (geom);
 -- add in the dvrpc hydro to the pos union
 create temp table add_h2o as
 select
@@ -127,6 +131,7 @@ select
 	geometry as geom
 from
 	source.regional_water_bodies;
+create index add_h2o_idx on add_h2o using GIST (geom);
 -- dissolve the geoms to zone 0
 create table output.undevelopable as
 select
@@ -145,11 +150,20 @@ select
 from
 	add_dvrpc_pos
 union
+select 
+	0 as zone,
+	geometry as geom
+from
+	source.dvrpc_landuse_2015
+where 
+	lu15sub = '13000'
+union
 select
 	0 as zone,
 	geometry as geom
 from
 	source.regional_water_bodies;
+create index add_h2o_2_idx on add_h2o_2 using GIST (geom);
 -- MAYBE DISREGARD dissolve the geoms to zone 0
 create table output.pos_h2o_only as
 select
@@ -173,6 +187,7 @@ from
 	source.census_blockgroups_2020 as cb
 join output.undevelopable as undev on
 	ST_Intersects(cb.geometry, undev.geom);
+create index bg_undev_intersection_idx on output.bg_undev_intersection using GIST (geom);
 -- output undevelopable/developable block group area in acres
 create view output.bg_undev_area_calc as
 with area_calcs as (
