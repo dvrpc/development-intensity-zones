@@ -21,7 +21,7 @@ For more information, see [Methodology](Methodology.md).
 - Python 3.x
 - .env ([see sample](.env_sample)) with PostgreSQL/ArcGIS Portal credentials and Census key
 - [DVRPC data sources](/source/dvrpc_data_sources.json)
-- [various other layers and tables as detailed in the Methodology](methodology.md#data-sources)
+- [various other layers and tables as detailed in the Methodology](Methodology.md#data-sources)
 
 ### Run
 1. Clone the repo

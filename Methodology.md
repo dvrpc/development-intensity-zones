@@ -17,7 +17,7 @@ The following data sources are used to create the DIZ (vintages subject to chang
 ##### Protected Zones
 
 * [DVRPC 2020 Protected Open Space Inventory](https://catalog.dvrpc.org/dataset/protected-open-space)
-* [DVRPC 2015 Land Use](hhttps://catalog.dvrpc.org/dataset/land-use-2015) - Transportation: Highway Right-of-Way, Transportation: Roadway, Transportation: Rail Right-of-Way, Utility: Right-of-Way, Utility: Other Facility, Institutional: Cemetery, Recreation: General, and Undeveloped: Drainage Basin, Water
+* [DVRPC 2015 Land Use](https://catalog.dvrpc.org/dataset/land-use-2015) - Transportation: Highway Right-of-Way, Transportation: Roadway, Transportation: Rail Right-of-Way, Utility: Right-of-Way, Utility: Other Facility, Institutional: Cemetery, Recreation: General, and Undeveloped: Drainage Basin, Water
 * [New Jersey Open Space](https://gisdata-njdep.opendata.arcgis.com/datasets/njdep::state-local-and-nonprofit-open-space-of-new-jersey/explore?location=40.132535%2C-74.754550%2C8.99) - beyond DVRPC region (found in /source/POS.gdb)
 * [Chesapeake Bay Watershed Open Space](https://gis.chesapeakebay.net/ags/rest/services/ChesapeakeProgress/cpProtectedLands_2018/MapServer) - beyond DVRPC region (found in /source/POS.gdb)
 * [Delaware River Basin Open Space](https://www.ccgov.org/government/land-use-development-services/gis/available-gis-data) - beyond DVRPC region (found in /source/POS.gdb)
