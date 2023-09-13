@@ -1,0 +1,7 @@
+"level_code","levels","density_index_thresholds","proximity_index_thresholds"
+1,lowest,0.0,0.0
+6,highest,25.0,200000.0
+4,medium-high,1.65,9000.0
+2,low,0.1,500.0
+3,medium-low,0.47,2100.0
+5,high,5.0,22000.0
