@@ -191,36 +191,29 @@ create index bg_undev_intersection_idx on output.bg_undev_intersection using GIS
 -- output undevelopable/developable block group area in acres
 create view output.bg_undev_area_calc as
 with area_calcs as (
+    select
+        cb.geoid,
+        (SUM(ST_Area(i.geom)))/ 4046.86 as undev_acres,
+        ST_Area(cb.geometry)/4046.86 as bg_acres,
+        cb.aland/4046.86 as aland_acres
+    from
+        source.census_blockgroups_2020 as cb
+    left join output.bg_undev_intersection i on
+        cb.geoid = i.geoid
+    group by
+        cb.geoid,
+        cb.aland,
+        cb.geometry
+)
 select
-	cb.geoid,
-	(SUM(ST_Area(i.geom)))/ 4046.86 as undev_acres,
-	ST_Area(cb.geometry)/4046.86 as bg_acres,
-	cb.aland/4046.86 as aland_acres
+    area_calcs.geoid,
+    area_calcs.bg_acres,
+    COALESCE(area_calcs.undev_acres, 0) as undev_acres,
+    area_calcs.aland_acres,
+    (area_calcs.bg_acres - COALESCE(area_calcs.undev_acres, 0)) as dev_acres,
+    (COALESCE(area_calcs.undev_acres, 0) / area_calcs.bg_acres) * 100 as percent_undev
 from
-	source.census_blockgroups_2020 as cb
-left join output.bg_undev_intersection i on
-	cb.geoid = i.geoid
-group by
-	cb.geoid,
-	cb.aland,
-	cb.geometry),
-area_clean as (
-select
-	area_calcs.geoid,
-	area_calcs.bg_acres,
-	case
-		when area_calcs.undev_acres is not null then area_calcs.undev_acres
-		else 0
-	end as undev_acres,
-	area_calcs.aland_acres
-from 
-	area_calcs)
-select
-	area_clean.*,
-	bg_acres-undev_acres as dev_acres,
-	(undev_acres/bg_acres) * 100 as percent_undev
-from
-	area_clean;
+    area_calcs;
 commit;
 /*
 crosswalk density
