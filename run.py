@@ -3,6 +3,9 @@ import load
 import json
 import os
 from dotenv import load_dotenv
+import time
+
+start_time = time.time()
 
 load_dotenv()
 
@@ -43,3 +46,7 @@ for geo in census_geo:
 load.csv_tables(dbname, source_schema, source_path)
 
 db_setup.execute_analysis(dbname, sql)
+
+end_time = time.time()
+duration = end_time - start_time
+print("Script duration: {:.2f} seconds".format(duration))
