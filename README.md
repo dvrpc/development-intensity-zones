@@ -5,6 +5,8 @@ The Development Intensity Zones (DIZ) geography as a block group-based assessmen
 
 ![Alt text](images/image.png)
 
+Protected zones are within block group-based geographies but are removed from density and proximity index calculations.  DIZ also uses the presence of structures (i.e. housing units, commercial and industrial square footage) to calculate these indices.
+
 The DIZ covers the 9-county DVRPC region, along with surrounding counties for greater context beyond the region.
 
 
@@ -12,16 +14,15 @@ The DIZ covers the 9-county DVRPC region, along with surrounding counties for gr
 
 The DIZ can be used for a variety of purposes. It provides simple classifications of the region’s areas by which data can be summed and analyzed. It can be used for policy applications, such as incentivising where future growth or investment goes based on smart growth principles. It’s important to note that the DIZ classifications are based on the current presence of development, largely using housing units for residential intensity and commercial square feet for non-residential intensity. This captures used space and space with potential for use (vacant space) and the presence of infrastructure to build buildings, but if one’s analysis is more suited for the presence of people, other metrics such as population, households, and employment may be more appropriate. If future growth in development is desirable for one’s analysis, the DIZ does not capture that.
 
-For more information, see [Methodology](Methodology.md).
+For more information, see [Methodology](methodology.md).
 
 ## To build the DIZ
 
 ### Requirements
 - PostgreSQL w/ PostGIS
 - Python 3.x
-- .env ([see sample](.env_sample)) with PostgreSQL/ArcGIS Portal credentials and Census key
 - [DVRPC data sources](/source/dvrpc_data_sources.json)
-- [various other layers and tables as detailed in the Methodology](Methodology.md#data-sources)
+- [various other layers and tables as detailed in the Methodology](methodology.md#data-sources)
 
 ### Run
 1. Clone the repo
@@ -44,6 +45,11 @@ For more information, see [Methodology](Methodology.md).
     ```
     pip install -r requirements.txt
     ```
+    - copy .env_sample and rename to .env
+    ```
+    copy .env_sample .env
+    ```
+    - edit .env environmental variables in VSCode and provide PostgreSQL/ArcGIS Portal credentials and a US Census API key
 3. Start the process
     ```
     python run.py
